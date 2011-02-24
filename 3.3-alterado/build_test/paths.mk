@@ -1,0 +1,20 @@
+# OLAM root directory.
+
+OLAM_ROOT=$(HOME)/olam
+
+# Versions.
+
+OLAM_VERSION=3.3-alterado
+
+# Source directories.
+
+OMODEL=$(OLAM_ROOT)/$(OLAM_VERSION)/omodel
+LEAF=$(OLAM_ROOT)/$(OLAM_VERSION)/leaf
+SEA=$(OLAM_ROOT)/$(OLAM_VERSION)/sea
+ED=$(OLAM_ROOT)/$(OLAM_VERSION)/ed
+MODEL_MODS=$(OLAM_ROOT)/$(OLAM_VERSION)/modules
+OISAN=$(OLAM_ROOT)/$(OLAM_VERSION)/oisan
+OUTILS=$(OLAM_ROOT)/$(OLAM_VERSION)/outils
+RADIATE=$(OLAM_ROOT)/$(OLAM_VERSION)/radiate
+CONVECT=$(OLAM_ROOT)/$(OLAM_VERSION)/convect
+OSPECIAL=$(OLAM_ROOT)/$(OLAM_VERSION)/special

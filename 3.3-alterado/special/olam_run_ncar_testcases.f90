@@ -1,0 +1,683 @@
+!===============================================================================
+! OLAM version 3.3
+
+! Copyright (C) 2002-2008; All Rights Reserved; 
+! Duke University, Durham, North Carolina, USA 
+
+! Portions of this software are copied or derived from the RAMS software
+! package.  The following copyright notice pertains to RAMS and its derivatives,
+! including OLAM:  
+
+   !----------------------------------------------------------------------------
+   ! Copyright (C) 1991-2006  ; All Rights Reserved ; Colorado State University; 
+   ! Colorado State University Research Foundation ; ATMET, LLC 
+
+   ! This software is free software; you can redistribute it and/or modify it 
+   ! under the terms of the GNU General Public License as published by the Free
+   ! Software Foundation; either version 2 of the License, or (at your option)
+   ! any later version. 
+
+   ! This software is distributed in the hope that it will be useful, but
+   ! WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   ! or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+   ! for more details.
+ 
+   ! You should have received a copy of the GNU General Public License along
+   ! with this program; if not, write to the Free Software Foundation, Inc.,
+   ! 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA 
+   ! (http://www.gnu.org/licenses/gpl.html) 
+   !----------------------------------------------------------------------------
+
+! It is requested that any scientific publications based on application of OLAM
+! include the following acknowledgment:  "OLAM was developed at the 
+! Edmund T. Pratt Jr. School of Engineering, Duke University."
+
+! For additional information, including published references, please contact
+! the software authors, Robert L. Walko (robert.walko@duke.edu)
+! or Roni Avissar (avissar@duke.edu).
+!===============================================================================
+subroutine olam_run(name_name)
+
+use misc_coms,   only: io6, time8, iflag, runtype, hfilin, time_istp8,  &
+                       expnme, mdomain, ngrids, initial, iswrtyp,  &
+                       ilwrtyp, nxp, nzp, timmax8, alloc_misc, iparallel,  &
+                       iyear1, imonth1, idate1, itime1, s1900_init, s1900_sim
+
+use leaf_coms,   only: nzg, nzs, isfcl, nwl, mwl
+use sea_coms,    only: nws, mws
+
+use mem_ijtabs,  only: istp, mrls
+use oplot_coms,  only: op
+use mem_grid,    only: nma, nua, nwa, mma, mua, mwa, mza, nwa, zm, zt,  &
+                       alloc_grid1, alloc_grid2
+use mem_basic,   only: alloc_basic, wc
+use micro_coms,  only: gnu
+use ed_options,  only: ied_offline
+use mem_nudge,   only: nudflag
+use mem_rayf,    only: rayf_init
+use mem_sflux,   only: init_fluxcells, alloc_jflux, mseaflux, mlandflux
+!hs use mem_hs,   only: alloc_hs
+
+implicit none
+
+character(len=*), intent(in) :: name_name
+
+integer :: i,ifm,nndtflg,ifileok,ierr,iplt_file
+real :: w1,w2,t1,t2,wtime_start
+real, external :: walltime
+
+wtime_start = walltime(0.)
+w1 = walltime(wtime_start)
+call cpu_time(t1)
+
+write(io6,*) 'FILES:',name_name(1:len_trim(name_name))
+
+istp = 1
+time8 = 0.
+iflag = 0
+
+! Read and copy namelist variables
+
+write(io6,'(/,a)') 'olam_run calling namelist read '
+
+call read_nl(name_name)
+
+write(io6,'(/,a)') 'olam_run calling namelist copy'
+
+call copy_nl('ALL_CASES')
+
+if (trim(runtype) == 'HISTORY') then
+   write(io6,'(/,a)') 'olam_run reading common values from history file'
+   call history_start('COMMIO')
+elseif (trim(runtype) == 'PLOTONLY') then
+   write(io6,'(/,a)') 'olam_run reading common values from plot file'
+   hfilin = trim(op%plt_files(1))
+   call history_start('COMMIO')
+else
+   call copy_nl('NOT_HISTORY')
+endif
+
+time_istp8 = time8
+
+! Get abs seconds of simulation start and current simulation time
+
+call date_abs_secs2(iyear1,imonth1,idate1,itime1*100,s1900_init)
+s1900_sim = s1900_init + time8
+
+! Print initial banner
+
+write(io6,'(a1)')         ' '
+write(io6,'(a1,78a1)')    ' ',('*',i=1,78)
+write(io6,'(2a1,a42)')    ' ','*','    OLAM version 3.3'
+write(io6,'(2a1)')        ' ','*'
+write(io6,'(2a1,a3,a64)') ' ','*','   ',EXPNME
+write(io6,'(a1,78a1)')    ' ',('*',i=1,78)
+
+! Safety check of namelist options
+
+write(io6,'(/,a)') 'olam_run checking namelist values'
+call oname_check()
+
+! Initialize various oplot parameters
+
+call oplot_init()
+
+! Generate or read from files the full-domain ATMOS, LAND, SEA, and FLUX grids
+
+call gridinit()
+
+! If RUNTYPE = 'MAKESFC' or 'MAKEGRID', run is finished; EXIT
+
+if (trim(runtype) == 'MAKESFC' .or. trim(runtype) == 'MAKEGRID') then
+   write(io6,*) trim(runtype)//' run complete'
+   go to 1000
+endif
+
+if (iparallel == 1) then
+
+! If run is parallel, assign each grid cell (ATM and, if ISFCL = 1, LAND and SEA)
+! to one of multiple subdomains
+
+   write(io6,'(/,a)') 'olam_run calling para_decomp'
+
+   call para_decomp()
+
+   write(io6,'(/,a,2i7)') 'olam_run after para_decomp',nwl,nws
+
+! Set up itab data types and grid coordinate arrays for current node, and 
+! reallocate memory for current node
+
+   call para_init() 
+
+   write(io6,'(/,a)') 'olam_run after para_init'
+   write(io6,'(a,i8)')   ' mma = ',mma
+   write(io6,'(a,i8)')   ' mua = ',mua
+   write(io6,'(a,i8)')   ' mwa = ',mwa
+
+   if (isfcl == 1) then
+      write(io6,'(a,i8)')   ' mwl = ',mwl
+      write(io6,'(a,i8)')   ' mws = ',mws
+      write(io6,'(a,i8)')   ' mlandflux = ',mlandflux
+      write(io6,'(a,i8)')   ' mseaflux  = ',mseaflux
+   endif
+endif
+
+! Initialize dtlm, dtsm, ndtrat, and nacoust, 
+! and compute the timestep schedule for all grid operations.
+! Allocate some JTABS
+
+write(io6,'(/,a)') 'olam_run calling modsched'
+
+call modsched()       ! calls alloc_jtabs1()
+
+write(io6,'(/,a)') 'olam_run calling fill_jtabs'
+
+call fill_jtabs(mma,mua,mwa)     ! Calls alloc_jtabs2(); fills more JTABS
+
+! Allocate jseaflux and jlandflux plus mrl and jend members
+
+if (isfcl == 1) then
+   write(io6,'(/,a)') 'olam_run calling alloc_jflux'
+
+   call alloc_jflux()
+endif
+
+! Allocate column initial state arrays
+
+call alloc_misc(mza)
+
+write(io6,'(/,a)') 'olam_run calling jnmbinit'
+
+call jnmbinit()
+
+!------------------------------------------------------------------
+! If we got here, we are doing an actual simulation or PLOTONLY run
+!------------------------------------------------------------------
+
+! Allocate remainder of main model memory (for 'INITIAL', 'HISTORY', or
+! 'PLOTONLY' run).  Allocate variable tables and fill variable tables for
+! history files and parallel communication.
+
+write(io6,'(/,a)') 'olam_run calling olam_mem_alloc'
+
+call olam_mem_alloc()
+
+! If this is a parallel run, allocate memory for mpi
+
+if (iparallel == 1) then
+   write(io6,'(/,a)') 'olam_run calling olam_alloc_mpi'
+
+   call olam_alloc_mpi(mza,mrls)
+
+   if (isfcl == 1) then
+      write(io6,'(/,a)') 'olam_run calling olam_alloc_mpi_land'
+
+      call olam_alloc_mpi_land(nzg,nzs)
+
+      write(io6,'(/,a)') 'olam_run calling olam_alloc_mpi_sea'
+
+      call olam_alloc_mpi_sea()
+
+      write(io6,'(/,a)') 'olam_run after olam_alloc_mpi_sea'
+
+   endif
+endif
+
+! Initialize primary atmospheric fields
+
+if (initial == 1) then
+   write(io6,'(/,a)') 'olam_run calling inithh'
+   call inithh()            ! Horizontally-homogeneous initialization
+elseif (initial == 2) then
+   write(io6,'(/,a)') 'olam_run calling isan driver(0)'
+   call isan_driver(0) 
+! (If in future, initialization is not automatically done for history restart,
+!  isan_driver(0) will still need to be called when nudging is to be done in 
+!  order to set current value of IFGFILE.)
+elseif (initial == 3) then
+   write(io6,'(/,a)') 'olam_run calling fldslhi'
+   call fldslhi()           ! Longitudinally-homogeneous initialization
+endif
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! special
+!call hurricane_frances_init()
+!call bubble_test()
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Initialize 3d microphysics fields (if level = 3) and other microphysics
+! quantities
+
+write(io6,'(/,a)') 'olam_run calling micinit'
+
+call micinit()
+
+! Initialize turbulent mixing coefficients
+
+call turb_k()
+
+! For parallel run, send and receive initialized scalars
+
+if (iparallel == 1) then
+   call mpi_send_w('S',wc)  ! Send scalars; wc used as dummy array here
+   call mpi_recv_w('S',wc)  ! Recv scalars; wc used as dummy array here
+endif
+
+if (iswrtyp == 3 .or. ilwrtyp == 3) then
+   write(io6,'(/,a)') 'olam_run calling harr_radinit'
+   call harr_radinit()
+endif
+
+!if (iswrtyp == 4 .or. ilwrtyp == 4) then
+!   write(io6,'(/,a)') 'olam_run calling fuliou_radinit'
+!   call fuliou_radinit()
+!endif
+
+! Check if LEAF3 will be used
+
+if (isfcl == 1) then
+
+! Start up LEAF3
+
+   write(io6,'(/,a)') 'olam_run calling leaf3_startup'
+   call leaf3_startup()
+
+! Start up SEA
+
+   write(io6,'(/,a)') 'olam_run calling sea_startup'
+   call sea_startup()
+
+! Initialize meteorological drivers for an offline ED run.
+
+   if(ied_offline == 1)then
+      call init_offline_met()
+      call read_offline_met_init()
+   endif
+
+! Initialize leaf fields that depend on atmosphere
+
+   write(io6,'(/,a)') 'olam_run calling leaf3_init_atm'
+   call leaf3_init_atm()
+
+   write(io6,'(/,a)') 'olam_run calling sea_init_atm'
+   call sea_init_atm()
+
+endif
+
+! If using variable initialization and polygon nudging, read most recent
+! and next observational analyses, and fill nudging polygons for both
+
+if (initial == 2 .and. nudflag == 1) then
+   write(io6,'(/,a)') 'olam_run calling isan_driver(1)'
+   call isan_driver(1)
+endif
+
+! Initialize Rayleigh friction profile
+
+write(io6,'(/,a)') 'olam_run calling rayf_init'
+call rayf_init(mza,zm,zt)
+
+!!x    call tkeinit(nza,nwa)
+
+! If this is 'PLOTONLY' run, loop through input history files, plot specified
+! fields, and exit
+
+!!!!!!!!!!!!!! SPECIAL FOR HS EXPERIMENT !!!!!!!!!!!!!!!!!!!!
+!hs call alloc_hs()
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+if (trim(runtype) == 'PLOTONLY') then
+
+   write(io6,'(/,a)') 'beginning PLOTONLY loop'
+
+   do iplt_file = 1,op%nplt_files
+
+! insert loop here over parallel history files if relevant
+
+      hfilin = trim(op%plt_files(iplt_file))
+      call history_start('HISTREAD')
+
+! end loop over parallel history files
+
+      call diagn_global()
+      call plot_fields()
+
+! Output on lat-lon grid with selected array dimensions (nlon,nlat)   
+
+      if (nxp ==  16) call history_write_ll(  90, 46)
+      if (nxp ==  32) call history_write_ll( 180, 91)
+      if (nxp ==  64) call history_write_ll( 360,181)
+      if (nxp == 128) call history_write_ll( 720,361)
+      if (nxp == 256) call history_write_ll(1440,721)
+   enddo
+
+   write(io6,'(/,a)') 'PLOTONLY run complete'
+   go to 1000
+endif
+
+! REPLACE INITIAL FIELDS WITH HISTORY READ
+
+if (trim(runtype) == 'HISTORY') then
+   write(io6,*) 'olam_run calling history_start'
+   call history_start('HISTREAD')
+endif
+
+write(io6,'(/,a)') 'olam_run calling plot_fields'
+
+call plot_fields()
+
+if (trim(runtype) /= 'HISTORY') then
+   write(io6,'(/,a)') 'olam_run calling history_write'
+   call history_write('STATE')
+
+! Output on lat-lon grid with selected array dimensions (nlon,nlat)   
+
+   if (iparallel == 0) then   
+      if (nxp ==  16) call history_write_ll(  90, 46)
+      if (nxp ==  32) call history_write_ll( 180, 91)
+      if (nxp ==  64) call history_write_ll( 360,181)
+      if (nxp == 128) call history_write_ll( 720,361)
+      if (nxp == 256) call history_write_ll(1440,721)
+   endif
+endif
+
+write(io6,'(/,a)') 'olam_run finished history_write'
+
+w2 = walltime(wtime_start)
+call cpu_time(t2)
+write(io6,'(a,2f12.3)') '++++++++++ CPU - wall time: olam initialization: ',t2-t1,w2-w1
+
+write(io6,'(/,a)') 'olam_run completed initialization'
+
+! Exit if doing a zero time run
+if (time8 >= timmax8) go to 1000
+
+! Call the model time integration driver
+
+if(ied_offline == 0)then
+   write(io6,'(/,a)') 'olam_run calling model'
+   call model()
+   write(io6,'(/,a)') 'subroutine model returned to olam_run'
+else
+   write(io6,'(/,a)') 'olam_run calling ed_offline_model'
+   call ed_offline_model()
+   write(io6,'(/,a)') 'subroutine ed_offline_model returned to olam_run'
+endif
+
+! OLAM finished, clean up some last things...
+
+1000 continue
+
+write(io6,'(/,a)') 'olam_run calling o_clsgks'
+
+call o_clsgks()
+
+write(io6,'(/,a)') 'olam_run returning to olammain'
+
+return
+end subroutine olam_run
+
+!=====================================================================
+
+subroutine model()
+
+use misc_coms, only: io6, time8, timmax8, dtlm, time_istp8, simtime,  &
+                     current_time, s1900_init, s1900_sim
+use ed_options, only: frq_phenology
+
+implicit none
+
+!   +------------------------------------------------------------------
+!   ! This routine drives the entire time integration process
+!   !   for a non-parallel run.
+!   +------------------------------------------------------------------
+!
+
+integer :: mstp
+real :: wtime_start,t1,wtime1,wtime2,t2,wtime_tot
+real, external :: walltime
+character(len=40) :: stepc1,stepc2,stepc3,stepc4,stepc5
+type(simtime) :: begtime
+
+ write(io6,*) 'starting subroutine MODEL'
+
+wtime_start = walltime(0.)
+
+! Start the timesteps
+
+mstp = 0
+
+do while (time8 < timmax8)
+
+   begtime = current_time
+
+! CPU timing information
+
+   call cpu_time(t1)
+   wtime1 = walltime(wtime_start)
+
+! Start the timestep schedule to loop through all grids and advance them
+! in time an increment equal to dtlm(1).
+
+   call timestep()
+
+   mstp = mstp + 1
+   time8 = time8 + dtlm(1)
+   time_istp8 = time8
+   s1900_sim = s1900_init + time8
+
+   call update_model_time(current_time, dtlm(1))
+
+   wtime2 = walltime(wtime_start)
+   call cpu_time(t2)
+
+   write (stepc1,'(i8)'   ) mstp
+   write (stepc2,'(f13.1)') time8
+   write (stepc3,'(f9.2)' ) time8/86400.
+   write (stepc4,'(f8.2)' ) t2-t1
+   write (stepc5,'(f8.2)' ) wtime2-wtime1
+
+   stepc1 = ' [nstep = '//trim(adjustl(stepc1))//']'
+   stepc2 = '   [simtime = '//trim(adjustl(stepc2))//' sec'
+   stepc3 = ' = '//trim(adjustl(stepc3))//' days]'
+   stepc4 = '   [cpu,wall(sec) = '//trim(adjustl(stepc4))
+   stepc5 = ' , '//trim(adjustl(stepc5))//']'
+   
+   write(io6,'(a)')  &
+      trim(stepc1)//trim(stepc2)//trim(stepc3)//trim(stepc4)//trim(stepc5)
+
+   call olam_output
+   
+enddo
+
+wtime_tot = walltime(wtime_start)
+write(io6, '(//,a,f10.0)') ' -----Total elapsed time: ',wtime_tot
+
+return
+end subroutine model
+
+!===========================================================================
+
+subroutine ed_offline_model()
+
+  use misc_coms,   only: io6, time8, timmax8, dtlm, simtime, current_time,  &
+                         frqstate, s1900_init, s1900_sim
+  use ed_options,  only: frq_phenology
+  use consts_coms, only: r8
+
+  implicit none
+
+  real :: wtime_start
+  real, external :: walltime
+  integer :: mstp
+  type(simtime) :: begtime
+  real :: t1
+  real :: wtime1
+  real :: wtime2
+  real :: t2
+  character(len=40) :: stepc1
+  character(len=40) :: stepc2
+  character(len=40) :: stepc3
+  character(len=40) :: stepc4
+  character(len=40) :: stepc5
+  real :: wtime_tot
+
+  write(io6,*) 'starting subroutine ED_OFFLINE_MODEL'
+
+  wtime_start = walltime(0.)
+
+! Start the timesteps
+  mstp = 0
+  if(time8 == 0.0)call write_ed_output()
+
+  do while (time8 < timmax8)
+
+     begtime = current_time
+
+     if(current_time%time < dtlm(1))  &
+     
+       write(io6,*)'Simulating:',  &
+          current_time%month,'/',current_time%date,'/',current_time%year
+
+! CPU timing information
+
+     call cpu_time(t1)
+     wtime1 = walltime(wtime_start)
+
+     ! Get radiative fluxes
+     call radiate_offline()
+
+     ! Get sensible and latent heat fluxes, and ustar.
+     call sfluxes_offline()
+
+     ! Update the land surface
+     call leaf3()
+
+     mstp = mstp + 1
+     time8 = time8 + dtlm(1)
+     s1900_sim = s1900_init + time8
+
+     call update_model_time(current_time, dtlm(1))
+
+     if ( mod(time8,real(frq_phenology,r8)) < dtlm(1) ) then
+        call ed_vegetation_dynamics()
+     endif
+
+     if(current_time%date == 1 .and. current_time%time < dtlm(1))then
+        ! Read new met driver files only if this is the first timestep 
+        ! on the first day of a month.
+        call read_offline_met()
+     endif
+
+     ! Update the meterological drivers.
+     call update_offline_met()
+
+!     wtime2 = walltime(wtime_start)
+!     call cpu_time(t2)
+
+!     write (stepc1,'(i8)'   ) mstp
+!     write (stepc2,'(F13.1)') time8
+!     write (stepc3,'(F9.2)' ) time8/86400.
+!     write (stepc4,'(F8.2)' ) t2-t1
+!     write (stepc5,'(F8.2)' ) wtime2-wtime1
+
+!     stepc1 = ' [nstep = '//trim(adjustl(stepc1))//']'
+!     stepc2 = '   [simtime = '
+!     stepc3 = ' = '//trim(adjustl(stepc3))//' days]'
+!     stepc4 = '   [cpu,wall(sec) = '//trim(adjustl(stepc4))
+!     stepc5 = ' , '//trim(adjustl(stepc5))//']'
+   
+!     write(io6, ('(a)'))  &
+!          trim(stepc1)//trim(stepc2)//trim(stepc3)//trim(stepc4)//trim(stepc5)
+
+     if (mod(current_time%time,frqstate) < dtlm(1))then
+        call write_ed_output()
+     endif
+
+  enddo
+
+  wtime_tot = walltime(wtime_start)
+  write(io6, '(//,a,f10.0)') ' -----Total elapsed time: ',wtime_tot
+
+
+  return
+end subroutine ed_offline_model
+
+!===========================================================================
+
+subroutine olam_output()
+
+use misc_coms,  only: io6, time8, dtlm, iflag, frqstate, timmax8, initial,  &
+                      s1900_sim, nxp, iparallel
+
+use consts_coms, only:  r4, r8
+use leaf_coms,  only: isfcl, iupdndvi, indvifile, s1900_ndvi
+use sea_coms,   only: iupdsst, iupdseaice, isstfile, iseaicefile,  &
+                      s1900_sst, s1900_seaice
+use oplot_coms,  only: op
+use mem_nudge,   only: nudflag
+use isan_coms,   only: ifgfile, s1900_fg
+
+implicit none
+
+integer  :: ierr,ifm,ifileok
+real(r8) :: frqplt8
+
+frqplt8 = op%frqplt
+
+if (mod(time8,frqplt8) < dtlm(1) .or. iflag == 1) then
+   call plot_fields()
+!!!!!!!!!!!!!! SPECIAL FOR HS EXPERIMENT !!!!!!!!!!!!!!!!!!!!
+!hs   call interp_hs()
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+endif
+
+if (mod(time8,dble(frqstate)) < dtlm(1)  .or.  &
+   time8  >=  timmax8 - .01*dtlm(1) .or. iflag == 1) then
+   call history_write('INST')
+   
+! Output on lat-lon grid with selected array dimensions (nlon,nlat)   
+
+   if (iparallel == 0) then   
+      if (nxp ==  16) call history_write_ll(  90, 46)
+      if (nxp ==  32) call history_write_ll( 180, 91)
+      if (nxp ==  64) call history_write_ll( 360,181)
+      if (nxp == 128) call history_write_ll( 720,361)
+      if (nxp == 256) call history_write_ll(1440,721)
+   endif
+endif
+
+if (isfcl == 1 .and. iupdsst == 1) then
+   if (s1900_sim >= s1900_sst(isstfile) .and. time8+.001 < timmax8) then
+      call sst_database_read(1)
+   endif
+endif
+
+if (isfcl == 1 .and. iupdseaice == 1) then
+   if (s1900_sim >= s1900_seaice(iseaicefile) .and. time8+.001 < timmax8) then
+      call seaice_database_read(1)
+   endif
+endif
+
+if (isfcl == 1 .and. iupdndvi == 1) then
+   if (s1900_sim >= s1900_ndvi(indvifile) .and. time8+.001 < timmax8) then
+      call ndvi_database_read(1)
+   endif
+endif
+
+if (initial == 2 .and. nudflag == 1) then
+   if (s1900_sim >= s1900_fg(ifgfile) .and. time8+.001 < timmax8) then
+
+      write(io6,*) ' '
+      write(io6,*) 'olam_output ',time8,s1900_sim,s1900_fg(ifgfile),timmax8
+
+      call isan_driver(1)
+
+   endif
+endif
+
+if (iflag == 1) stop 'IFLAG'
+
+return
+end subroutine olam_output
+
