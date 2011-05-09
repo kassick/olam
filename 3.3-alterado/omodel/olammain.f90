@@ -59,11 +59,16 @@ integer(kind=4) :: start_time, end_time
 real :: omp_time1, omp_time2
 real, external :: omp_get_wtime
 
+integer rastro_id
+
 wtime_start_linha = walltime(0.)
 
 ! Determine if this run is parallel, and determine myrank and mgroupsize
 
 call olam_mpi_init()
+
+rastro_id=10
+call rst_init_f(myrank,rastro_id)
 
 iparallel = 0
 if (mgroupsize > 1) iparallel = 1
@@ -80,7 +85,7 @@ if (mgroupsize > 1) iparallel = 1
    io6 = 20
    
    write (io6file,'(i10)') myrank
-   io6file = '/mnt/pvfs2/o.io6_r'//trim(adjustl(io6file))
+   io6file = '/tmp/o.io6_r'//trim(adjustl(io6file))
 
 ! First, remove file in case it exists
 
@@ -151,5 +156,6 @@ inicio = walltime(wtime_start_linha)
     endif
 endif
 
+call rst_finalize_f()
 stop 'olam_end'
 end program main
