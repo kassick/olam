@@ -16,6 +16,8 @@ OBJ = $(ARC)($(MODEL_MODS)/max_dims.o) \
       $(ARC)($(MODEL_MODS)/mem_para.o) \
       $(ARC)($(MODEL_MODS)/plotcolors.o) \
       $(ARC)($(OUTILS)/hdf5_utils.o) \
+      $(ARC)($(OUTILS)/rastro.o) \
+      $(ARC)($(OUTILS)/rastro_f.o) \
       $(ARC)($(MODEL_MODS)/micro_coms.o) \
       $(ARC)($(MODEL_MODS)/oplot_coms.o) \
       $(ARC)($(OISAN)/isan_coms.o) \

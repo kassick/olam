@@ -376,6 +376,10 @@ $(ARC)($(OMODEL)/para_init.o): \
                      $(ARC)($(MODEL_MODS)/mem_grid.o)  \
                      $(ARC)($(MODEL_MODS)/misc_coms.o)
 
+$(ARC)($(OUTILS)/hdf5_utils.o): \
+		    $(ARC)($(OUTILS)/rastro.o) \
+		    $(ARC)($(OUTILS)/rastro_f.o)
+
 $(ARC)($(OMODEL)/ocio.o): \
                      $(ARC)($(MODEL_MODS)/misc_coms.o)  \
                      $(ARC)($(MODEL_MODS)/mem_grid.o)  \

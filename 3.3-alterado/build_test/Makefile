@@ -8,9 +8,14 @@ include ./include.mk
 
 # Compiler commands.
 
-INCLUDES   = -I$(OUTILS) $(PAR_INCS) $(HDF5_INCS) $(NETCDF_INCS)
+CC	 = icc
+CFLAGS   = $(C_OPTS) $(INCLUDES) -D$(CMACH)
+
+
+
+INCLUDES   = -I$(OUTILS) $(PAR_INCS) $(HDF5_INCS) $(NETCDF_INCS) $(RASTRO_INCS)
 F_COMMAND  = $(F_COMP) -c $(F_OPTS) $(INCLUDES)
-C_COMMAND  = $(C_COMP) -c $(C_OPTS) $(INCLUDES) -D$(CMACH)
+C_COMMAND  = $(C_COMP) -c $(CFLAGS)
 
 ifndef F_DEFINE_FLAG
 F_DEFINE_FLAG=-D
@@ -59,9 +64,14 @@ include objects.mk
 	$(ARCHIVE) $@ $(<F:.c=.o)
 	rm -f $(<F:.c=.o)
 
+
 # Define targets.
 
 all: $(EXE)
+
+#$(OUTILS)/rastro.c: $(OUTILS)/rastro.rsti
+#	$(RASTRO_GEN) -f $(OUTILS)/rastro_f.c -c $@ -h $(OUTILS)/rastro.h     $<
+
 
 MAIN_OBJ = $(notdir $(MAIN:.f90=.o))
 MPIF_OBJ = $(notdir $(MPIF:.F90=.o))
@@ -69,7 +79,7 @@ MPIF_OBJ = $(notdir $(MPIF:.F90=.o))
 $(EXE): $(ARC) $(MPIF) $(MAIN) FORCE
 	@echo ""
 	$(LOADER) -o $(EXE) $(MAIN_OBJ) $(MPIF_OBJ) $(LOADER_OPTS) $(ARC) \
-	    $(LIBNCARG) $(PAR_LIBS) $(LIBS) $(HDF5_LIBS) $(NETCDF_LIBS) $(OMP)
+	    $(LIBNCARG) $(PAR_LIBS) $(LIBS) $(HDF5_LIBS) $(NETCDF_LIBS) $(RASTRO_LIBS) $(OMP)
 	rm -f *.o
 	@echo ""
 	@echo Finished building === $(EXE)
