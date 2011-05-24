@@ -59,16 +59,13 @@ integer(kind=4) :: start_time, end_time
 real :: omp_time1, omp_time2
 real, external :: omp_get_wtime
 
-integer rastro_id
-
 wtime_start_linha = walltime(0.)
 
 ! Determine if this run is parallel, and determine myrank and mgroupsize
 
 call olam_mpi_init()
 
-rastro_id=10
-call rst_init_f(myrank,rastro_id)
+call rst_init_f(myrank,10)
 
 iparallel = 0
 if (mgroupsize > 1) iparallel = 1

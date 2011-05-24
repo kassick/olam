@@ -38,11 +38,18 @@
 !===============================================================================
 Module hdf5_utils
 
+integer :: OLAM_EVT_HDF5_OPEN_START   = Z'beef'
+integer :: OLAM_EVT_HDF5_OPEN_END     = Z'bef0'
+integer :: OLAM_EVT_HDF5_CREATE_START = Z'bef1'
+integer :: OLAM_EVT_HDF5_CREATE_END   = Z'bef2'
+
 Contains
 
 subroutine shdf5_open(locfn,access,idelete)
 
 use misc_coms, only: io6
+use mem_para,  only: myrank, mgroupsize
+use omp_lib
 
 implicit none
 
@@ -60,6 +67,14 @@ logical :: exists ! File existence
 real, external :: walltime
 real :: wtime_start_shdf5open, inicio
 
+integer :: thread_id
+
+
+thread_id = omp_get_thread_num()
+call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_START, myrank, thread_id, locfn,access)
+
+
+
 wtime_start_shdf5open = walltime(0.)
 
 caccess = access
@@ -67,6 +82,7 @@ caccess = access
 ! Check for existence of RAMS file.
 
 inicio = walltime(wtime_start_shdf5open)
+
 
 inquire(file=trim(locfn),exist=exists)
 
@@ -78,6 +94,7 @@ if (access(1:1) == 'R') then
       print*,'shdf5_open:'
       print*,'   Attempt to open a file for reading that does not exist.'
       print*,'   Filename: ',trim(locfn)
+      call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
       stop 'shdf5_open: no file'
    else
       if (caccess == 'R ') iaccess = 1
@@ -85,31 +102,42 @@ if (access(1:1) == 'R') then
 
     inicio = walltime(wtime_start_shdf5open)
 
-      call fh5f_open(trim(locfn)//char(0), iaccess, hdferr)
+    call fh5f_open(trim(locfn)//char(0), iaccess, hdferr)
 
       
     write(io6, *) '                             ==T== Tempo total gasto na fh5f_open(): ',(walltime(wtime_start_shdf5open)-inicio)
-      
+
+ 
       if (hdferr < 0) then
          print*,'shdf5_open:'
          print*,'   Error opening hdf5 file - error -',hdferr
          print*,'   Filename: ',trim(locfn)
+         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
          stop 'shdf5_open: open error'      
       endif
    endif
+
+   call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
+
 elseif (access(1:1) == 'W') then
    if (.not.exists) then
+      call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
+      
       iaccess=2
     
       inicio = walltime(wtime_start_shdf5open)
       
-    call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
+      call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_START, myrank, thread_id, locfn,access)
+      call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
     
-    write(io6, *) '                             ==T== Tempo gasto na fh5f_create(): ',(walltime(wtime_start_shdf5open)-inicio)
+      write(io6, *) '                             ==T== Tempo gasto na fh5f_create(): ',(walltime(wtime_start_shdf5open)-inicio)
+
+      call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_END, myrank, thread_id, locfn,access)
 
     else
       if(.not.present(idelete) ) then
          print*,'shdf5_open: idelete not specified when access=W'
+         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
          stop 'shdf5_open: no idelete'
       endif
       
@@ -118,17 +146,23 @@ elseif (access(1:1) == 'W') then
          print*,'   Attempt to open an existing file for writing, '
          print*,'      but overwrite is disabled. idelete=',idelete
          print*,'   Filename: ',trim(locfn)
+         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
          stop 'shdf5_open'
       else
+         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
+         
+         call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_START, myrank, thread_id, locfn,access)
          call system('rm -f '//trim(locfn)//char(0))
          iaccess=1
       
          inicio = walltime(wtime_start_shdf5open)
          
-    call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
+         call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
     
-    write(io6, *) '                             ==T== Tempo gasto na fh5f_create(): ',(walltime(wtime_start_shdf5open)-inicio)
-    
+         write(io6, *) '                             ==T== Tempo gasto na fh5f_create(): ',(walltime(wtime_start_shdf5open)-inicio)
+
+         call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_END, myrank, thread_id, locfn,access)
+
     endif
    endif
    if(hdferr < 0) then
