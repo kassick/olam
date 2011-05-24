@@ -63,7 +63,7 @@ C_OPTS=-O3 -DUNDERSCORE -DLITTLE
 #NCARG_DIR=/usr/local/ncarg/lib
 #LIBNCARG=-L$(NCARG_DIR) -lncarg -lncarg_gks -lncarg_c \
 #          -L/usr/X11/lib64 -lX11 -ldl -lpthread
-NCARG_DIR=/home/kassick/Work/ncarg/lib/
+NCARG_DIR=/home/rkassick/Work/ncarg/lib/
 LIBNCARG=-L$(NCARG_DIR) -lncarg -lncarg_gks -lncarg_c \
           -L/usr/X11/lib64 -lX11 -ldl -lpthread
 
@@ -90,9 +90,9 @@ ARCHIVE=ar rs
 
 OMP=-openmp
 
-RASTRO_LIBS=-L/home/kassick/Work/librastro/lib -lRastro
-RASTRO_INCS=-I/home/kassick/Work/librastro/include
-RASTRO_GEN=/home/kassick/Work/librastro/bin/rastro_generate
+RASTRO_LIBS=-L/home/rkassick/Work/rastro/lib -lRastro
+RASTRO_INCS=-I/home/rkassick/Work/rastro/include
+RASTRO_GEN=/home/rkassick/Work/rastro/bin/rastro_generate
 
 
 #----------------- IBM xlf/xlc ---------------------------------
