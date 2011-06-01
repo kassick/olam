@@ -39,10 +39,10 @@ RM = /usr/bin/cmake -E remove -f
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/kassick/Work/olamfs-trace-converter
+CMAKE_SOURCE_DIR = /home/kassick/Work/olam/olamfs-trace-converter
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/kassick/Work/olamfs-trace-converter
+CMAKE_BINARY_DIR = /home/kassick/Work/olam/olamfs-trace-converter
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -110,14 +110,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/kassick/Work/olamfs-trace-converter && $(CMAKE_COMMAND) -E cmake_progress_start /home/kassick/Work/olamfs-trace-converter/CMakeFiles /home/kassick/Work/olamfs-trace-converter/src/CMakeFiles/progress.marks
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kassick/Work/olamfs-trace-converter/CMakeFiles 0
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(CMAKE_COMMAND) -E cmake_progress_start /home/kassick/Work/olam/olamfs-trace-converter/CMakeFiles /home/kassick/Work/olam/olamfs-trace-converter/src/CMakeFiles/progress.marks
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/kassick/Work/olam/olamfs-trace-converter/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -126,22 +126,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/kassick/Work/olamfs-trace-converter && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/CMakeFiles/olam_trace2paje.dir/rule:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/olam_trace2paje.dir/rule
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/olam_trace2paje.dir/rule
 .PHONY : src/CMakeFiles/olam_trace2paje.dir/rule
 
 # Convenience name for target.
@@ -150,7 +150,7 @@ olam_trace2paje: src/CMakeFiles/olam_trace2paje.dir/rule
 
 # fast build rule for target.
 olam_trace2paje/fast:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/build
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/build
 .PHONY : olam_trace2paje/fast
 
 aky_keys.o: aky_keys.c.o
@@ -158,7 +158,7 @@ aky_keys.o: aky_keys.c.o
 
 # target to build an object file
 aky_keys.c.o:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_keys.c.o
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_keys.c.o
 .PHONY : aky_keys.c.o
 
 aky_keys.i: aky_keys.c.i
@@ -166,7 +166,7 @@ aky_keys.i: aky_keys.c.i
 
 # target to preprocess a source file
 aky_keys.c.i:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_keys.c.i
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_keys.c.i
 .PHONY : aky_keys.c.i
 
 aky_keys.s: aky_keys.c.s
@@ -174,7 +174,7 @@ aky_keys.s: aky_keys.c.s
 
 # target to generate assembly for a file
 aky_keys.c.s:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_keys.c.s
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_keys.c.s
 .PHONY : aky_keys.c.s
 
 aky_names.o: aky_names.c.o
@@ -182,7 +182,7 @@ aky_names.o: aky_names.c.o
 
 # target to build an object file
 aky_names.c.o:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_names.c.o
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_names.c.o
 .PHONY : aky_names.c.o
 
 aky_names.i: aky_names.c.i
@@ -190,7 +190,7 @@ aky_names.i: aky_names.c.i
 
 # target to preprocess a source file
 aky_names.c.i:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_names.c.i
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_names.c.i
 .PHONY : aky_names.c.i
 
 aky_names.s: aky_names.c.s
@@ -198,7 +198,7 @@ aky_names.s: aky_names.c.s
 
 # target to generate assembly for a file
 aky_names.c.s:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_names.c.s
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_names.c.s
 .PHONY : aky_names.c.s
 
 aky_paje.o: aky_paje.c.o
@@ -206,7 +206,7 @@ aky_paje.o: aky_paje.c.o
 
 # target to build an object file
 aky_paje.c.o:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_paje.c.o
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_paje.c.o
 .PHONY : aky_paje.c.o
 
 aky_paje.i: aky_paje.c.i
@@ -214,7 +214,7 @@ aky_paje.i: aky_paje.c.i
 
 # target to preprocess a source file
 aky_paje.c.i:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_paje.c.i
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_paje.c.i
 .PHONY : aky_paje.c.i
 
 aky_paje.s: aky_paje.c.s
@@ -222,7 +222,7 @@ aky_paje.s: aky_paje.c.s
 
 # target to generate assembly for a file
 aky_paje.c.s:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_paje.c.s
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/aky_paje.c.s
 .PHONY : aky_paje.c.s
 
 olam_trace2paje.o: olam_trace2paje.c.o
@@ -230,7 +230,7 @@ olam_trace2paje.o: olam_trace2paje.c.o
 
 # target to build an object file
 olam_trace2paje.c.o:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/olam_trace2paje.c.o
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/olam_trace2paje.c.o
 .PHONY : olam_trace2paje.c.o
 
 olam_trace2paje.i: olam_trace2paje.c.i
@@ -238,7 +238,7 @@ olam_trace2paje.i: olam_trace2paje.c.i
 
 # target to preprocess a source file
 olam_trace2paje.c.i:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/olam_trace2paje.c.i
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/olam_trace2paje.c.i
 .PHONY : olam_trace2paje.c.i
 
 olam_trace2paje.s: olam_trace2paje.c.s
@@ -246,7 +246,7 @@ olam_trace2paje.s: olam_trace2paje.c.s
 
 # target to generate assembly for a file
 olam_trace2paje.c.s:
-	cd /home/kassick/Work/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/olam_trace2paje.c.s
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(MAKE) -f src/CMakeFiles/olam_trace2paje.dir/build.make src/CMakeFiles/olam_trace2paje.dir/olam_trace2paje.c.s
 .PHONY : olam_trace2paje.c.s
 
 # Help Target
@@ -285,6 +285,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/kassick/Work/olamfs-trace-converter && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/kassick/Work/olam/olamfs-trace-converter && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

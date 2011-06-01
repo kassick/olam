@@ -17,6 +17,9 @@
 #ifndef __AKY_H
 #define __AKY_H
 
+#define MAX_AKY_STATE_NAMES 5002
+#if 0
+   // We do not want all akypuera hassle here
 #define MPI_INIT 1000
 #define MPI_FINALIZE_IN 1002
 #define MPI_FINALIZE_OUT 1003
@@ -31,7 +34,6 @@
 #define MPI_COMM_SET_NAME_IN 3002
 #define MPI_COMM_SET_NAME_OUT 3003
 
-#define MAX_AKY_STATE_NAMES 5002
 
 /* used */
 #define MPI_REDUCE_IN 25
@@ -304,6 +306,9 @@
 #define MPI_CART2_MAX 252
 #define MPI_GRAPH_MIN 233
 #define MPI_GRAPH_MAX 244
+
+#endif
+
 
 //aky stuff
 #define AKY_PTP_SEND 5000
