@@ -49,6 +49,7 @@ character(len=30)  :: io6file
 character(len=30)  :: logfile
 integer :: numarg
 integer :: i,n
+integer :: rastro_id
 integer :: bad = 0
 real, external :: walltime
 real :: wtime_start_linha,inicio,fim
@@ -65,7 +66,8 @@ wtime_start_linha = walltime(0.)
 
 call olam_mpi_init()
 
-call rst_init_f(myrank,10)
+rastro_id=10
+call rst_init_f(myrank,rastro_id)
 
 iparallel = 0
 if (mgroupsize > 1) iparallel = 1

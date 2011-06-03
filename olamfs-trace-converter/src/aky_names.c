@@ -21,10 +21,22 @@
 
 static char **mpi_names = NULL;
 
+typedef struct _olam_evt_names_t {
+  int id;
+  char * name;
+} olam_evt_names_t;
+
+#define OLAM_EVT_S(id) {OLAM_EVT_ ## id ## _IN, #id}, {OLAM_EVT_ ## id ## _OUT, #id}
+
+static olam_evt_names_t * olam_evt_names = { 
+  OLAM_EVT_S(HDF5_OPEN),
+  OLAM_EVT_S(HDF5_CREATE),
+  {0, NULL}
+}
+
 void name_init(void)
 {
   mpi_names = (char **) malloc(sizeof(char *) * MAX_AKY_STATE_NAMES);
-#if 0
   mpi_names[MPI_INIT] = strdup("MPI_Init");
   mpi_names[MPI_COMM_SPAWN_IN] = strdup("MPI_Comm_spawn");
   mpi_names[MPI_COMM_GET_NAME_IN] = strdup("MPI_Comm_get_name");
@@ -172,7 +184,10 @@ void name_init(void)
   mpi_names[MPI_CART_RANK_IN] = strdup("MPI_Cart_rank");
   mpi_names[MPI_CART_SUB_IN] = strdup("MPI_Cart_sub");
   mpi_names[MPI_FINALIZE_IN] = strdup("MPI_Finalize");
-#endif
+
+  for (i = 0; olam_names[i].name != NULL; i++) {
+    mpi_names[olam_evts.id] = strdup(olam_evts.name);
+  }
 }
 
 char *name_get(int id)
