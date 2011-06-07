@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Sex, 03 Jun 2011 18:02:00 -0300 (kassick)"
+ * Updated: "Ter, 07 Jun 2011 18:41:26 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -30,6 +30,7 @@
 #include <rastro.h>
 #include <assert.h>
 
+#include <aky.h>
 #include <pvfs_events.h>
 #include <olam_events.h>
 
@@ -44,7 +45,7 @@ void usage() {
   printf("Usage: %s <options> <file1.rst> <file2.rst> ...\n",PROGNAME);
   printf(" -h                 displays this message\n");
   printf(" -m                 adds MPI messages to the paje file\n");
-  printf(" -o                 disables offset in constants (for olam rastro v>=11)"
+  printf(" -o                 disables offset in constants (for olam rastro v>=11)");
   printf(" -somethingels      does some thing else\n");
 }
 
@@ -113,18 +114,19 @@ int main(int argc, char** argv)
 
   while (rst_decode_event(&data, &event)) {
     char mpi_process[100];
+    char mpi_name[100];
     char value[100];
     char state[100];
     double timestamp;
     int type;
     char key[AKY_DEFAULT_STR_SIZE];
-    char *locfn;
+    char *locfn,*locfn_access;
 
     if (event.id2 >= PVFS_VERSION_BASE)
     {
       // this is a PVFS event
       // Identified by server id and by file name
-      snprintf(mpi_process, 100, "pvfs_%d",event.id1);
+      snprintf(mpi_process, 100, "pvfs_%ld",event.id1);
     } else { 
       // this is olam event -- identified by the process number
       snprintf(mpi_process, 100, "rank%ld", event.id1);
@@ -137,7 +139,7 @@ int main(int argc, char** argv)
     switch (event.type) {
       // Use Aky events as well
       case MPI_INIT:
-      case PVFS_INIT:
+      case PVFS_EVT_INIT:
         pajeCreateContainer(timestamp, mpi_process,
                             "PROCESS", "0", mpi_process);
         break;
@@ -146,7 +148,7 @@ int main(int argc, char** argv)
         // Creates arrow from rank%d to filename
         // Creates an state "opened"
         // open is iiss, myrank, thread_id, locfn,access
-        ASSERT(event.ct.n_string == 2);
+        assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
       
@@ -173,7 +175,7 @@ int main(int argc, char** argv)
         // Creates arrow from rank%d to filename
         // Creates an state with event
 
-        ASSERT(event.ct.n_string == 2);
+        assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         //locfn_access = event.v_string[1];
        
@@ -192,7 +194,7 @@ int main(int argc, char** argv)
       case OLAM_EVT_HDF5_CREATE_OUT:
         // Closes an state "open"
         // open is iiss, myrank, thread_id, locfn,access
-        ASSERT(event.ct.n_string == 2);
+        assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
       
@@ -207,7 +209,7 @@ int main(int argc, char** argv)
         // Creates arrow from rank%d to filename
         // closes an state "opened"
         // open is iiss, myrank, thread_id, locfn,access
-        ASSERT(event.ct.n_string == 2);
+        assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
       
         // Type here is FILE -- Hope paje does not go crazy... ;)
@@ -357,8 +359,6 @@ int main(int argc, char** argv)
       case MPI_CART_RANK_IN:
       case MPI_CART_SUB_IN:
       case MPI_FINALIZE_IN:
-      case OLAM_EVT_HDF5_CREATE_IN:
-      case OLAM_EVT_CLOSE_IN:
         pajePushState(timestamp, mpi_process, "STATE", value);
         break;
       case MPI_COMM_SPAWN_OUT:
@@ -492,12 +492,9 @@ int main(int argc, char** argv)
       case MPI_CART_SUB_OUT:
         pajePopState(timestamp, mpi_process, "STATE");
         break;
-      case OLAM_EVT_HDF5_OPEN_OUT:
-      case OLAM_EVT_HDF5_CREATE_OUT:
         locfn = event.v_string[0];
         pajePopState(timestamp, locfn , "STATE");
       case MPI_FINALIZE_OUT:
-      case OLAM_EVT_CLOSE_OUT:
         pajePopState(timestamp, mpi_process, "STATE");
         pajeDestroyContainer(timestamp, "PROCESS", mpi_process);
         break;

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/olamfs-trace-converter/include/olam_events.h"
 // Created: "Qui, 02 Jun 2011 10:32:37 -0300 (kassick)"
-// Updated: "Ter, 07 Jun 2011 18:35:19 -0300 (kassick)"
+// Updated: "Ter, 07 Jun 2011 19:30:35 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -27,6 +27,7 @@
 
 #define OLAM_VERSION_BASE (10)
 #define OLAM_EVT_BASE (4000)
+#define OLAM_EVT_MAX  (4499)
 
 // IN / OUT Declaration
 #define OLAM_EVT_IO(name) \
@@ -37,11 +38,11 @@
   OLAM_EVT_ ## name 
 
 #define OLAM_EVT_STR(id) \
-  {OLAM_EVT_ ## id ## _IN, "OLAM_" #id}, \
-  {OLAM_EVT_ ## id ## _OUT, "OLAM_" #id "V"}
+  {OLAM_EVT_ ## id ## _IN, "OLAM_" #id, #id, IN}, \
+  {OLAM_EVT_ ## id ## _OUT, "OLAM_" #id "V" ,#id, OUT}
 
 #define OLAM_EVT_STR_N(id) \
-  {OLAM_EVT_ ## id  , "OLAM_" #id}
+  {OLAM_EVT_ ## id  , "OLAM_" #id, #id, EVT}
 
 
 
@@ -56,10 +57,16 @@ typedef enum _olam_evts_t {
 
 
 
+typedef enum _olam_evt_type_t {
+  IN = 0,
+  OUT,
+  EVT
+} olam_evt_type_t;
 
 typedef struct _olam_evt_names_t {
   olam_evts_t id;
-  char * name;
+  char * name, *short_name;
+  olam_evt_type_t type;
 } olam_evt_names_t;
 
 
