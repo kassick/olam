@@ -17,26 +17,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <aky.h>
+#include "aky.h"
+#include <olam_events.h>
+#include <pvfs_events.h>
 
 static char **mpi_names = NULL;
 
-typedef struct _olam_evt_names_t {
-  int id;
-  char * name;
-} olam_evt_names_t;
 
-#define OLAM_EVT_S(id) {OLAM_EVT_ ## id ## _IN, #id}, {OLAM_EVT_ ## id ## _OUT, #id}
-
-static olam_evt_names_t * olam_evt_names = { 
-  OLAM_EVT_S(HDF5_OPEN),
-  OLAM_EVT_S(HDF5_CREATE),
-  {0, NULL}
-}
 
 void name_init(void)
 {
+  int i;
   mpi_names = (char **) malloc(sizeof(char *) * MAX_AKY_STATE_NAMES);
+
+  bzero(mpi_names,sizeof(char *) * MAX_AKY_STATE_NAMES);
+
   mpi_names[MPI_INIT] = strdup("MPI_Init");
   mpi_names[MPI_COMM_SPAWN_IN] = strdup("MPI_Comm_spawn");
   mpi_names[MPI_COMM_GET_NAME_IN] = strdup("MPI_Comm_get_name");
@@ -91,8 +86,7 @@ void name_init(void)
   mpi_names[MPI_GROUP_RANGE_INCL_IN] = strdup("MPI_Group_range_incl");
   mpi_names[MPI_GROUP_RANGE_INCL_OUT] = strdup("MPI_Group_range_incl_out");
   mpi_names[MPI_GROUP_SIZE_IN] = strdup("MPI_Group_size");
-  mpi_names[MPI_GROUP_TRANSLATE_RANKS_IN] =
-      strdup("MPI_Group_translate_ranks");
+  mpi_names[MPI_GROUP_TRANSLATE_RANKS_IN] = strdup("MPI_Group_translate_ranks");
   mpi_names[MPI_GROUP_UNION_IN] = strdup("MPI_Group_union");
   mpi_names[MPI_INTERCOMM_CREATE_IN] = strdup("MPI_Intercomm_create");
   mpi_names[MPI_INTERCOMM_CREATE_OUT] = strdup("MPI_Intercomm_create_out");
@@ -176,8 +170,7 @@ void name_init(void)
   mpi_names[MPI_GRAPH_GET_IN] = strdup("MPI_Graph_get");
   mpi_names[MPI_GRAPH_MAP_IN] = strdup("MPI_Graph_map");
   mpi_names[MPI_GRAPH_NEIGHBORS_IN] = strdup("MPI_Graph_neighbors");
-  mpi_names[MPI_GRAPH_NEIGHBORS_COUNT_IN] =
-      strdup("MPI_Graph_neighbors_count");
+  mpi_names[MPI_GRAPH_NEIGHBORS_COUNT_IN] = strdup("MPI_Graph_neighbors_count");
   mpi_names[MPI_GRAPHDIMS_GET_IN] = strdup("MPI_Graphdims_get");
   mpi_names[MPI_TOPO_TEST_IN] = strdup("MPI_Topo_test");
   mpi_names[MPI_RECV_IDLE_IN] = strdup("MPI_Recv_idle");
@@ -185,8 +178,12 @@ void name_init(void)
   mpi_names[MPI_CART_SUB_IN] = strdup("MPI_Cart_sub");
   mpi_names[MPI_FINALIZE_IN] = strdup("MPI_Finalize");
 
-  for (i = 0; olam_names[i].name != NULL; i++) {
-    mpi_names[olam_evts.id] = strdup(olam_evts.name);
+  for (i = 0; olam_evt_names[i].name != NULL; i++) {
+    mpi_names[olam_evt_names[i].id] = strdup(olam_evt_names[i].name);
+  }
+  
+  for (i = 0; pvfs_evt_names[i].name != NULL; i++) {
+    mpi_names[pvfs_evt_names[i].id] = strdup(pvfs_evt_names[i].name);
   }
 }
 
@@ -194,3 +191,22 @@ char *name_get(int id)
 {
   return mpi_names[id];
 }
+
+#ifdef UNIT_TEST
+#warning "Unit Testing!!!"
+
+int main(int argc, char ** argv)
+{
+  int i;
+
+  name_init();
+
+  for (i = 0; i < MAX_AKY_STATE_NAMES; i++) {
+    char *name = name_get(i);
+    if (name) {
+      printf("Name %s has id %d\n",name,i);
+    }
+  }
+}
+
+#endif
