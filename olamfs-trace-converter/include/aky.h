@@ -17,6 +17,9 @@
 #ifndef __AKY_H
 #define __AKY_H
 
+#include <pvfs_events.h>
+#include <olam_events.h>
+
 #define MAX_AKY_STATE_NAMES 5002
 #define MPI_INIT 1000
 #define MPI_FINALIZE_IN 1002
@@ -350,6 +353,13 @@ void paje_hierarchy (void);
 //prototypes for aky_names.c
 void name_init (void);
 char *name_get (int id);
+
+evt_name_t *data_get(int id);
+
+typedef struct _aky_name_entry_t {
+  char * name;
+  void * data;
+} aky_name_entry_t;
 
 #define AKY_DEFAULT_STR_SIZE 200
 

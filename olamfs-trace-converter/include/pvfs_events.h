@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/olamfs-trace-converter/include/pvfs_events.h"
 // Created: "Sex, 03 Jun 2011 14:42:25 -0300 (kassick)"
-// Updated: "Ter, 07 Jun 2011 18:28:17 -0300 (kassick)"
+// Updated: "Qua, 08 Jun 2011 19:09:18 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,52 +25,37 @@
 #ifndef _PVFS_EVENTS_H_
 #define _PVFS_EVENTS_H_
 
+#include <stdlib.h>
+#include <name_types.h>
+#include <macros_f.h>
+
 #define PVFS_VERSION_BASE (20)
 #define PVFS_EVT_BASE (4500)
-
-// IN / OUT Declaration
-#define PVFS_EVT_IO(name) \
- PVFS_EVT_ ## name ## _IN,\
- PVFS_EVT_ ## name ## _OUT
-
-#define PVFS_EVT_N(name) \
-  PVFS_EVT_ ## name
-
-#define PVFS_EVT_STR(id) \
-  {PVFS_EVT_ ## id ## _IN, "PVFS_" #id}, \
-  {PVFS_EVT_ ## id ## _OUT, "PVFS_" #id "V"}
-
-#define PVFS_EVT_STR_N(id) \
-  {PVFS_EVT_ ## id  , "PVFS_" #id}
-
-
+#define PVFS_EVT_MAX  (4999)
+#define EVT_BASE_NAME PVFS
+#include <evt_template.h>
 
 // Add IDs here
 typedef enum _pvfs_evts_t {
   PVFS_EVT_INIT = PVFS_EVT_BASE,
-  PVFS_EVT_IO(CREATE),
-  PVFS_EVT_IO(OPEN),
-  PVFS_EVT_IO(WRITE),
-  PVFS_EVT_IO(READ),
+  EVT_IO(CREATE),
+  EVT_IO(OPEN),
+  EVT_IO(WRITE),
+  EVT_IO(READ),
 } pvfs_evts_t;
 
 
 
-
-typedef struct _pvfs_evt_names_t {
-  pvfs_evts_t id;
-  char * name;
-} pvfs_evt_names_t;
-
 // Add names to list here
-static pvfs_evt_names_t  pvfs_evt_names[] = { 
-  PVFS_EVT_STR_N(INIT),
-  PVFS_EVT_STR(OPEN),
-  PVFS_EVT_STR(CREATE),
-  PVFS_EVT_STR(WRITE),
-  PVFS_EVT_STR(READ),
-  {0, NULL},
+static evt_name_t  pvfs_evt_names[] = { 
+  EVT_NAME_ENTRY_N(INIT),
+  EVT_NAME_ENTRY(OPEN),
+  EVT_NAME_ENTRY(CREATE),
+  EVT_NAME_ENTRY(WRITE),
+  EVT_NAME_ENTRY(READ),
+  NULL_EVT,
 };
 
 
+#undef EVT_BASE_NAME
 #endif

@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Ter, 07 Jun 2011 18:41:26 -0300 (kassick)"
+ * Updated: "Qua, 08 Jun 2011 19:13:05 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -29,6 +29,7 @@
 #include <search.h>
 #include <rastro.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include <aky.h>
 #include <pvfs_events.h>
@@ -39,6 +40,14 @@
 
 #define OPTSTR "mho"
 #define PROGNAME "olam_trace2paje"
+
+#define OLAM_CONTAINER "OLAM"
+#define PVFS_CONTAINER "FS"
+#define PAJE_ROOT_CONTAINER "0"
+
+#define PROCESS_TYPE  "PROCESS"
+#define FILE_TYPE     "FILE"
+#define SERVER_TYPE   "SERVER"
 
 
 void usage() {
@@ -54,6 +63,8 @@ int main(int argc, char** argv)
   int opt;
   char mpi_messages = FALSE;
   int const_offset = OLAM_EVT_BASE;
+
+  evt_name_t * ename;
   
   rst_file_t data;
   rst_event_t event;
@@ -107,14 +118,20 @@ int main(int argc, char** argv)
   name_init();
   paje_header();
   paje_hierarchy();
-  pajeCreateContainer(0,"OLAM","OLAM","0","OLAM");
-  pajeCreateContainer(0,"FS","FS","0","FS");
-
-  //printf("Hello!\n");
+  
+  // Separate OLAM events (App and MPI Events) from FS events
+  pajeCreateContainer(0,OLAM_CONTAINER,
+                        OLAM_CONTAINER,
+                        PAJE_ROOT_CONTAINER,
+                        OLAM_CONTAINER);
+  
+  pajeCreateContainer(0,PVFS_CONTAINER,
+                        PVFS_CONTAINER,
+                        PAJE_ROOT_CONTAINER,
+                        PVFS_CONTAINER);
 
   while (rst_decode_event(&data, &event)) {
-    char mpi_process[100];
-    char mpi_name[100];
+    char entity_name[100];
     char value[100];
     char state[100];
     double timestamp;
@@ -126,23 +143,31 @@ int main(int argc, char** argv)
     {
       // this is a PVFS event
       // Identified by server id and by file name
-      snprintf(mpi_process, 100, "pvfs_%ld",event.id1);
+      snprintf(entity_name, 100, "pvfs_%" PRIu64 ,event.id1);
     } else { 
       // this is olam event -- identified by the process number
-      snprintf(mpi_process, 100, "rank%ld", event.id1);
+      snprintf(entity_name, 100, "rank%" PRIu64, event.id1);
     }
     
     snprintf(value, 100, "%s", name_get(event.type));
+    ename = data_get(event.type); // only one of these will be valid, but ok
     timestamp = (double) event.timestamp / 1000000;
 
 
     switch (event.type) {
-      // Use Aky events as well
+      // OLAM and PVFS events here
+      case OLAM_EVT_INIT:
       case MPI_INIT:
-      case PVFS_EVT_INIT:
-        pajeCreateContainer(timestamp, mpi_process,
-                            "PROCESS", "0", mpi_process);
+        pajeCreateContainer(timestamp, entity_name,
+                            PROCESS_TYPE, OLAM_CONTAINER, entity_name);
         break;
+
+      case PVFS_EVT_INIT:
+        pajeCreateContainer(timestamp, entity_name,
+                            SERVER_TYPE, PVFS_CONTAINER, entity_name);
+        break;
+
+      
       case OLAM_EVT_HDF5_OPEN_IN:
         // Creates the container /filename/ 
         // Creates arrow from rank%d to filename
@@ -152,20 +177,26 @@ int main(int argc, char** argv)
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
       
+        //Create the container for the /locfn/ file
         // Type here is FILE -- Hope paje does not go crazy... ;)
         pajeCreateContainer(timestamp, locfn,
-                            "FILE", "0", locfn);
-        
-        snprintf(state,100, "STATE_%s",value);
+                            FILE_TYPE, PVFS_CONTAINER, locfn);
+       
+        //Push two stacked states to file:
+        //  OPEN -- during the open operation
+        //  OPENED -- from OPEN_IN to CLOSE_OUT
+        snprintf(state,100, "STATE_%s",ename->start_name);
         pajePushState(timestamp, locfn, state, value);
-        snprintf(state,100, "STATE_%s","opened");
-        pajePushState(timestamp, locfn, state, "opened");
+        pajePushState(timestamp, locfn, "STATE_opened", "opened");
 
+        // key for arrow:
         // id is "open W ## myrank ## /file/name"
-        snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%d#%s",
-            locfn_access, event.id1, locfn);
-        pajeStartLink(timestamp, "0", "LINK", mpi_process, "PTP", key);
-        pajeEndLink  (timestamp, "0", "LINK", locfn      , "PTP", key);
+        snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
+                                      locfn_access, event.id1, locfn);
+
+        //Inter-container arrow -- ok?
+        pajeStartLink(timestamp, OLAM_CONTAINER, "LINK", entity_name, "PTP", key);
+        pajeEndLink  (timestamp, PVFS_CONTAINER, "LINK", locfn      , "PTP", key);
         
         break;
 
@@ -183,9 +214,9 @@ int main(int argc, char** argv)
         pajePushState(timestamp, locfn, state, value);
 
         // id is "open W ## myrank ## /file/name"
-        snprintf(key,AKY_DEFAULT_STR_SIZE,"%s#%d#%s",
-            mpi_name, event.id1, locfn);
-        pajeStartLink(timestamp, "0", "LINK", mpi_process, "PTP", key);
+        snprintf(key,AKY_DEFAULT_STR_SIZE,"%s#%" PRIu64 "#%s",
+            entity_name, event.id1, locfn);
+        pajeStartLink(timestamp, "0", "LINK", entity_name, "PTP", key);
         pajeEndLink  (timestamp, "0", "LINK", locfn      , "PTP", key);
         
         break;
@@ -198,8 +229,54 @@ int main(int argc, char** argv)
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
       
-        snprintf(state,100, "STATE_%s",value);
+        snprintf(state,100, "STATE_%s",ename->start_name);
         pajePopState(timestamp, locfn, state);
+
+        break;
+
+      case OLAM_EVT_HDF5_WRITE_IN:
+      case OLAM_EVT_HDF5_READ_IN:
+        assert(event.ct.n_string == 2);
+        locfn = event.v_string[0];
+        locfn_access = event.v_string[1];
+      
+        snprintf(state,100, "STATE_%s",ename->start_name);
+        pajePushState(timestamp, locfn, state, value);
+
+        // key for arrow:
+        // id is "open W ## myrank ## /file/name"
+        snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
+                                      locfn_access, event.id1, locfn);
+
+        if (event.type == OLAM_EVT_HDF5_WRITE_IN) {
+          pajeStartLink(timestamp, OLAM_CONTAINER, "LINK", entity_name, "PTP", key);
+        } else {
+          pajeStartLink(timestamp, PVFS_CONTAINER, "LINK", locfn,       "PTP", key);
+        }
+
+
+        break;
+
+
+      case OLAM_EVT_HDF5_WRITE_OUT:
+      case OLAM_EVT_HDF5_READ_OUT:
+        assert(event.ct.n_string == 2);
+        locfn = event.v_string[0];
+        locfn_access = event.v_string[1];
+      
+        snprintf(state,100, "STATE_%s",ename->start_name);
+        pajePopState(timestamp, locfn, state);
+
+        // key for arrow:
+        // id is "open W ## myrank ## /file/name"
+        snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
+                                      locfn_access, 
+                                      event.id1, locfn);
+        if (event.type == OLAM_EVT_HDF5_WRITE_OUT) {
+          pajeEndLink  (timestamp, PVFS_CONTAINER, "LINK", locfn      , "PTP", key);
+        } else {
+          pajeEndLink  (timestamp, OLAM_CONTAINER, "LINK", entity_name, "PTP", key);
+        }
 
         break;
 
@@ -211,22 +288,13 @@ int main(int argc, char** argv)
         // open is iiss, myrank, thread_id, locfn,access
         assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
+        
+        // pop close state and opened state
+        snprintf(state,100, "STATE_%s",ename->start_name);
+        pajePopState(timestamp, locfn, state);
+        pajePopState(timestamp, locfn, "STATE_opened");
       
-        // Type here is FILE -- Hope paje does not go crazy... ;)
-        pajeCreateContainer(timestamp, locfn,
-                            "FILE", "0", locfn);
-        
-        snprintf(state,100, "STATE_%s",value);
-        pajePushState(timestamp, locfn, state, value);
-        snprintf(state,100, "STATE_%s","opened");
-        pajePushState(timestamp, locfn, state, "opened");
-
-        // id is "open W ## myrank ## /file/name"
-        snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%d#%s",
-            locfn_access, event.id1, locfn);
-        pajeStartLink(timestamp, "0", "LINK", mpi_process, "PTP", key);
-        pajeEndLink  (timestamp, "0", "LINK", locfn      , "PTP", key);
-        
+        pajeDestroyContainer(timestamp, FILE_TYPE, locfn);
         break;
 
       case MPI_COMM_SPAWN_IN:
@@ -359,7 +427,7 @@ int main(int argc, char** argv)
       case MPI_CART_RANK_IN:
       case MPI_CART_SUB_IN:
       case MPI_FINALIZE_IN:
-        pajePushState(timestamp, mpi_process, "STATE", value);
+        pajePushState(timestamp, entity_name, "STATE", value);
         break;
       case MPI_COMM_SPAWN_OUT:
       case MPI_COMM_GET_NAME_OUT:
@@ -490,13 +558,13 @@ int main(int argc, char** argv)
       case MPI_RECV_IDLE_OUT:
       case MPI_CART_RANK_OUT:
       case MPI_CART_SUB_OUT:
-        pajePopState(timestamp, mpi_process, "STATE");
+        pajePopState(timestamp, entity_name, "STATE");
         break;
         locfn = event.v_string[0];
         pajePopState(timestamp, locfn , "STATE");
       case MPI_FINALIZE_OUT:
-        pajePopState(timestamp, mpi_process, "STATE");
-        pajeDestroyContainer(timestamp, "PROCESS", mpi_process);
+        pajePopState(timestamp, entity_name, "STATE");
+        pajeDestroyContainer(timestamp, PROCESS_TYPE, entity_name);
         break;
       
 
@@ -506,7 +574,7 @@ int main(int argc, char** argv)
         char key[AKY_DEFAULT_STR_SIZE];
         aky_put_key("n", event.id1, event.v_uint32[0], key,
                     AKY_DEFAULT_STR_SIZE);
-        pajeStartLink(timestamp, "0", "LINK", mpi_process, "PTP", key);
+        pajeStartLink(timestamp, "0", "LINK", entity_name, "PTP", key);
       }
       break;
     case AKY_PTP_RECV:
@@ -514,7 +582,7 @@ int main(int argc, char** argv)
         char key[AKY_DEFAULT_STR_SIZE];
         aky_get_key("n", event.v_uint32[0], event.id1, key,
                     AKY_DEFAULT_STR_SIZE);
-        pajeEndLink(timestamp, "0", "LINK", mpi_process, "PTP", key);
+        pajeEndLink(timestamp, "0", "LINK", entity_name, "PTP", key);
       }
       break;
 #endif
