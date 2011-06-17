@@ -38,6 +38,7 @@
 !===============================================================================
 subroutine timestep()
 
+use rastro_evts
 use misc_coms,   only: io6, time8, time_istp8, nqparm, initial, ilwrtyp,   &
                        iswrtyp, dtsm, nqparm_sh, dtlm, iparallel,   &
                        s1900_init, s1900_sim
@@ -77,6 +78,7 @@ if (time8 < 1.e-3) then
 endif
 
 do jstp = 1,nstp  ! nstp = no. of finest-grid-level aco steps in dtlm(1)
+   call rst_event_ii_f(OLAM_INNERSTEP_IN,istp,jstp)
    istp = jstp
 
    call tend0(rhot)
@@ -210,6 +212,8 @@ do jstp = 1,nstp  ! nstp = no. of finest-grid-level aco steps in dtlm(1)
    s1900_sim = s1900_init + time_istp8
 
 ! call check_nans(23)
+
+   call rst_event_ii_f(OLAM_INNERSTEP_OUT,istp,jstp)
 
 enddo
 
