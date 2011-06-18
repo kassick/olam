@@ -358,6 +358,7 @@ $(ARC)($(OMODEL)/othrm.o): \
                      $(ARC)($(MODEL_MODS)/micro_coms.o)
 
 $(ARC)($(OMODEL)/timestep.o): \
+		     $(ARC)($(MODEL_MODS)/rastro_evts.o)\
                      $(ARC)($(MODEL_MODS)/mem_basic.o)  \
                      $(ARC)($(MODEL_MODS)/mem_ijtabs.o)  \
                      $(ARC)($(LEAF)/mem_leaf.o)  \
