@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/olamfs-trace-converter/include/pvfs_events.h"
 // Created: "Sex, 03 Jun 2011 14:42:25 -0300 (kassick)"
-// Updated: "Qua, 08 Jun 2011 19:09:18 -0300 (kassick)"
+// Updated: "Sex, 17 Jun 2011 18:11:22 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,7 +37,7 @@
 
 // Add IDs here
 typedef enum _pvfs_evts_t {
-  PVFS_EVT_INIT = PVFS_EVT_BASE,
+  PVFS_INIT = PVFS_EVT_BASE,
   EVT_IO(CREATE),
   EVT_IO(OPEN),
   EVT_IO(WRITE),

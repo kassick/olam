@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/olamfs-trace-converter/include/macros_f.h"
 // Created: "Qua, 08 Jun 2011 18:58:37 -0300 (kassick)"
-// Updated: "Qua, 08 Jun 2011 19:07:46 -0300 (kassick)"
+// Updated: "Sex, 17 Jun 2011 18:10:19 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,6 +33,7 @@
 #define CAT3(X,Y,Z) X##_##Y##_##Z
 #define CAT4(X,Y,Z,W) X##_##Y##_##Z##_##W
 #define TEMPLATE(X,Y) CAT1(X,Y)
+#define TEMPLATE2(X,Y) CAT1(X,Y)
 #define TEMPLATE3(X,Y,Z) CAT3(X,Y,Z)
 #define TEMPLATE4(X,Y,Z,W) CAT4(X,Y,Z,W)
 

@@ -21,6 +21,8 @@
 #include <olam_events.h>
 
 #define MAX_AKY_STATE_NAMES 5002
+
+#if 0
 #define MPI_INIT 1000
 #define MPI_FINALIZE_IN 1002
 #define MPI_FINALIZE_OUT 1003
@@ -291,6 +293,8 @@
 #define MPI_CART_RANK_OUT 250
 #define MPI_CART_SUB_IN 251
 #define MPI_CART_SUB_OUT 252
+
+#endif
 
 //help stuff
 #define MPI_COMM_MIN 39

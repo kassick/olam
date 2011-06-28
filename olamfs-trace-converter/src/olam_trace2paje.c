@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Qua, 08 Jun 2011 19:13:05 -0300 (kassick)"
+ * Updated: "Sex, 17 Jun 2011 18:15:11 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -34,6 +34,7 @@
 #include <aky.h>
 #include <pvfs_events.h>
 #include <olam_events.h>
+#include <mpi_events.h>
 
 #define FALSE (0)
 #define TRUE (!FALSE)
@@ -156,19 +157,19 @@ int main(int argc, char** argv)
 
     switch (event.type) {
       // OLAM and PVFS events here
-      case OLAM_EVT_INIT:
+      case OLAM_INIT:
       case MPI_INIT:
         pajeCreateContainer(timestamp, entity_name,
                             PROCESS_TYPE, OLAM_CONTAINER, entity_name);
         break;
 
-      case PVFS_EVT_INIT:
+      case PVFS_INIT:
         pajeCreateContainer(timestamp, entity_name,
                             SERVER_TYPE, PVFS_CONTAINER, entity_name);
         break;
 
       
-      case OLAM_EVT_HDF5_OPEN_IN:
+      case OLAM_HDF5_OPEN_IN:
         // Creates the container /filename/ 
         // Creates arrow from rank%d to filename
         // Creates an state "opened"
@@ -201,8 +202,8 @@ int main(int argc, char** argv)
         break;
 
 
-      case OLAM_EVT_HDF5_CLOSE_IN:
-      case OLAM_EVT_HDF5_CREATE_IN:
+      case OLAM_HDF5_CLOSE_IN:
+      case OLAM_HDF5_CREATE_IN:
         // Creates arrow from rank%d to filename
         // Creates an state with event
 
@@ -210,6 +211,7 @@ int main(int argc, char** argv)
         locfn = event.v_string[0];
         //locfn_access = event.v_string[1];
        
+       // pop state open
         snprintf(state,100, "STATE_%s",value);
         pajePushState(timestamp, locfn, state, value);
 
@@ -221,8 +223,8 @@ int main(int argc, char** argv)
         
         break;
 
-      case OLAM_EVT_HDF5_OPEN_OUT:
-      case OLAM_EVT_HDF5_CREATE_OUT:
+      case OLAM_HDF5_OPEN_OUT:
+      case OLAM_HDF5_CREATE_OUT:
         // Closes an state "open"
         // open is iiss, myrank, thread_id, locfn,access
         assert(event.ct.n_string == 2);
@@ -234,8 +236,8 @@ int main(int argc, char** argv)
 
         break;
 
-      case OLAM_EVT_HDF5_WRITE_IN:
-      case OLAM_EVT_HDF5_READ_IN:
+      case OLAM_HDF5_WRITE_IN:
+      case OLAM_HDF5_READ_IN:
         assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
@@ -248,7 +250,7 @@ int main(int argc, char** argv)
         snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
                                       locfn_access, event.id1, locfn);
 
-        if (event.type == OLAM_EVT_HDF5_WRITE_IN) {
+        if (event.type == OLAM_HDF5_WRITE_IN) {
           pajeStartLink(timestamp, OLAM_CONTAINER, "LINK", entity_name, "PTP", key);
         } else {
           pajeStartLink(timestamp, PVFS_CONTAINER, "LINK", locfn,       "PTP", key);
@@ -258,8 +260,8 @@ int main(int argc, char** argv)
         break;
 
 
-      case OLAM_EVT_HDF5_WRITE_OUT:
-      case OLAM_EVT_HDF5_READ_OUT:
+      case OLAM_HDF5_WRITE_OUT:
+      case OLAM_HDF5_READ_OUT:
         assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
@@ -272,7 +274,7 @@ int main(int argc, char** argv)
         snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
                                       locfn_access, 
                                       event.id1, locfn);
-        if (event.type == OLAM_EVT_HDF5_WRITE_OUT) {
+        if (event.type == OLAM_HDF5_WRITE_OUT) {
           pajeEndLink  (timestamp, PVFS_CONTAINER, "LINK", locfn      , "PTP", key);
         } else {
           pajeEndLink  (timestamp, OLAM_CONTAINER, "LINK", entity_name, "PTP", key);
@@ -281,7 +283,7 @@ int main(int argc, char** argv)
         break;
 
 
-      case OLAM_EVT_HDF5_CLOSE_OUT:
+      case OLAM_HDF5_CLOSE_OUT:
         // Destroys the container /filename/ 
         // Creates arrow from rank%d to filename
         // closes an state "opened"

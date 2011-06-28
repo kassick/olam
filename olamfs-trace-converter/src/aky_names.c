@@ -20,6 +20,7 @@
 #include "aky.h"
 #include <olam_events.h>
 #include <pvfs_events.h>
+#include <mpi_events.h>
 
 
 
@@ -33,6 +34,7 @@ void name_init(void)
   int i;
   mpi_names = malloc(sizeof(aky_name_entry_t) * MAX_AKY_STATE_NAMES);
   bzero(mpi_names,sizeof(aky_name_entry_t) * MAX_AKY_STATE_NAMES);
+#if 0
 
   mpi_names[MPI_INIT].name = strdup("MPI_Init");
   mpi_names[MPI_COMM_SPAWN_IN].name = strdup("MPI_Comm_spawn");
@@ -178,6 +180,12 @@ void name_init(void)
   mpi_names[MPI_CART_RANK_IN].name = strdup("MPI_Cart_rank");
   mpi_names[MPI_CART_SUB_IN].name = strdup("MPI_Cart_sub");
   mpi_names[MPI_FINALIZE_IN].name = strdup("MPI_Finalize");
+#endif
+  
+  for (i = 0; mpi_evt_names[i].name != NULL; i++) {
+    mpi_names[mpi_evt_names[i].id].name = strdup(mpi_evt_names[i].name);
+    mpi_names[mpi_evt_names[i].id].data = &(mpi_evt_names[i]);
+  }
 
   for (i = 0; olam_evt_names[i].name != NULL; i++) {
     mpi_names[olam_evt_names[i].id].name = strdup(olam_evt_names[i].name);

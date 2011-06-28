@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/gen_fortran_names.c"
  * Created: "Ter, 07 Jun 2011 18:48:10 -0300 (kassick)"
- * Updated: "Ter, 07 Jun 2011 19:28:00 -0300 (kassick)"
+ * Updated: "Sex, 17 Jun 2011 18:13:27 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -28,6 +28,8 @@
 #include <getopt.h>
 #include <aky.h>
 #include <olam_events.h>
+#include <pvfs_events.h>
+#include <mpi_events.h>
 
 
 
@@ -64,11 +66,22 @@ int main(int argc, char **argv)
   for (i = 0; olam_evt_names[i].name != NULL; i++)
   {
     if (olam_evt_names[i].type == EVT) {
-      fprintf(of,"integer :: OLAM_EVT_%s  =  %d\n",olam_evt_names[i].short_name,olam_evt_names[i].id);
+      fprintf(of,"integer :: OLAM_%s  =  %d\n",olam_evt_names[i].short_name,olam_evt_names[i].id);
     } else if (olam_evt_names[i].type == IN) {
-      fprintf(of,"integer :: OLAM_EVT_%s_IN  =  %d\n",olam_evt_names[i].short_name,olam_evt_names[i].id);
+      fprintf(of,"integer :: OLAM_%s_IN  =  %d\n",olam_evt_names[i].short_name,olam_evt_names[i].id);
     } else {
-      fprintf(of,"integer :: OLAM_EVT_%s_OUT  =  %d\n",olam_evt_names[i].short_name,olam_evt_names[i].id);
+      fprintf(of,"integer :: OLAM_%s_OUT  =  %d\n",olam_evt_names[i].short_name,olam_evt_names[i].id);
+    }
+  }
+  
+  for (i = 0; mpi_evt_names[i].name != NULL; i++)
+  {
+    if (mpi_evt_names[i].type == EVT) {
+      fprintf(of,"integer :: MPI_%s  =  %d\n",mpi_evt_names[i].short_name,mpi_evt_names[i].id);
+    } else if (mpi_evt_names[i].type == IN) {
+      fprintf(of,"integer :: MPI_%s_IN  =  %d\n",mpi_evt_names[i].short_name,mpi_evt_names[i].id);
+    } else {
+      fprintf(of,"integer :: MPI_%s_OUT  =  %d\n",mpi_evt_names[i].short_name,mpi_evt_names[i].id);
     }
   }
 
