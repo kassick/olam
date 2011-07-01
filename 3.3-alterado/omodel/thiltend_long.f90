@@ -51,12 +51,21 @@ real, intent(inout) :: rhot(mza,mwa)
 
 integer :: j,iw,mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_THILTEND_LONG_IN,rst_buf)
+#endif
+
+
 ! Horizontal loop over W/T points
 
 call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw)
 do j = 1,jtab_w(17)%jend(mrl); iw = jtab_w(17)%iw(j)
 !----------------------------------------------------------------------
@@ -66,8 +75,15 @@ call qsub('W',iw)
 
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',17)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_THILTEND_LONG_OUT,rst_buf)
+#endif
 
 return
 end subroutine thiltend_long

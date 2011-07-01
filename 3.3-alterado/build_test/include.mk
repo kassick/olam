@@ -49,6 +49,7 @@ PAR_INCS=-I/usr/lib/openmpi/include
 PAR_LIBS=-lmpi_f90
 #PAR_LIBS=-lmpich
 OLAM_MPI=yes
+OLAM_RASTRO=yes
 
 # OPTIMIZED:
 F_OPTS=-xW -O3 -fno-alias -prec-div -free -traceback

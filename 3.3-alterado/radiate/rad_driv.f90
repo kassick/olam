@@ -91,6 +91,12 @@ integer, external :: julday
 integer :: jday
 real :: rlong_previous(mwa)
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_RADIATE_IN,rst_buf)
+#endif
+
+
 ! Check whether it is time to update radiative fluxes and heating rates
 
 if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
@@ -119,6 +125,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    call psub()
 !----------------------------------------------------------------------
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private(iw,k)
    do j = 1,jtab_w(12)%jend(1); iw = jtab_w(12)%iw(j)! jend(1) = hardw for mrl = 1
 !----------------------------------------------------------------------
@@ -150,10 +159,16 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
    call rsub('Wa',12)
 
 ! If running leaf3, loop over all SEA cells.
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (sea_cosz,water_albedo)
    do iws = 2,mws
 
@@ -208,6 +223,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Do parallel send of SEA albedos and rlongup
 
@@ -217,6 +235,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
 ! If running leaf3, loop over all LAND cells.
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do
    do iwl = 2,mwl
 
@@ -262,6 +283,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Set the pointer for the first ED site
 
@@ -308,6 +332,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 ! If running leaf3, loop over all SEAFLUX cells to get mean surface radiative
 ! properties for each IW grid cell.
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (isf,iw,iws,arf_atm)
    do j = 1,jseaflux(1)%jend(1)
       isf = jseaflux(1)%iseaflux(j)
@@ -330,6 +357,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Do parallel recv of LAND albedos and rlongup
 
@@ -340,6 +370,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 ! If running leaf3, loop over all LANDFLUX cells to get mean surface radiative
 ! properties for each IW grid cell.
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private(ilf,iw,iwl,arf_atm)
    do j = 1,jlandflux(1)%jend(1)
       ilf = jlandflux(1)%ilandflux(j)
@@ -367,11 +400,17 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Loop over all radiative IW grid columns
 
    call psub()
 !----------------------------------------------------------------------
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (iw,ka,koff,nrad)
    do j = 1,jtab_w(12)%jend(1); iw = jtab_w(12)%iw(j) ! jend(1) = hardw for  mrl=1
 !----------------------------------------------------------------------
@@ -411,11 +450,17 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
    call rsub('Wb',12)
 
 ! If running leaf3, loop over SEAFLUX cells to transfer downward surface
 ! shortwave and longwave fluxes from IW atmospheric column to sea cells
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (isf,iw,iws,arf_sea)
    do j = 1,jseaflux(1)%jend(1)
       isf = jseaflux(1)%iseaflux(j)
@@ -437,6 +482,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Do parallel send of atm radiative fluxes to sea
 
@@ -448,6 +496,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 ! If running leaf3, loop over LANDFLUX cells to transfer downward surface
 ! shortwave and longwave fluxes from IW atmospheric column to land cells
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (ilf,iw,iwl,arf_land)
    do j = 1,jlandflux(1)%jend(1)
       ilf = jlandflux(1)%ilandflux(j)
@@ -469,6 +520,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Do parallel recv of atm radiative fluxes to sea
 
@@ -487,6 +541,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 ! If running leaf3, loop over SEAFLUX cells to transfer downward surface
 ! shortwave and longwave fluxes from IW atmospheric column to sea cells
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (isf,iws)
    do j = 1,jseaflux(2)%jend(1)
       isf = jseaflux(2)%iseaflux(j)
@@ -505,6 +562,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Do parallel recv of atm radiative fluxes to land
 
@@ -516,6 +576,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 ! If running leaf3, loop over LANDFLUX cells to transfer downward surface
 ! shortwave and longwave fluxes from IW atmospheric column to land cells
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do private (ilf,iwl,arf_land)
    do j = 1,jlandflux(2)%jend(1)
       ilf = jlandflux(2)%ilandflux(j)
@@ -535,10 +598,16 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
                                + landflux(ilf)%rshort_diffuse
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! If running leaf3, loop over all LAND cells to compute radiative fluxes 
 ! for all cell components, given that rshort and rlong are now updated.
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
    !$omp parallel do
    do iwl = 2,mwl
 
@@ -570,6 +639,9 @@ if (istp == 1 .and. mod(time_istp8 + .001d0,dble(radfrq)) < dtlong) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Set the pointer for the first ED site
 
@@ -598,6 +670,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw,k)
 do j = 1,jtab_w(12)%jend(mrl); iw = jtab_w(12)%iw(j)
 !----------------------------------------------------------------------
@@ -609,8 +684,15 @@ call qsub('W',iw)
 
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('Wc',12)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_RADIATE_OUT,rst_buf)
+#endif
 
 return
 end subroutine radiate

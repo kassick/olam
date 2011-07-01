@@ -63,6 +63,12 @@ integer :: iw
 integer :: k
 integer :: mrl, mrlw
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_CUPARM_DRIVER_IN,rst_buf)
+#endif
+
+
 ! Memory allocation for Grell cumulus transport
 
 if (ialloc == 0)  then
@@ -96,6 +102,10 @@ if ((istp == 1) .and. (mod(time_istp8+0.001_r8,real(confrq,r8)) < dtlong)) then
 
    call psub()
 !----------------------------------------------------------------------
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
+
    !$omp parallel do private (iw,mrlw)
    do j = 1,jtab_w(15)%jend(1); iw = jtab_w(15)%iw(j) ! jend(1) for mrl = 1
 !----------------------------------------------------------------------
@@ -143,6 +153,9 @@ if ((istp == 1) .and. (mod(time_istp8+0.001_r8,real(confrq,r8)) < dtlong)) then
 
    enddo
    !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
    call rsub('Wa',15)
 
 ! Print maximum heating rate
@@ -162,6 +175,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw,k)
 do j = 1,jtab_w(15)%jend(mrl); iw = jtab_w(15)%iw(j)
 !----------------------------------------------------------------------
@@ -182,8 +198,15 @@ call qsub('W',iw)
 
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('Wb',15)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_CUPARM_DRIVER_OUT,rst_buf)
+#endif
 
 return
 end subroutine cuparm_driver

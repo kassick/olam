@@ -87,6 +87,11 @@ real :: fracliq(nzg,mwl)     ! initial soil liquid fraction (0-1)
 
 real, external :: rhovsl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_LEAF3_INIT_ATM_IN,rst_buf)
+#endif
+
 ! This subroutine fills the primary LEAF3 arrays that depend on current
 ! atmospheric conditions.
 
@@ -346,6 +351,9 @@ if (iparallel == 1) then
   call mpi_send_wl('A')
   call mpi_recv_wl('A')
 endif
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_LEAF3_INIT_ATM_OUT,rst_buf)
+#endif
 
 return
 end subroutine leaf3_init_atm

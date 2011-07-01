@@ -71,6 +71,10 @@ integer :: jrecv
 integer :: nwlpts, nwlfpts
 integer :: mrl
 
+#ifdef OLAM_RASTRO
+call rst_event_iii_f(OLAM_O_ALLOC_MPI_LAND_IN,nzg,nzs,mrls)
+#endif
+
 ! allocate send buffers
 
 call MPI_Pack_size(1,MPI_INTEGER,MPI_COMM_WORLD,nbytes_int  ,ierr)
@@ -235,6 +239,10 @@ do jrecv = 1,nrecvs_wlf(1)
    enddo
 
 enddo
+
+#ifdef OLAM_RASTRO
+call rst_event_iii_f(OLAM_O_ALLOC_MPI_LAND_OUT,nzg,nzs,mrls)
+#endif
 
 #endif
 

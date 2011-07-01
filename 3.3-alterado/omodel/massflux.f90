@@ -53,6 +53,12 @@ real, intent(out) :: rho_old(mza,mwa)
 
 integer :: j,k,iu,iw,mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_ZERO_MASSFLUX_IN,rst_buf)
+#endif
+
+
 ! Zero out long timestep mass flux components (used for scalar advective 
 ! transport) so they may be summed over small timesteps
 
@@ -60,6 +66,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iu,k)
 do j = 1,jtab_u(14)%jend(mrl); iu = jtab_u(14)%iu(j)
 !----------------------------------------------------------------------
@@ -69,6 +78,9 @@ call qsub('U',iu)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('U',14)
 
@@ -76,6 +88,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw,k)
 do j = 1,jtab_w(18)%jend(mrl); iw = jtab_w(18)%iw(j)
 !----------------------------------------------------------------------
@@ -89,8 +104,15 @@ call qsub('W',iw)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',18)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_ZERO_MASSFLUX_OUT,rst_buf)
+#endif
 
 return
 end subroutine zero_massflux
@@ -113,10 +135,19 @@ real, intent(inout) :: wmarwsc(mza,mwa)
 integer :: j,k,iu,iw,mrl,mrlu,mrlw
 real :: acoi,acoi2
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_TIMEAVG_MASSFLUX_IN,rst_buf)
+#endif
+
+
 call psub()
 !----------------------------------------------------------------------
 mrl = mrl_endl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iu,mrlu,k,acoi)
 do j = 1,jtab_u(20)%jend(mrl); iu = jtab_u(20)%iu(j)
 !----------------------------------------------------------------------
@@ -128,6 +159,9 @@ call qsub('U',iu)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('U',20)
 
@@ -135,6 +169,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_endl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw,mrlw,k,acoi2)
 do j = 1,jtab_w(25)%jend(mrl); iw = jtab_w(25)%iw(j)
 !----------------------------------------------------------------------
@@ -146,8 +183,15 @@ call qsub('W',iw)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',25)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_TIMEAVG_MASSFLUX_OUT,rst_buf)
+#endif
 
 return
 end subroutine timeavg_massflux

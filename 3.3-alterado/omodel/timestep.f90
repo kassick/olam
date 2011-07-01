@@ -67,6 +67,11 @@ real :: rho_old    (mza,mwa) ! density from beginning of timestep [kg/m^3]
 real :: alpha_press(mza,mwa) ! 
 real :: rhot       (mza,mwa) ! grid-cell total mass tendency [kg/s]
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_TIMESTEP_IN,rst_buf)
+#endif
+
 ! +----------------------------------------------------------------------------+
 ! |  Each call to subroutine timestep drives all steps in advancing by dtlong  |
 ! +----------------------------------------------------------------------------+
@@ -78,7 +83,9 @@ if (time8 < 1.e-3) then
 endif
 
 do jstp = 1,nstp  ! nstp = no. of finest-grid-level aco steps in dtlm(1)
+#ifdef OLAM_RASTRO
    call rst_event_ii_f(OLAM_INNERSTEP_IN,istp,jstp)
+#endif
    istp = jstp
 
    call tend0(rhot)
@@ -213,13 +220,19 @@ do jstp = 1,nstp  ! nstp = no. of finest-grid-level aco steps in dtlm(1)
 
 ! call check_nans(23)
 
+#ifdef OLAM_RASTRO
    call rst_event_ii_f(OLAM_INNERSTEP_OUT,istp,jstp)
+#endif
 
 enddo
 
 ! Call ED model if it is time to do vegetation dynamics
 
 if (mod(real(time8)+dtlm(1),frq_phenology) < dtlm(1)) call ed_vegetation_dynamics()  
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_TIMESTEP_OUT,rst_buf)
+#endif
 
 return
 end subroutine timestep
@@ -303,6 +316,10 @@ real, intent(in) :: rhot
 
 integer :: n,mrl,j,k,iw,iu
 
+#ifdef OLAM_RASTRO
+call rst_event_r_f(OLAM_TEND0_IN,rhot)
+#endif
+
 ! SET SCALAR TENDENCIES TO ZERO
 
 mrl = mrl_begl(istp)
@@ -321,6 +338,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw,k)
 do j = 1,jtab_w(14)%jend(mrl); iw = jtab_w(14)%iw(j)
 !----------------------------------------------------------------------
@@ -330,6 +350,9 @@ call qsub('W',iw)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',14)
 
@@ -340,6 +363,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iu,k)
 do j = 1,jtab_u(11)%jend(mrl); iu = jtab_u(11)%iu(j)
 !----------------------------------------------------------------------
@@ -349,8 +375,15 @@ call qsub('U',iu)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('U',11)
+
+#ifdef OLAM_RASTRO
+call rst_event_r_f(OLAM_TEND0_OUT,rhot)
+#endif
 
 return
 end subroutine tend0
@@ -374,6 +407,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw,k)
 do j = 1,jtab_w(11)%jend(mrl); iw = jtab_w(11)%iw(j)
 !----------------------------------------------------------------------
@@ -383,6 +419,9 @@ call qsub('W',iw)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',11)
 
@@ -404,6 +443,12 @@ real, intent(in) :: rho_old(mza,mwa)
 
 integer :: n,mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_PREDTR_IN,rst_buf)
+#endif
+
+
 !   -  Step thermodynamic variables from  t  to  t+1.
 !   -  Set top, lateral and bottom boundary conditions on some variables
 !        if needed.
@@ -421,6 +466,10 @@ do n = 1,num_scalar
    call o_update(n,scalar_tab(n)%var_p,scalar_tab(n)%var_t,rho_old)
 enddo
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PREDTR_OUT,rst_buf)
+#endif
 
 return
 end subroutine predtr
@@ -449,6 +498,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_endl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw,k,dtl)
 do j = 1,jtab_w(27)%jend(mrl); iw = jtab_w(27)%iw(j)
 !----------------------------------------------------------------------
@@ -459,6 +511,9 @@ call qsub('W',iw)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',27)!RRR
 

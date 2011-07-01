@@ -56,9 +56,11 @@ character(len=10)  :: post
 logical            :: exans
 integer            :: nv, nvcnt, ndims, idims(3)
 real, external :: walltime
-real :: wtime_start_historywrite, inicio
 
-wtime_start_historywrite = walltime(0.)
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_HISTORY_WRITE_IN,vtype)
+#endif
+
 
 if (ioutput == 0) return
 
@@ -94,10 +96,6 @@ write(io6,*) 'history_write: opening file: ',trim(hnamel)
 write(io6,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 call shdf5_open(hnamel,'W',iclobber)
-
-write(io6, *) '     ==T== Abrir o history file: ',(walltime(wtime_start_historywrite)-inicio)
-
-inicio = walltime(wtime_start_historywrite)
 
 ! Write the common fields
 
@@ -149,17 +147,15 @@ do nv = 1,num_var
 enddo
 
 
-write(io6, *) '     ==T== Escrever o history file: ',(walltime(wtime_start_historywrite)-inicio)
-
-inicio = walltime(wtime_start_historywrite)
-
 call shdf5_close()
-
-write(io6, *) '     ==T== Fechar o history file: ',(walltime(wtime_start_historywrite)-inicio)
 
 ! Comment out following call (Martin includes grid info in history file)
 
 ! call write_ed_output()
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_HISTORY_WRITE_OUT,vtype)
+#endif
 
 return
 end subroutine history_write

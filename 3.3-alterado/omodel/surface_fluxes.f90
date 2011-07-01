@@ -98,6 +98,11 @@ type(patch), pointer :: ed_patch
 real :: vxu1,vxu2,vxu3,vyu1,vyu2,vyu3,vzu1,vzu2,vzu3
 real :: uc1,uc2,uc3,ucs,vcs,wcs
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SURFACE_TURB_FLUX_IN,rst_buf)
+#endif
+
 if (isfcl == 0) then
 
 ! ISFCL = 0 is the no-LEAF option:  Set all surface fluxes (to zero by default).
@@ -584,6 +589,10 @@ else
 
 endif
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SURFACE_TURB_FLUX_OUT,rst_buf)
+#endif
+
 return
 end subroutine surface_turb_flux
 
@@ -711,6 +720,12 @@ real :: tempc
 
 real, external :: rhovsl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SURFACE_CUPARM_FLUX_IN,rst_buf)
+#endif
+
+
 ! Subroutine to transfer atmospheric cumulus parameterization 
 ! precipitation FLUX to leaf3 land cells
 
@@ -805,6 +820,10 @@ call rsub('JLANDFLUX_cuparm',2)
 
 ! WILL NEED TO ADD SEA LOOP HERE WHEN OCEAN MODEL IS COUPLED WITH OLAM
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SURFACE_CUPARM_FLUX_OUT,rst_buf)
+#endif
+
 return
 end subroutine surface_cuparm_flux
 
@@ -830,6 +849,12 @@ integer :: mrl
 
 real :: arf_land
 real :: arf_land_dtf
+
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SURFACE_PRECIP_FLUX_IN,rst_buf)
+#endif
+
 
 ! Subroutine to transfer atmospheric microphysics parameterization 
 ! precipitation flux to leaf3 land cells.
@@ -912,6 +937,10 @@ call rsub('JLANDFLUX_pcp',2)
 
 ! pcpgr, qpcpgr, dpcpgr have now been "transferred" to leaf cells.
 ! No need to zero pcpgr, qpcpgr, dpcpgr since microphysics will replace them.
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SURFACE_PRECIP_FLUX_OUT,rst_buf)
+#endif
 
 return
 end subroutine surface_precip_flux

@@ -30,6 +30,10 @@ MPI_DEF=$(F_DEFINE_FLAG)OLAM_MPI
 OLAM_SUFFIX=-mpi
 endif
 
+ifdef OLAM_RASTRO
+INCLUDES = $(INCLUDES) $(F+DEFINE_FLAG)OLAM_RASTRO
+endif
+
 # Define archive and executable names.
 
 BASE=olam

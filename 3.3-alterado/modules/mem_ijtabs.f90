@@ -264,6 +264,10 @@ Contains
    integer :: iw,iu,im,k,nl,mrl
    integer :: iloop,iw1,iw2,mrl0,jend
 
+#ifdef OLAM_RASTRO
+   call rst_event_iii_f(OLAM_FILL_JTABS_IN,mma,mua,mwa)
+#endif
+
 ! Allocate and zero-fill jtab_ws_mpi%jend
 
    do iloop = 1,nloops_m
@@ -425,6 +429,9 @@ Contains
 ! Here, loop 15 MRL dependence is as for other loops in order to copy
 ! THSRC and RTSRC to tendency arrays at the proper time for each MRL.
 
+#ifdef OLAM_RASTRO
+   call rst_event_iii_f(OLAM_FILL_JTABS_OUT,mma,mua,mwa)
+#endif
    return
    end subroutine fill_jtabs
 

@@ -52,7 +52,6 @@ integer :: i,n
 integer :: rastro_id
 integer :: bad = 0
 real, external :: walltime
-real :: wtime_start_linha,inicio,fim
 real, external :: etime
 real :: totaltime, elapsed(2)
 integer :: time_array_0(8), time_array_1(8)
@@ -60,7 +59,6 @@ integer(kind=4) :: start_time, end_time
 real :: omp_time1, omp_time2
 real, external :: omp_get_wtime
 
-wtime_start_linha = walltime(0.)
 
 ! Determine if this run is parallel, and determine myrank and mgroupsize
 
@@ -88,13 +86,11 @@ if (mgroupsize > 1) iparallel = 1
 
 ! First, remove file in case it exists
 
-   inicio = walltime(wtime_start_linha)
 
    call system('rm -f '//trim(io6file)//char(0))
 
    open(io6,file=io6file,status='new',form='formatted')
 
-   write(io6, *) ' ==T== Abrir o log: ',(walltime(wtime_start_linha)-inicio)
 ! endif
 
 write(io6,'(/,a,i6)') ' myrank     = ',myrank
@@ -143,16 +139,9 @@ call olam_run(name_name)
 
 ! If this run is parallel, finalize MPI and close io6 file
 
-write(io6,*) ' ==T== Tempo total antes da mpi_finalize: ',walltime(wtime_start_linha)
-
 call olam_mpi_finalize()
 if (iparallel == 1) then
-inicio = walltime(wtime_start_linha)
-
    close(io6)
-   if(myrank == 0) then
-       write(6, *) ' ==T== Fechar o arquivo de LOG: ',(walltime(wtime_start_linha)-inicio)
-    endif
 endif
 
 call rst_finalize_f()

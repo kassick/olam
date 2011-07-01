@@ -46,7 +46,18 @@ implicit none
 
 integer :: j,iw,mrl
 
-if (level /= 3) return
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_MICRO_IN,rst_buf)
+#endif
+
+
+if (level /= 3) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_MICRO_OUT,rst_buf)
+#endif
+return
+endif
 
 call psub()
 !----------------------------------------------------------------------
@@ -61,6 +72,10 @@ call qsub('W',iw)
 enddo
 endif
 call rsub('W',30)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_MICRO_OUT,rst_buf)
+#endif
 
 return
 end subroutine micro

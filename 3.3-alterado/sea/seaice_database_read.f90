@@ -80,6 +80,11 @@ real :: rio, rjo
 character(len=128) :: flnm
 character(len=10)  :: sdate
 
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_SEAICE_DATABASE_READ_IN,iaction)
+#endif
+
+
 ! This subroutine is simpler than topm_database because it assumes that 
 ! each seaice_database file covers the entire geographic area of the model.
 ! If this ever changes, this subroutine must be modified.
@@ -281,6 +286,10 @@ deallocate(dato)
 if (iaction == 0) then
    sea%seaicep(:) = sea%seaicef(:)
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_SEAICE_DATABASE_READ_OUT,iaction)
+#endif
 
 return
 end subroutine seaice_database_read

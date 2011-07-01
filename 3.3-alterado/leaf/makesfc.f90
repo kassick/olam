@@ -856,9 +856,6 @@ logical there
 integer :: iwl
 integer, allocatable :: iscr(:,:)
 real, external :: walltime
-real :: wtime_start_landfileread, inicio
-
-wtime_start_landfileread = walltime(0.)
 
 !-------------------------------------------------------------------------------
 ! STEP 1: Open land file and read 4 array dimensions
@@ -868,8 +865,6 @@ flnm = trim(landusefile)//'-S'//'.h5'
 
 write(io6,*) 'Checking leaf file ',trim(flnm)
 
-inicio = walltime(wtime_start_landfileread)
-
 inquire(file=flnm,exist=there)
 
 if (.not. there) then
@@ -878,10 +873,6 @@ if (.not. there) then
 endif
 
 call shdf5_open(flnm,'R')
-
-write(io6, *) '             ==T== Abrir o landfile: ',(walltime(wtime_start_landfileread)-inicio)
-
-inicio = walltime(wtime_start_landfileread)
 
 ndims = 1
 idims(1) = 1
@@ -962,13 +953,7 @@ do iwl = 1,nwl
    itab_wl(iwl)%iu(1:maxjml) = iscr(1:maxjml,iwl)
 enddo
 
-write(io6, *) '             ==T== Ler o landfile: ',(walltime(wtime_start_landfileread)-inicio)
-
-inicio = walltime(wtime_start_landfileread)
-
 call shdf5_close()
-
-write(io6, *) '             ==T== Fechar o landfile: ',(walltime(wtime_start_landfileread)-inicio)
 
 mml = nml
 mul = nul
@@ -997,9 +982,7 @@ logical :: there
 integer :: iws
 integer, allocatable :: iscr(:,:)
 real, external :: walltime
-real :: wtime_start_seafileread, inicio
 
-wtime_start_seafileread = walltime(0.)
 
 !-------------------------------------------------------------------------------
 ! STEP 1: Open SEAFILE and read 3 array dimensions
@@ -1009,8 +992,6 @@ flnm = trim(seafile)//'-S'//'.h5'
 
 write(io6,*)  'Checking sea file ',trim(flnm)
 
-inicio = walltime(wtime_start_seafileread)
-
 inquire(file=flnm,exist=there)
 
 if (.not. there) then
@@ -1019,10 +1000,6 @@ if (.not. there) then
 endif
 
 call shdf5_open(flnm,'R')
-
-write(io6, *) '             ==T== Abrir o seafile: ',(walltime(wtime_start_seafileread)-inicio)
-
-inicio = walltime(wtime_start_seafileread)
 
 ndims = 1
 idims(1) = 1
@@ -1091,13 +1068,7 @@ do iws = 1,nws
    itab_ws(iws)%iu(1:maxjms) = iscr(1:maxjms,iws)
 enddo
 
-write(io6, *) '             ==T== Ler o seafile: ',(walltime(wtime_start_seafileread)-inicio)
-
-inicio = walltime(wtime_start_seafileread)
-
 call shdf5_close()
-
-write(io6, *) '             ==T== Fechar o seafile: ',(walltime(wtime_start_seafileread)-inicio)
 
 mms = nms
 mus = nus

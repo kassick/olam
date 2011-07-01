@@ -44,6 +44,11 @@ use misc_coms,  only: io6
 
 implicit none
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_OPLOT_INIT_IN,rst_buf)
+#endif
+
 call o_opngks()
 call gks_colors(1)
 
@@ -54,6 +59,10 @@ op%loopplot = 0
 op%dualpts  = 'PROG'
 op%icigrnd = 13
 op%iplotback = 0
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_OPLOT_INIT_OUT,rst_buf)
+#endif
 
 return
 end subroutine oplot_init
@@ -75,16 +84,14 @@ integer :: outyear,outmonth,outdate,outhour
 real, save :: dummy(1)=0.,xinc,yinc
 character(len=30) :: ylabel
 real, external :: walltime
-real :: wtime_start_plotfields,inicio
 
-wtime_start_plotfields = walltime(0.)
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_PLOT_FIELDS_IN,rst_buf)
+#endif
 
 ! Reopen the current graphics output workstation if it is closed
 call o_reopnwk()
-
-write(io6, *) '     ==T== Abrir o plotfile: ',walltime(wtime_start_plotfields)
-
-inicio = walltime(wtime_start_plotfields)
 
 do iplt = 1,op%nplt
 
@@ -268,17 +275,15 @@ enddo
 ! meta file (including the last frame) during a run and in case the
 ! simulation crashes.
 
-write(io6, *) '     ==T== Plotando coisas: ',(walltime(wtime_start_plotfields)-inicio)
-
-
 if ((trim(runtype) /= 'PLOTONLY') .and. (op%plttype == 0)) then
 
-    inicio = walltime(wtime_start_plotfields)
 
    call o_clswk()
 
-   write(io6, *) '      ==T== Fechar o plotfile: ',(walltime(wtime_start_plotfields)-inicio)
 endif
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PLOT_FIELDS_OUT,rst_buf)
+#endif
 
 return
 end subroutine plot_fields

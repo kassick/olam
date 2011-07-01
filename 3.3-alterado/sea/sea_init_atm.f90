@@ -69,6 +69,11 @@ real :: soil_tempc
 
 real, external :: rhovsl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SEA_INIT_ATM_IN,rst_buf)
+#endif
+
 ! This subroutine fills the primary LEAF3 arrays which depend on current
 ! atmospheric conditions.
 
@@ -186,6 +191,10 @@ if (iparallel == 1) then
    call mpi_send_ws('A',mrl)
    call mpi_recv_ws('A',mrl)
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SEA_INIT_ATM_OUT,rst_buf)
+#endif
 
 return
 end subroutine sea_init_atm

@@ -56,6 +56,10 @@ integer :: i,k,ifileok,nf
 integer :: iyears, imonths, idates, ihours
 character(len=14) :: ctotdate_current
 
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_ISAN_DRIVER_IN,iaction)
+#endif
+
 ! Read in 'ZONAVG_CLIMATE' data and fill zonavg arrarys
 
 call zonavg_init()
@@ -159,6 +163,9 @@ call isan_singletime(iaction)
 
 call dealloc_zonavg()
 
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_ISAN_DRIVER_OUT,iaction)
+#endif
 return
 end subroutine isan_driver
 

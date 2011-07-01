@@ -52,6 +52,11 @@ integer :: ierr
 integer :: ndims, idims(1)
 integer :: iws
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SEA_STARTUP_IN,rst_buf)
+#endif
+
 ! Subroutine SEA_STARTUP allocates some sea arrays and initializes sst
 
 ! THIS SUBROUTINE DOES NOT INITIALIZE canopy temperature and moisture
@@ -122,6 +127,11 @@ elseif (runtype /= 'PLOTONLY' .and. runtype /= 'PARCOMBINE') then
    endif
    
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SEA_STARTUP_OUT,rst_buf)
+#endif
+
 
 return
 end subroutine sea_startup

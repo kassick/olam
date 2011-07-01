@@ -64,6 +64,11 @@ integer :: i,j,iw,k,ilhcat,ilcat,lcat,lhcat,nip,idum,nd1,nd2,mrl
 logical :: l1,l2
 character*80 dataline,cname
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_MICINIT_IN,rst_buf)
+#endif
+
 call micinit_gam()
 
 if (level < 3) return
@@ -150,6 +155,10 @@ call rsub('Wc',7)
 ! Make collection table
 
 call mkcoltb()
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_MICINIT_OUT,rst_buf)
+#endif
 
 return
 
@@ -349,6 +358,11 @@ use misc_coms,  only: io6
 
 implicit none
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAN_JNMBINIT_IN,rst_buf)
+#endif
+
 if (level /= 3) then
 
    if (level <= 1) then
@@ -394,6 +408,9 @@ else
    endif
 
 endif
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAN_JNMBINIT_OUT,rst_buf)
+#endif
 return
 end subroutine jnmbinit
 

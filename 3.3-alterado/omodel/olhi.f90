@@ -65,6 +65,11 @@ real, dimension(mza,mwa) :: uzonal  ! automatic array
 
 real, external :: rhovsl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_FLDSLHI_IN,rst_buf)
+#endif
+
 call zonavg_init()  ! Read in 'ZONAVG_CLIMATE' data and fill zonavg arrarys
 
 call psub()
@@ -235,6 +240,10 @@ write(io6,*) ' '
 
 deallocate(zont,zonu,zonz,zonr  &
    ,zonp_vect,zont_vect,zonu_vect,zonz_vect,zonr_vect)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_FLDSLHI_OUT,rst_buf)
+#endif
 
 return
 end subroutine fldslhi

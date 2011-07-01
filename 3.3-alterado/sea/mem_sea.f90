@@ -426,6 +426,11 @@ Contains
    
    integer :: jsend,iws,jend,mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_FILL_JSEA_IN,rst_buf)
+#endif
+
 ! Allocate and zero-fill JTAB_WS_MPI%JEND
 
    do jsend = 1,maxremote
@@ -435,7 +440,12 @@ Contains
 
 ! Return if run is not parallel (jtab not needed)
 
-   if (iparallel == 0) return
+   if (iparallel == 0) then
+	#ifdef OLAM_RASTRO
+	call rst_event_s_f(OLAM_FILL_JSEA_OUT,rst_buf)
+	#endif
+	return
+   endif
    
 ! Compute and store JTAB_WS_MPI%JEND(1)
 
@@ -478,6 +488,9 @@ Contains
       enddo
    enddo
 
+#ifdef OLAM_RASTRO
+   call rst_event_s_f(OLAM_FILL_JSEA_OUT,rst_buf)
+#endif
    return
    end subroutine fill_jsea
 

@@ -52,12 +52,21 @@ integer :: iu
 integer :: iw
 integer :: mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_VELTEND_LONG_IN,rst_buf)
+#endif
+
+
 ! Horizontal loop over U points
 
 call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iu)
 do j = 1,jtab_u(12)%jend(mrl); iu = jtab_u(12)%iu(j)
 !----------------------------------------------------------------------
@@ -67,6 +76,9 @@ call qsub('U',iu)
 
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('U',12)
 
@@ -76,6 +88,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw)
 do j = 1,jtab_w(16)%jend(mrl); iw = jtab_w(16)%iw(j)
 !----------------------------------------------------------------------
@@ -85,8 +100,15 @@ call qsub('W',iw)
 
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',16)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_VELTEND_LONG_OUT,rst_buf)
+#endif
 
 return
 end subroutine veltend_long

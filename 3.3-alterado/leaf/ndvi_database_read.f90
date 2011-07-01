@@ -79,6 +79,11 @@ integer, save :: indvicyclic, nndvifiles
 
 logical :: there
 
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_NDVI_DATABASE_READ_IN,iaction)
+#endif
+
+
 ! Check type of call to ndvi_database_read
 
 if (iaction == 0) then
@@ -242,6 +247,10 @@ enddo
 if (iaction == 0) then
    land%veg_ndvip(:) = land%veg_ndvif(:)
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_NDVI_DATABASE_READ_OUT,iaction)
+#endif
 
 return
 end subroutine ndvi_database_read

@@ -233,6 +233,10 @@ Contains
 
    integer :: mrl,mrlw,isf,ilf,iw,iws,iwl,iloop,jsend,jend
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_FILL_JFLUX_IN,rst_buf)
+#endif
 ! Allocate and initialize JSEAFLUX%JEND
 
    do iloop = 1,12
@@ -414,6 +418,10 @@ Contains
          enddo
       enddo
    enddo
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_FILL_JFLUX_OUT,rst_buf)
+#endif
 
    return
    end subroutine fill_jflux

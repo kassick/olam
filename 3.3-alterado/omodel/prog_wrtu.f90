@@ -85,6 +85,12 @@ real, parameter :: chi = .1
 real, parameter :: chic = 1.5 + chi
 real, parameter :: chip = -.5 - chi
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_PROG_WRTU_IN,rst_buf)
+#endif
+
+
 ! Make copy of rho array
 
 rho_s(:,:) = rho(:,:)
@@ -98,6 +104,9 @@ enddo
 
 ! Horizontal mass fluxes for acoustic and long timesteps, and ump update
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(k) 
 do iu = 2,mua
    do k = 1,mza-1
@@ -107,6 +116,9 @@ do iu = 2,mua
    enddo
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 
 ! Horizontal fluxes or courant numbers for acoustic timestep quantities
 
@@ -114,6 +126,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begs(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iu) 
 do j = 1,jtab_u(15)%jend(mrl); iu = jtab_u(15)%iu(j)
 !----------------------------------------------------------------------
@@ -123,6 +138,9 @@ call qsub('U',iu)
 
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('U',15)
 
@@ -144,6 +162,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begs(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw) 
 do j = 1,jtab_w(19)%jend(mrl); iw = jtab_w(19)%iw(j)
 !----------------------------------------------------------------------
@@ -154,6 +175,9 @@ call qsub('W',iw)
       
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('Wa',19)
 
@@ -164,6 +188,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begs(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw,iwp,k) 
 do j = 1,jtab_w(22)%jend(mrl); iw = jtab_w(22)%iw(j)
    iwp = itab_w(iw)%iwp
@@ -178,6 +205,9 @@ call qsub('W',iw)
    
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',22)
 
@@ -196,6 +226,9 @@ if (mrl > 0) then
 !!! Uncomment for 10-meter mountain experiment only !!!!
 !   call uwcomp(0,0,0,0.,0.,0.)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iu)
 do j = 1,jtab_u(16)%jend(mrl); iu = jtab_u(16)%iu(j)
 !----------------------------------------------------------------------
@@ -205,6 +238,9 @@ call qsub('U',iu)
 
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('Ua',16)
 
@@ -214,6 +250,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begs(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw,ka,k) 
 do j = 1,jtab_w(19)%jend(mrl); iw = jtab_w(19)%iw(j)
 !----------------------------------------------------------------------
@@ -229,6 +268,9 @@ call qsub('W',iw)
    wc(mza-1,iw) = 0.
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('Wb',19)
 
@@ -239,6 +281,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_begs(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iw,iwp,k) 
 do j = 1,jtab_w(24)%jend(mrl); iw = jtab_w(24)%iw(j)
    iwp = itab_w(iw)%iwp
@@ -253,6 +298,9 @@ call qsub('W',iw)
 
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',24)
 
@@ -262,6 +310,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_ends(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iu,iw1,iw2,ka,k)
 do j = 1,jtab_u(16)%jend(mrl); iu = jtab_u(16)%iu(j)
 iw1 = itab_u(iu)%iw1; iw2 = itab_u(iu)%iw2
@@ -278,6 +329,9 @@ call qsub('U',iu)
 
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('Ub',16)
 
@@ -293,6 +347,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_ends(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private(iu,iup,k) 
 do j = 1,jtab_u(18)%jend(mrl); iu = jtab_u(18)%iu(j)
    iup = itab_u(iu)%iup
@@ -306,12 +363,19 @@ call qsub('U',iu)
 
 enddo
 !$omp end parallel do 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('U',18)
 
 if (iparallel == 1) then
    call mpi_send_u('U')  ! Send U group
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PROG_WRTU_OUT,rst_buf)
+#endif
 
 return
 end subroutine prog_wrtu

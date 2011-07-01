@@ -56,6 +56,12 @@ integer :: iws      ! sea cell loop counter
 real :: timefac_sst   ! fraction of elapsed time from past to future SST obs
 real :: timefac_seaice   ! fraction of elapsed time from past to future SEA ICE obs
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SEACELLS_IN,rst_buf)
+#endif
+
+
 ! Time interpolation factors for updating SST and SEA ICE
 
 timefac_sst = 0.
@@ -73,6 +79,9 @@ endif
 
 ! Loop over ALL SEA CELLS
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do
 do iws = 2,mws
 
@@ -109,6 +118,13 @@ do iws = 2,mws
                    
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SEACELLS_OUT,rst_buf)
+#endif
 
 return
 end subroutine seacells

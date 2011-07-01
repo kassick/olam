@@ -44,10 +44,18 @@ subroutine inithh()
 
 implicit none
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_INITHH_IN,rst_buf)
+#endif
+
 call arrsnd()  !  Arrange the input sounding.
 call refs1d()  !  Compute the 1-D reference state variables 
 call fldshhi()  !  Compute the 3-D model fields.
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_INITHH_OUT,rst_buf)
+#endif
 return
 end subroutine inithh
 

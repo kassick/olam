@@ -97,6 +97,11 @@ End type
 
 type (grp_var) :: grp(mgroupsize)
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_PARA_DECOMP_IN,rst_buf)
+#endif
+
 ! Allocate permanent itabg data structures
 
 allocate (itabg_m(nma))
@@ -554,6 +559,10 @@ if (isfcl == 1) then
 
 endif
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARA_DECOMP_OUT,rst_buf)
+#endif
+
 return
 end subroutine para_decomp
 
@@ -632,6 +641,11 @@ real :: aru_temp(nza,nua),arw_temp(nza,nwa)
 real :: volui_temp(nza,nua),volwi_temp(nza,nwa)
 
 real(kind=8) :: volt_temp(nza,nwa),volti_temp(nza,nwa)
+
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_PARA_INIT_IN,rst_buf)
+#endif
 
 ! Allocate temporary ltab data structures
 
@@ -1503,6 +1517,10 @@ enddo
 ! Deallocate temporary data structures and arrays
 
 deallocate (ltab_m,ltab_u,ltab_w)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARA_INIT_OUT,rst_buf)
+#endif
 
 return
 end subroutine para_init

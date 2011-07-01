@@ -47,6 +47,12 @@ implicit none
 
 integer :: n,j,iw,iwp,k
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_TRSETS_IN,rst_buf)
+#endif
+
+
 ! SCALARS - Lateral, top, and bottom boundary conditions.
 
 ! Prognostic scalars other than thil
@@ -68,6 +74,10 @@ if (level >= 1) then
    call latsett(sh_v)
    call topbott(sh_v)
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_TRSETS_OUT,rst_buf)
+#endif
 
 return
 end subroutine trsets

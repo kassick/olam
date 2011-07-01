@@ -38,10 +38,10 @@
 !===============================================================================
 Module hdf5_utils
 
-integer :: OLAM_EVT_HDF5_OPEN_START   = Z'beef'
-integer :: OLAM_EVT_HDF5_OPEN_END     = Z'bef0'
-integer :: OLAM_EVT_HDF5_CREATE_START = Z'bef1'
-integer :: OLAM_EVT_HDF5_CREATE_END   = Z'bef2'
+!integer :: OLAM_EVT_HDF5_OPEN_START   = Z'beef'
+!integer :: OLAM_EVT_HDF5_OPEN_END     = Z'bef0'
+!integer :: OLAM_EVT_HDF5_CREATE_START = Z'bef1'
+!integer :: OLAM_EVT_HDF5_CREATE_END   = Z'bef2'
 
 Contains
 
@@ -65,28 +65,20 @@ character(len=2) :: caccess ! File access ('R ','W ','RW')
 logical :: exists ! File existence
 
 real, external :: walltime
-real :: wtime_start_shdf5open, inicio
-
 integer :: thread_id
-
-
 thread_id = omp_get_thread_num()
-call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_START, myrank, thread_id, locfn,access)
+
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN, myrank, thread_id, locfn,access)
+#endif
 
 
-
-wtime_start_shdf5open = walltime(0.)
 
 caccess = access
 
 ! Check for existence of RAMS file.
 
-inicio = walltime(wtime_start_shdf5open)
-
-
 inquire(file=trim(locfn),exist=exists)
-
-write(io6, *) '                             ==T== Ver se o arquivo existia: ',(walltime(wtime_start_shdf5open)-inicio)
 
 ! Create a new file or open an existing RAMS file.
 if (access(1:1) == 'R') then
@@ -94,50 +86,48 @@ if (access(1:1) == 'R') then
       print*,'shdf5_open:'
       print*,'   Attempt to open a file for reading that does not exist.'
       print*,'   Filename: ',trim(locfn)
-      call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
       stop 'shdf5_open: no file'
    else
       if (caccess == 'R ') iaccess = 1
       if (caccess == 'RW') iaccess = 2
 
-    inicio = walltime(wtime_start_shdf5open)
 
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_HDF5_OPEN_IN, myrank, thread_id, locfn,access)
+#endif
     call fh5f_open(trim(locfn)//char(0), iaccess, hdferr)
-
-      
-    write(io6, *) '                             ==T== Tempo total gasto na fh5f_open(): ',(walltime(wtime_start_shdf5open)-inicio)
-
+     
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT, myrank, thread_id, locfn,access)
+#endif
  
       if (hdferr < 0) then
          print*,'shdf5_open:'
          print*,'   Error opening hdf5 file - error -',hdferr
          print*,'   Filename: ',trim(locfn)
-         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
          stop 'shdf5_open: open error'      
       endif
    endif
 
-   call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
 
 elseif (access(1:1) == 'W') then
    if (.not.exists) then
-      call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
       
       iaccess=2
     
-      inicio = walltime(wtime_start_shdf5open)
-      
-      call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_START, myrank, thread_id, locfn,access)
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, locfn,access)
+#endif
       call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, locfn,access)
+#endif
     
-      write(io6, *) '                             ==T== Tempo gasto na fh5f_create(): ',(walltime(wtime_start_shdf5open)-inicio)
 
-      call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_END, myrank, thread_id, locfn,access)
 
     else
       if(.not.present(idelete) ) then
          print*,'shdf5_open: idelete not specified when access=W'
-         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
          stop 'shdf5_open: no idelete'
       endif
       
@@ -146,22 +136,19 @@ elseif (access(1:1) == 'W') then
          print*,'   Attempt to open an existing file for writing, '
          print*,'      but overwrite is disabled. idelete=',idelete
          print*,'   Filename: ',trim(locfn)
-         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
          stop 'shdf5_open'
       else
-         call rst_event_iiss_f(OLAM_EVT_HDF5_OPEN_END, myrank, thread_id, locfn,access)
-         
-         call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_START, myrank, thread_id, locfn,access)
          call system('rm -f '//trim(locfn)//char(0))
          iaccess=1
       
-         inicio = walltime(wtime_start_shdf5open)
-         
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, locfn,access)
+#endif
          call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, locfn,access)
+#endif
     
-         write(io6, *) '                             ==T== Tempo gasto na fh5f_create(): ',(walltime(wtime_start_shdf5open)-inicio)
-
-         call rst_event_iiss_f(OLAM_EVT_HDF5_CREATE_END, myrank, thread_id, locfn,access)
 
     endif
    endif
@@ -172,6 +159,9 @@ elseif (access(1:1) == 'W') then
    endif
 endif
 
+#ifdef OLAM_RASTRO
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT, myrank, thread_id, locfn,access)
+#endif
 
 return
 end subroutine shdf5_open
@@ -180,6 +170,7 @@ end subroutine shdf5_open
 
 subroutine shdf5_info(dsetname,ndims,dims)
 
+use mem_para,  only: myrank, mgroupsize
 implicit none
 
 character(len=*) :: dsetname ! Dataset name
@@ -188,30 +179,61 @@ integer :: dims(*)
 integer :: ndims ! Dataset rank (in file)
 
 integer :: hdferr ! Error flag
+integer :: thread_id
+thread_id = omp_get_thread_num()
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_INFO_IN, myrank, thread_id, dsetname)
+#endif
 
 ! Open the dataset.
 
+
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_DATASET_OPEN_IN, myrank, thread_id, dsetname)
+#endif
 call fh5d_open( trim(dsetname)//char(0), hdferr)
+
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_DATASET_OPEN_OUT, myrank, thread_id, dsetname)
+#endif
 
 if (hdferr < 0) then
    print*, 'In shdf5_info:'
    print*, 'Variable ', trim(dsetname), ' is not in the currently opened hdf5 file'
    ndims   = 0
    dims(1) = 0
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_INFO_OUT, myrank, thread_id, dsetname)
+#endif
    return
 endif
 
 ! Get dataset's dimensions
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_DATASET_GETINFO_IN, myrank, thread_id, dsetname)
+#endif
 call fh5s_get_ndims(ndims)
 call fh5s_get_dims(dims)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_DATASET_GETINFO_OUT, myrank, thread_id, dsetname)
+#endif
 
 !print*,'ndims: ',ndims
 !print*,'dims: ',dims(1:ndims)
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_DATASET_CLOSE_IN, myrank, thread_id, dsetname)
+#endif
 call fh5d_close(hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_DATASET_CLOSE_OUT, myrank, thread_id, dsetname)
+#endif
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_INFO_OUT, myrank, thread_id, dsetname)
+#endif
 return
 end subroutine shdf5_info
 
@@ -221,6 +243,7 @@ end subroutine shdf5_info
 subroutine shdf5_orec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
                                          ,ivars,rvars,cvars,dvars,lvars)
 use misc_coms, only: io6
+use mem_para,  only: myrank, mgroupsize
 
 implicit none
 
@@ -243,9 +266,13 @@ character(len=2) :: ctype    ! Variable type: int, real, char
 integer :: hdferr ! Error flag
 
 real, external :: walltime
-real :: wtime_start_shdf5orec, inicio
+integer :: thread_id
+thread_id = omp_get_thread_num()
 
-wtime_start_shdf5orec = walltime(0.)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_OREC_IN, myrank, thread_id, dsetname)
+#endif
+
 
 ! Find which data type is input
     if(present(ivars)) then ; ctype='is'
@@ -271,14 +298,20 @@ if (ndims <=0 .or. minval(dims(1:ndims)) <=0) then
 endif
 dimsh(1:ndims) = dims(1:ndims)
      
-inicio = walltime(wtime_start_shdf5orec)
-
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_PREPARE_WRITE_IN, myrank, thread_id, dsetname)
+#endif
 ! Prepare memory and options for the write
 call fh5_prepare_write(ndims, dimsh, hdferr)
-write(io6, *) '                             ==T== Tempo gasto na fh5_prepare_write(): ',(walltime(wtime_start_shdf5orec)-inicio)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_PREPARE_WRITE_OUT, myrank, thread_id, dsetname)
+#endif
 
 if (hdferr /= 0) then
    print*,'shdf5_orec: can''t prepare requested field:',trim(dsetname)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_OREC_OUT, myrank, thread_id, dsetname)
+#endif
    return
 endif
 
@@ -288,9 +321,11 @@ if (ctype(1:1) == 'c') h5_type=3
 if (ctype(1:1) == 'd') h5_type=4  ! If native precision is 8 bytes, do h5_type=2
 if (ctype(1:1) == 'l') h5_type=5
 
-inicio = walltime(wtime_start_shdf5orec)
 
 ! Write the dataset.
+#ifdef OLAM_RASTRO
+call rst_event_iiiss_f(OLAM_HDF5_WRITE_IN, myrank, thread_id, h5_type, ctype, dsetname)
+#endif
 if (ctype == 'is') then
    call fh5_write(h5_type, ivars, trim(dsetname)//char(0), hdferr)
 elseif (ctype == 'rs') then
@@ -313,7 +348,9 @@ elseif (ctype == 'la') then
    call fh5_write(h5_type, lvara, trim(dsetname)//char(0), hdferr)
 endif
 
-write(io6, *) '                             ==T== Tempo gasto na fh5_write(): ',(walltime(wtime_start_shdf5orec)-inicio)
+#ifdef OLAM_RASTRO
+call rst_event_iiiss_f(OLAM_HDF5_WRITE_OUT, myrank, thread_id, h5_type, ctype, dsetname)
+#endif
 
 if (hdferr /= 0) then
    print*,'In shdf5_orec: hdf5 write error =',hdferr
@@ -322,11 +359,18 @@ endif
 
 ! Close the dataset, the dataspace for the dataset, and the dataspace properties.
 
-inicio = walltime(wtime_start_shdf5orec)
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_CLOSE_WRITE_IN, myrank, thread_id, dsetname)
+#endif
 call fh5_close_write(hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_CLOSE_WRITE_OUT, myrank, thread_id, dsetname)
+#endif
 
-write(io6, *) '                             ==T== Tempo gasto na fh5_close_write(): ',(walltime(wtime_start_shdf5orec)-inicio)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_OREC_OUT, myrank, thread_id, dsetname)
+#endif
 
 return
 end subroutine
@@ -337,6 +381,7 @@ subroutine shdf5_irec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
                                          ,ivars,rvars,cvars,dvars,lvars)
 
 use misc_coms, only: io6
+use mem_para,  only: myrank, mgroupsize
         
 implicit none
 
@@ -360,9 +405,13 @@ integer :: hdferr ! Error flag
 character(len=2) :: ctype
 
 real, external :: walltime
-real :: wtime_start_shdf5irec, inicio
+integer :: thread_id
+thread_id = omp_get_thread_num()
 
-wtime_start_shdf5irec = walltime(0.)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_IREC_IN, myrank, thread_id, dsetname)
+#endif
+
 
 ! Find which data type will be read
     if(present(ivars)) then ; ctype='is'
@@ -390,15 +439,22 @@ endif
 dimsh(1:ndims) = dims(1:ndims)
 !print*,'-----:',trim(dsetname)
     
-inicio = walltime(wtime_start_shdf5irec)
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_PREPARE_READ_IN, myrank, thread_id, dsetname)
+#endif
 ! Prepare file and memory space for the read
 call fh5_prepare_read(trim(dsetname)//char(0), ndims, dimsh, hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_PREPARE_READ_OUT, myrank, thread_id, dsetname)
+#endif
 
-write(io6, *) '                                     ==T== Tempo gasto na fh5_prepare_read(): ',(walltime(wtime_start_shdf5irec)-inicio)
 
 if (hdferr < 0) then
    print*,'shdf5_irec: can''t prepare requested field:',trim(dsetname)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_IREC_OUT, myrank, thread_id, dsetname)
+#endif
    return
 endif
 
@@ -409,8 +465,10 @@ if (ctype(1:1) == 'c') h5_type=3
 if (ctype(1:1) == 'd') h5_type=4  ! If native precision is 8 bytes, do h5_type=2
 if (ctype(1:1) == 'l') h5_type=5
 
-inicio = walltime(wtime_start_shdf5irec)
 
+#ifdef OLAM_RASTRO
+call rst_event_iiiss_f(OLAM_HDF5_READ_IN, myrank, thread_id, h5_type, ctype, dsetname)
+#endif
 if (ctype == 'is') then
    call fh5d_read(h5_type,ivars,hdferr)
 elseif (ctype == 'rs') then
@@ -432,8 +490,10 @@ elseif (ctype == 'da') then
 elseif (ctype == 'la') then
    call fh5d_read(h5_type,lvara,hdferr)
 endif
+#ifdef OLAM_RASTRO
+call rst_event_iiiss_f(OLAM_HDF5_READ_OUT, myrank, thread_id, h5_type, ctype, dsetname)
+#endif
 
-write(io6, *) '                                     ==T== Tempo gasto na fh5d_read(): ',(walltime(wtime_start_shdf5irec)-inicio)
 
 
 if (hdferr /= 0) then
@@ -443,13 +503,20 @@ endif
 
 ! Close the dataset, the dataspace for the dataset, and the memory space.
 
-inicio = walltime(wtime_start_shdf5irec)
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_CLOSE_READ_IN, myrank, thread_id, dsetname)
+#endif
 call fh5_close_read(hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_HDF5_CLOSE_READ_OUT, myrank, thread_id, dsetname)
+#endif
 
-write(io6, *) '                                     ==T== Tempo gasto na fh5_close_read(): ',(walltime(wtime_start_shdf5irec)-inicio)
 
 
+#ifdef OLAM_RASTRO
+call rst_event_iis_f(OLAM_SHDF5_IREC_OUT, myrank, thread_id, dsetname)
+#endif
 return
 end subroutine
 
@@ -458,22 +525,33 @@ end subroutine
 subroutine shdf5_close()
         
 use misc_coms, only: io6, iparallel
+use mem_para,  only: myrank, mgroupsize
 
 implicit none
 
 integer :: hdferr  ! Error flags
 real, external :: walltime
-real :: wtime_start_shdf5close, inicio
+integer :: thread_id
+thread_id = omp_get_thread_num()
 
-wtime_start_shdf5close = walltime(0.)
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
+#endif
 
 ! Close RAMS hdf file.
 
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_HDF5_CLOSE_IN,myrank, thread_id)
+#endif
 call fh5f_close(hdferr)
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_HDF5_CLOSE_OUT,myrank, thread_id)
+#endif
 
-inicio = walltime(wtime_start_shdf5close)
-write(io6, *) '                                     ==T== Tempo gasto na fh5f_close(): ',(walltime(wtime_start_shdf5close)-inicio)
 
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_SHDF5_CLOSE_OUT,myrank, thread_id)
+#endif
 return
 end  subroutine
 
@@ -516,3 +594,5 @@ subroutine shdf5_io(action,ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
 end subroutine shdf5_io
 
 end module
+
+

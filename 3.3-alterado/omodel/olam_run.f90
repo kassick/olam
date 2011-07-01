@@ -69,7 +69,6 @@ integer :: i,ifm,nndtflg,ifileok,ierr,iplt_file
 integer :: mwa_prog, mua_prog
 real :: w1,w2,t1,t2,wtime_start
 real, external :: walltime
-real :: inicio,fim,inicio2,fim2,wtime_start2
 
 wtime_start = walltime(0.)
 w1 = walltime(wtime_start)
@@ -85,9 +84,7 @@ iflag = 0
 
 write(io6,'(/,a)') 'olam_run calling namelist read'
 
-inicio = walltime(wtime_start)
 call read_nl(name_name)
-write(io6, *) ' ==T== Tempo total gasto na read_nl(): ',(walltime(wtime_start)-inicio)
 
 write(io6,'(/,a)') 'olam_run checking namelist values'
 call oname_check()
@@ -135,15 +132,11 @@ endif
 
 ! Initialize various oplot parameters
 
-inicio = walltime(wtime_start)
-!call oplot_init()
-write(io6, *) ' ==T== Tempo total gasto na oplot_init(): ',(walltime(wtime_start)-inicio)
+call oplot_init()
 
 ! Generate or read from files the full-domain ATMOS, LAND, SEA, and FLUX grids
 
-inicio = walltime(wtime_start)
 call gridinit()
-write(io6, *) ' ==T== Tempo total gasto na gridinit(): ',(walltime(wtime_start)-inicio)
 
 ! If RUNTYPE = 'MAKESFC' or 'MAKEGRID', run is finished; EXIT
 
@@ -366,7 +359,7 @@ if ((runtype == 'PLOTONLY') .or. (runtype == 'PARCOMBINE')) then
       call history_start('HISTREAD')
 
       if (runtype == 'PLOTONLY') then
-!         call plot_fields()
+         call plot_fields()
       else
          call history_write('STATE')
       endif
@@ -399,18 +392,12 @@ endif
 
 write(io6,'(/,a)') 'olam_run calling plot_fields'
 
-inicio = walltime(wtime_start)
-
-!call plot_fields()
-write(io6, *) ' ==T== Tempo total gasto na plot_fields(): ',(walltime(wtime_start)-inicio)
+call plot_fields()
 
 if (trim(runtype) /= 'HISTORY') then
    write(io6,'(/,a)') 'olam_run calling history_write'
 
-   inicio = walltime(wtime_start)
-
    call history_write('STATE')
-   write(io6, *) ' ==T== Tempo total gasto na history_write(): ',(walltime(wtime_start)-inicio)
 endif
 
 write(io6,'(/,a)') 'olam_run finished history_write'
@@ -429,10 +416,7 @@ if (time8 >= timmax8) go to 1000
 if(ied_offline == 0)then
    write(io6,'(/,a)') 'olam_run calling model'
    
-   inicio = walltime(wtime_start)
-   
    call model()
-   write(io6, *) ' ==T== Tempo total gasto na model(): ',(walltime(wtime_start)-inicio)
    write(io6,'(/,a)') 'subroutine model returned to olam_run'
 else
    write(io6,'(/,a)') 'olam_run calling ed_offline_model'
@@ -446,10 +430,7 @@ endif
 
 write(io6,'(/,a)') 'olam_run calling o_clsgks'
 
-inicio = walltime(wtime_start)
-
 call o_clsgks()
-write(io6, *) ' ==T== Tempo gasto na o_clsgks(): ',(walltime(wtime_start)-inicio)
 
 write(io6,'(/,a)') 'olam_run returning to olammain'
 
@@ -475,9 +456,11 @@ real :: wtime_start,t1,wtime1,wtime2,t2,wtime_tot
 real, external :: walltime
 character(len=40) :: stepc1,stepc2,stepc3,stepc4,stepc5
 type(simtime) :: begtime
-real :: wtime_start2, inicio
 
-wtime_start2 = walltime(0.)
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_MODEL_IN,rst_buf)
+#endif
 
  write(io6,*) 'starting subroutine MODEL'
 
@@ -526,15 +509,17 @@ do while (time8 < timmax8)
    write(io6,'(a)')  &
       trim(stepc1)//trim(stepc2)//trim(stepc3)//trim(stepc4)//trim(stepc5)
 
-      inicio = walltime(wtime_start2)
 
    call olam_output
-      write(io6, *) '       ==T== Tempo total gasto na olam_output(): ',(walltime(wtime_start2)-inicio)
    
 enddo
 
 wtime_tot = walltime(wtime_start)
 write(io6, '(//,a,f10.0)') ' -----Total elapsed time: ',wtime_tot
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_MODEL_OUT,rst_buf)
+#endif
 
 return
 end subroutine model
@@ -661,18 +646,18 @@ implicit none
 integer :: ierr,ifm,ifileok
 real(kind=r8) :: frqplt8
 real, external :: walltime
-real :: wtime_start_olamoutput, inicio
 
-wtime_start_olamoutput = walltime(0.)
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_O_OUTPUT_IN,rst_buf)
+#endif
+
 
 frqplt8 = op%frqplt
 
 if (mod(time8,frqplt8) < dtlm(1) .or. iflag == 1) then
 
-    inicio = walltime(wtime_start_olamoutput)
-
-!   call plot_fields()
-    write(io6, *) '                     ==T== Tempo gasto na plot_fields(): ',(walltime(wtime_start_olamoutput)-inicio)
+   call plot_fields()
 !!!!!!!!!!!!!! SPECIAL FOR HS EXPERIMENT !!!!!!!!!!!!!!!!!!!!
 !hs   call interp_hs()
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -682,10 +667,7 @@ endif
 if (mod(time8,real(frqstate,r8)) < dtlm(1)  .or.  &
    time8  >=  timmax8 - .01*dtlm(1) .or. iflag == 1) then
     
-   inicio = walltime(wtime_start_olamoutput)
-   
     call history_write('INST')
-    write(io6, *) '                     ==T== Tempo gasto na history_write(): ',(walltime(wtime_start_olamoutput)-inicio)
 endif
 
 if (isfcl == 1 .and. iupdsst == 1) then
@@ -719,7 +701,11 @@ endif
 
 if (iflag == 1) stop 'IFLAG'
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_O_OUTPUT_OUT,rst_buf)
+#endif
 
 return
 end subroutine olam_output
+
 

@@ -160,13 +160,20 @@ Contains
    
    integer, intent(in) :: mza
 
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_ALLOC_MISC_IN,mza)
+#endif
+
    allocate (u01d (mza))
    allocate (v01d (mza))
    allocate (pr01d(mza))
    allocate (th01d(mza))
    allocate (dn01d(mza))
    allocate (rt01d(mza))
-   
+  
+#ifdef OLAM_RASTRO 
+call rst_event_i_f(OLAM_ALLOC_MISC_OUT,mza)
+#endif
    return
    end subroutine alloc_misc
    

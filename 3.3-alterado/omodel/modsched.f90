@@ -59,6 +59,11 @@ integer :: mrl
 integer :: nshort(mrls)  ! automatic array
 integer :: nlong(mrls)   ! automatic array
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_MODSCHED_IN,rst_buf)
+#endif
+
 ! Find number of short timesteps of most refined mesh done per long and short
 !    timestep of every refinement level.
 
@@ -162,6 +167,10 @@ enddo
 ! Set dt_sea equal to dt_leaf
 
 dt_sea = dt_leaf
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_MODSCHED_OUT,rst_buf)
+#endif
 
 return
 end subroutine modsched

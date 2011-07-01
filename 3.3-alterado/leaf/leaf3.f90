@@ -58,6 +58,12 @@ real :: timefac_ndvi  ! fraction of elapsed time from past to future NDVI obs
 type(patch), pointer :: ed_patch
 type(site),  pointer :: ed_site
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_LEAF3_IN,rst_buf)
+#endif
+
+
 ! Time interpolation factor for updating NDVI
 
 timefac_ndvi = 0.
@@ -179,6 +185,10 @@ do iwl = 2,mwl
    endif
 
 enddo
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_LEAF3_OUT,rst_buf)
+#endif
 
 return
 end subroutine leaf3

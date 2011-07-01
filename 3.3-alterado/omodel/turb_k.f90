@@ -52,6 +52,12 @@ integer :: j,iw,k,iwp,mrl
 real :: dzimo2(mza)   ! automatic array
 real :: dzim2 (mza)   ! automatic array
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_TURB_K_IN,rst_buf)
+#endif
+
+
 do k = 2,mza-2
    dzimo2(k) = .5 * dzim(k)
    dzim2(k) = dzim(k) * dzim(k)
@@ -63,6 +69,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_endl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw)
 do j = 1,jtab_w(34)%jend(mrl); iw = jtab_w(34)%iw(j)
 !----------------------------------------------------------------------
@@ -72,6 +81,9 @@ call qsub('W',iw)
    
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',34)
 
@@ -81,6 +93,9 @@ call psub()
 !----------------------------------------------------------------------
 mrl = mrl_endl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw,iwp,k)
 do j = 1,jtab_w(35)%jend(mrl); iw = jtab_w(35)%iw(j)
    iwp = itab_w(iw)%iwp
@@ -93,8 +108,15 @@ call qsub('W',iw)
    enddo
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',35)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_TURB_K_OUT,rst_buf)
+#endif
 
 return
 end subroutine turb_k

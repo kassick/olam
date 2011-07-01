@@ -328,10 +328,22 @@ real :: umass,umassoraxis
 !sp
 real :: umtbef
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_OBS_NUDGE_IN,rst_buf)
+#endif
+
+
 ! Check whether it is time to nudge
 
 mrl = mrl_begl(istp)
-if (mrl < 1) return
+if (mrl < 1) then
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_OBS_NUDGE_OUT,rst_buf)
+#endif
+	return
+endif
 
 ! Time interpolation coefficients
 
@@ -536,6 +548,10 @@ call qsub('U',iu)
 
 enddo
 call rsub('U',13)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_OBS_NUDGE_OUT,rst_buf)
+#endif
 
 return
 end subroutine obs_nudge

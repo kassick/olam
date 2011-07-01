@@ -55,6 +55,12 @@ integer :: j,iw,k,mrl
 real :: zwt1(mza)
 real :: zwt2(mza)
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_SCALAR_TRANSPORT_IN,rst_buf)
+#endif
+
+
 ! Compute vertical advective weights for a stretched grid
 
 do k = 1,mza-1
@@ -77,6 +83,10 @@ call qsub('W',iw)
 enddo     ! end horizontal loop over W/T points
 endif
 call rsub('W',26)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_SCALAR_TRANSPORT_OUT,rst_buf)
+#endif
 
 return
 end subroutine scalar_transport

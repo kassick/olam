@@ -61,6 +61,11 @@ real(kind=8) :: d_huge
 
 character(len=1), dimension(8) :: tunits = (/ 'd','D','h','H','m','M','s','S' /)
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_ONAME_CHECK_IN,rst_buf)
+#endif
+
 nfatal = 0
 nwarn  = 0
 
@@ -605,8 +610,14 @@ write(io6,*) ' FATAL     errors - ', nfatal
 write(io6,*) ' WARNING   errors - ', nwarn
 write(io6,*) ' -----------------------------------------------'
 write(io6,*) ''
+
+
+
 if (nfatal > 0) stop 'ONAME_CHECK'
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_ONAME_CHECK_OUT,rst_buf)
+#endif
 
 contains
   

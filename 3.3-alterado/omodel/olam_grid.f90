@@ -55,9 +55,11 @@ use mem_sflux,   only: init_fluxcells, nlandflux, nseaflux
 implicit none
 
 real, external :: walltime
-real :: wtime_start_gridinit,inicio
 
-wtime_start_gridinit = walltime(0.)
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_GRIDINIT_IN,rst_buf)
+#endif
 
 ! Read LAND and SEA files
 
@@ -65,17 +67,11 @@ if (runtype /= 'MAKESFC' .and. isfcl == 1) then
 
    write(io6,'(/,a)') 'gridinit calling landfile_read'
 
-   inicio = walltime(wtime_start_gridinit)
-
    call landfile_read()
-   write(io6, *) '      ==T== Tempo total gasto na landfile_read(): ',(walltime(wtime_start_gridinit)-inicio)
-
+    
    write(io6,'(/,a)') 'gridinit calling seafile_read'
   
-   inicio = walltime(wtime_start_gridinit)
-   
    call seafile_read()
-   write(io6, *) '      ==T== Tempo total gasto na seafile_read(): ',(walltime(wtime_start_gridinit)-inicio)
 
 endif
 
@@ -146,6 +142,11 @@ if (runtype == 'MAKESFC' .or. runtype == 'MAKEGRID') then
    if (runtype == 'MAKESFC') then
       write(io6,'(/,a)') 'gridinit calling makesfc'
       call makesfc()
+      
+#ifdef OLAM_RASTRO
+      call rst_event_s_f(OLAM_GRIDINIT_OUT,rst_buf)
+#endif
+
       return
    endif
 
@@ -206,10 +207,7 @@ else
 
    write(io6,'(/,a)') 'gridinit calling gridfile_read'
 
-   inicio = walltime(wtime_start_gridinit)
-
    call gridfile_read()
-   write(io6, *) '      ==T== Tempo total gasto na gridfile_read(): ',(walltime(wtime_start_gridinit)-inicio)
 
 endif
 
@@ -220,6 +218,10 @@ if (isfcl == 1) then
    write(io6,'(a,i8)')   ' nlandflux = ',nlandflux
    write(io6,'(a,i8)')   ' nseaflux  = ',nseaflux
 endif
+      
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_GRIDINIT_OUT,rst_buf)
+#endif
 
 return
 end subroutine gridinit
@@ -1316,14 +1318,9 @@ real,    allocatable :: rscr(:,:)
 logical, allocatable :: lscr(:,:)
 
 real, external :: walltime
-real :: wtime_start_gridfileread, inicio
-
-wtime_start_gridfileread = walltime(0.)
 
 
 ! Check if grid file exists
-inicio = walltime(wtime_start_gridfileread)
-
 inquire(file=gridfile, exist=exans)
 
 
@@ -1336,10 +1333,6 @@ if (exans) then
    write(io6,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
    call shdf5_open(trim(gridfile),'R')
-
-   write(io6, *) '              ==T== Abrir o gridfile: ',(walltime(wtime_start_gridfileread)-inicio)
-
-   inicio = walltime(wtime_start_gridfileread)
 
 ! Read the grid information that exists in namelist
 
@@ -1871,13 +1864,8 @@ if (exans) then
    endif
 
 ! Close the GRIDFILE
-   write(io6, *) '              ==T== Ler o gridfile: ',(walltime(wtime_start_gridfileread)-inicio)
-
-   inicio = walltime(wtime_start_gridfileread)
-
    call shdf5_close()
 
-   write(io6, *) '              ==T== Fechar o gridfile: ',(walltime(wtime_start_gridfileread)-inicio)
 else
 
 ! Grid file does not exist.

@@ -52,6 +52,12 @@ subroutine ed_vegetation_dynamics()
   integer :: doy
   integer :: julday
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_ED_VEGETATION_DYNAMICS_IN,rst_buf)
+#endif
+
+
   ! find the day of year
   doy = julday(current_time%month, current_time%date, current_time%year)
   
@@ -95,6 +101,10 @@ subroutine ed_vegetation_dynamics()
      cs => cs%next_site
   enddo
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_ED_VEGETATION_DYNAMICS_OUT,rst_buf)
+#endif
+
   return
 end subroutine ed_vegetation_dynamics
 
@@ -107,6 +117,11 @@ subroutine update_model_time(ctime,dtlong)
 
   type(simtime) :: ctime
   real :: dtlong
+
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_UPDATE_MODEL_TIME_IN,rst_buf)
+#endif
 
   ctime%time = ctime%time + dtlong
   if(ctime%time.ge.86400.0)then
@@ -158,6 +173,10 @@ subroutine update_model_time(ctime,dtlong)
         endif
      endif
   endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_UPDATE_MODEL_TIME_OUT,rst_buf)
+#endif
 
   return
 end subroutine update_model_time

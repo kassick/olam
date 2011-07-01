@@ -64,6 +64,11 @@ implicit none
 
 integer :: ng,nv,ntpts
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_O_MEM_ALLOC_IN,rst_buf)
+#endif
+
 ! Allocate variable tables and initialize table counters to zero
 
 allocate (vtab_r(maxvars))
@@ -148,6 +153,9 @@ dts_w(1:mwa) = dtsm(1)
 !enddo
 
 write(io6,*) 'end alloc'
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_O_MEM_ALLOC_OUT,rst_buf)
+#endif
 
 return
 end subroutine olam_mem_alloc

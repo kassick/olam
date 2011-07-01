@@ -53,6 +53,11 @@ subroutine init_offline_met()
   integer :: mem_size
   logical :: l1
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_INIT_OFFLINE_MET_IN,rst_buf)
+#endif
+
   ! Open the config file
   inquire(file=trim(ed_offline_db),exist=l1)
   if(.not.l1)then
@@ -163,6 +168,9 @@ subroutine init_offline_met()
 
   ! Close the header file and return
   close(12)
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_INIT_OFFLINE_MET_OUT,rst_buf)
+#endif
 
   return
 end subroutine init_offline_met
@@ -191,6 +199,8 @@ subroutine read_offline_met_init()
   integer :: m2
   integer :: y2
   integer :: year_use_2
+
+call rst_event_s_f(OLAM_READ_OFFLINE_MET_INIT_IN," ")
 
   ! If we need to recycle over years, find the appropriate year to apply.
   year_use = current_time%year
@@ -285,6 +295,7 @@ subroutine read_offline_met_init()
      call shdf5_close()
 
   enddo
+call rst_event_s_f(OLAM_READ_OFFLINE_MET_INIT_OUT," ")
 
   return
 end subroutine read_offline_met_init

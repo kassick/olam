@@ -58,6 +58,11 @@ real :: deltaz
 ! compute node process, at the time of model initialization.
 !------------------------------------------------------------------------------
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_HARR_RADINIT_IN,rst_buf)
+#endif
+
 ! Initialize constants for Harrington s/w and l/w radiation computations
 
 call harr_radinit1(ng,nb,nsolb,npsb,nuum,prf,alpha,trf,beta  &
@@ -94,6 +99,10 @@ else
    nadd_rad = min(nadd_rad,maxadd_rad)
 
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_HARR_RADINIT_OUT,rst_buf)
+#endif
 
 return
 end subroutine harr_radinit

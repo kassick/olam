@@ -54,6 +54,10 @@ character(len=10) :: number
 
 ! Check if history files exist
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_HISTORY_START_IN,action)
+#endif
+
 exanp = .false.
 nfl = len_trim(hfilin)
 hfilinp = hfilin(1:nfl-3)//'_r0.h5'
@@ -76,7 +80,12 @@ if (iparallel == 1 .and. exanz) then
       write(number,'(i6)') iter
       hfilinp = hfilin(1:nfl-3)//'_r'//trim(adjustl(number))//'.h5'
       inquire(file=hfilinp, exist=exanp)
-      if (.not. exanp) exit
+      if (.not. exanp) then
+#ifdef OLAM_RASTRO
+	call rst_event_s_f(OLAM_HISTORY_START_OUT,action)
+#endif
+	exit
+      endif
    enddo
 endif
       
@@ -140,7 +149,12 @@ elseif (exanz .and. iparallel == 0) then
          ! check if history file exists from parallel run, and exit loop
          ! when file does not exist
          inquire(file=hfilinp, exist=exanp)
-         if (.not. exanp) exit
+         if (.not. exanp) then
+#ifdef OLAM_RASTRO
+		call rst_event_s_f(OLAM_HISTORY_START_OUT,action)
+#endif
+		exit
+	 endif
 
          ! Parallel history file exists.  Open, read, and close file.
          write(io6,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -190,6 +204,10 @@ else
    stop 'in history_start'
    
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_HISTORY_START_OUT,action)
+#endif
 
 return
 end subroutine history_start

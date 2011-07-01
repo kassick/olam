@@ -63,7 +63,11 @@ Contains
 
    integer :: k
    real :: distimi,distimwi
-   
+
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_RAYF_INIT_IN,mza)
+#endif  
+ 
    allocate(rayf_cof(mza),rayf_cofw(mza))
 
 ! RAYF coefficient for THIL and UMC  
@@ -93,6 +97,10 @@ Contains
          endif
       enddo
    endif
+
+#ifdef OLAM_RASTRO
+call rst_event_i_f(OLAM_RAYF_INIT_OUT,mza)
+#endif  
 
   return
   end subroutine rayf_init

@@ -749,6 +749,11 @@ Contains
    
    integer :: jsend,iwl,jend,mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_FILL_JLAND_IN,rst_buf)
+#endif
+
 ! Allocate and zero-fill JTAB_WL_MPI%JEND
 
    do jsend = 1,maxremote
@@ -800,6 +805,10 @@ Contains
          enddo
       enddo
    enddo
+
+#ifdef OLAM_RASTRO
+   call rst_event_s_f(OLAM_FILL_JLAND_OUT,rst_buf)
+#endif
 
    return
    end subroutine fill_jland

@@ -36,7 +36,12 @@ subroutine fuliou_radinit()
        !MINERAL DUST PARAMETERS
        !                CLAY                  SILT
        redust=(/ 0.1, 0.2, 0.4, 0.8,   1.0, 2.0, 4.0, 8.0/)
-  
+
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_FULIOU_RADINIT_IN,rst_buf)
+#endif
+ 
   open(12,file=trim(mie_file),form='formatted',status='old')
  3000 FORMAT(A80)
  3001 FORMAT(18X,6(F7.5,1X))
@@ -275,6 +280,9 @@ subroutine fuliou_radinit()
   read(12)tdust
   close(12)
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_FULIOU_RADINIT_OUT,rst_buf)
+#endif
   return
 end subroutine fuliou_radinit
 

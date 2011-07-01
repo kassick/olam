@@ -56,6 +56,11 @@ implicit none
 
 integer :: iwl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_LEAF3_STARTUP_IN,rst_buf)
+#endif
+
 ! Subroutine LEAF3_STARTUP allocates and initializes some leaf3 arrays.
 
 ! THIS SUBROUTINE DOES NOT INITIALIZE soil/veg/canopy temperature and moisture
@@ -121,6 +126,9 @@ elseif (runtype /= 'PLOTONLY' .and. runtype /= 'PARCOMBINE') then
 
 endif
 
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_LEAF3_STARTUP_OUT,rst_buf)
+#endif
 return
 end subroutine leaf3_startup
 

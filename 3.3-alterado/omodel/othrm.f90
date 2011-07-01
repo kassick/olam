@@ -48,12 +48,21 @@ implicit none
 
 integer iw,j,mrl
 
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_THERMO_IN,rst_buf)
+#endif
+
+
 ! Horizontal loop over W/T points
 
 call psub()
 !-------------------------------------------------------------------------
 mrl = mrl_endl(istp)
 if (mrl > 0) then
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_IN,rst_buf)
+#endif
 !$omp parallel do private (iw)
 do j = 1,jtab_w(29)%jend(mrl); iw = jtab_w(29)%iw(j)
 !-------------------------------------------------------------------------
@@ -71,8 +80,15 @@ call qsub('W',iw)
 
 enddo
 !$omp end parallel do
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_PARBLOCK_OUT,rst_buf)
+#endif
 endif
 call rsub('W',29)
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_THERMO_OUT,rst_buf)
+#endif
 
 return
 end subroutine thermo

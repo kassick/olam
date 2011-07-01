@@ -108,14 +108,17 @@ integer, parameter :: iwkid=1
 integer            :: iopen
 integer, external  :: ngckop
 real, external :: walltime
-real :: wtime_start, inicio
-
-wtime_start = walltime(0.)
 
 ! call clsgks()
 
 ! Check if GKS workstation is active, and if so
 ! deactivate and close it.
+
+#ifdef OLAM_RASTRO
+character(len=*) :: rst_buf = '_'
+call rst_event_s_f(OLAM_O_CLSGKS_IN,rst_buf)
+#endif
+
 
 iopen = ngckop(iwkid)
 if (iopen .eq. 1) then
@@ -128,8 +131,9 @@ endif
 call gqops(iopen)
 if (iopen > 0) call gclks()
 
-inicio = walltime(wtime_start)
-write(io6, *) ' ==T== Tempo total gasto na o_clsgks(): ',inicio
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_O_CLSGKS_OUT,rst_buf)
+#endif
 
 end subroutine o_clsgks
 

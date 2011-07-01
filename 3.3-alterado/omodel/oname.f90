@@ -49,17 +49,15 @@ character(len=9) :: line
 integer :: iline, iplt
 logical :: fexists
 real, external :: walltime
-real :: wtime_start_readnl, inicio
 
 
 namelist /OLAMIN/ nl
 
-wtime_start_readnl = walltime(0.)
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_READ_NL_IN,file)
+#endif
 
 ! OPEN THE NAMELIST FILE
-
-inicio = walltime(wtime_start_readnl)
-
 inquire(file=file, exist=fexists)
 
 
@@ -70,10 +68,6 @@ endif
 
 open(10, status='OLD', file=file)
  
-write(io6, *) '         ==T== Abrir o OLAMIN: ',(walltime(wtime_start_readnl)-inicio)
-
-inicio = walltime(wtime_start_readnl)
-
 ! READ GRID POINT AND OPTIONS INFORMATION FROM THE NAMELIST
 
 read(10, nml=OLAMIN)
@@ -102,14 +96,11 @@ enddo
 
 1999 continue
 
-write(io6, *) '         ==T== Ler do OLAMIN: ',(walltime(wtime_start_readnl)-inicio)
-
-inicio = walltime(wtime_start_readnl) 
-
 close(10)
 
-write(io6, *) '         ==T== Fechar o OLAMIN: ',(walltime(wtime_start_readnl)-inicio)
-
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_READ_NL_OUT,file)
+#endif
 
 end subroutine read_nl
 
@@ -164,6 +155,10 @@ implicit none
 character(len=*) :: copy_type
 integer :: i,j
 real(kind=8) :: tfact
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_COPY_NL_IN,copy_type)
+#endif
 
 if (copy_type == 'ALL_CASES') then
 	
@@ -446,6 +441,10 @@ elseif (copy_type == 'NOT_HISTORY') then
    current_time%time = int(itime1 * 0.01) * 3600.0   &
         + (itime1 * 0.01 - int(itime1*0.01))*100.0*60.0
 endif
+
+#ifdef OLAM_RASTRO
+call rst_event_s_f(OLAM_COPY_NL_OUT,copy_type)
+#endif
 
 end subroutine copy_nl
 
