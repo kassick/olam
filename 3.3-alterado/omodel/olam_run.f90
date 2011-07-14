@@ -63,7 +63,7 @@ use consts_coms, only: r8
 
 implicit none
 
-character*1, intent(in) :: name_name
+character(len=*), intent(in) :: name_name
 
 integer :: i,ifm,nndtflg,ifileok,ierr,iplt_file
 integer :: mwa_prog, mua_prog

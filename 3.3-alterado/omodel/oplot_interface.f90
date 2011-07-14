@@ -1364,7 +1364,7 @@ use misc_coms,  only: io6
 implicit none
 
 integer, intent(in) :: iplt
-character*1, intent(in) :: filltype
+character(len=*), intent(in) :: filltype
 
 ! Set plot color (black)
 
@@ -1440,7 +1440,7 @@ use misc_coms,  only: io6
 implicit none
 
 integer, intent(in) :: i
-character*1, intent(in) :: var
+character(len=*), intent(in) :: var
 
 real :: hpt,vpt
 integer, save :: jplt=1  ! transform to projection of FIRST field in OLAMIN
@@ -1491,7 +1491,7 @@ use oplot_coms, only: op
 
 implicit none
 
-character*1, intent(in) :: fldname
+character(len=*), intent(in) :: fldname
 integer, intent(in) :: num
 
 integer :: outyear,outmonth,outdate,outhour

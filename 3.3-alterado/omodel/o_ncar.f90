@@ -215,7 +215,7 @@ subroutine o_maproj(chr,o_x,o_y,o_r)
 
 implicit none
 
-character*1, intent(in) :: chr
+character(len=*), intent(in) :: chr
 real, intent(in) :: o_x,o_y,o_r
 
 real(kind=4) :: x,y,r
@@ -235,7 +235,7 @@ subroutine o_mapset(chr,o_x1,o_x2,o_y1,o_y2)
 
 implicit none
 
-character*1, intent(in) :: chr
+character(len=*), intent(in) :: chr
 real, intent(in) :: o_x1,o_x2,o_y1,o_y2
 
 real(kind=4) :: x1,x2,y1,y2
@@ -282,7 +282,7 @@ subroutine o_plchhq(o_x,o_y,chr,o_r1,o_r2,o_r3)
 implicit none
 
 real, intent(in) :: o_x,o_y,o_r1,o_r2,o_r3
-character*1, intent(in) :: chr
+character(len=*), intent(in) :: chr
 
 real(kind=4) :: x,y,r1,r2,r3
 
@@ -304,7 +304,7 @@ subroutine o_plchmq(o_x,o_y,chr,o_r1,o_r2,o_r3)
 implicit none
 
 real, intent(in) :: o_x,o_y,o_r1,o_r2,o_r3
-character*1, intent(in) :: chr
+character(len=*), intent(in) :: chr
 
 real(kind=4) :: x,y,r1,r2,r3
 
@@ -326,7 +326,7 @@ subroutine o_plchlq(o_x,o_y,chr,o_r1,o_r2,o_r3)
 implicit none
 
 real, intent(in) :: o_x,o_y,o_r1,o_r2,o_r3
-character*1, intent(in) :: chr
+character(len=*), intent(in) :: chr
 
 real(kind=4) :: x,y,r1,r2,r3
 
@@ -463,7 +463,7 @@ subroutine o_sfseti(a,i)
 implicit none
 
 integer, intent(in) :: i
-character*1 :: a
+character(len=*) :: a
 
 call sfseti(a,i)
 
@@ -495,7 +495,7 @@ subroutine o_mapsti(a,i)
 
 implicit none
 
-character*1, intent(in) :: a
+character(len=*), intent(in) :: a
 integer, intent(in) :: i
 
 call mapsti(a,i)
@@ -508,7 +508,7 @@ subroutine o_mapstc(a,b)
 
 implicit none
 
-character*1, intent(in) :: a,b
+character(len=*), intent(in) :: a,b
 
 call mapstc(a,b)
 
@@ -530,7 +530,7 @@ subroutine o_pcsetr(a,r)
 
 implicit none
 
-character*1, intent(in) :: a
+character(len=*), intent(in) :: a
 real, intent(in) :: r
 
 call pcsetr(a,r)
@@ -543,7 +543,7 @@ subroutine o_pcseti(a,i)
 
 implicit none
 
-character*1, intent(in) :: a
+character(len=*), intent(in) :: a
 integer, intent(in) :: i
 
 call pcseti(a,i)
