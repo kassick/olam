@@ -67,7 +67,7 @@ logical :: exists ! File existence
 
 real, external :: walltime
 integer :: thread_id
-integer :: OMP_GET_THREAD_NUM
+!integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -174,6 +174,7 @@ subroutine shdf5_info(dsetname,ndims,dims)
 
 use mem_para,  only: myrank, mgroupsize
 use rastro_evts
+use omp_lib
 implicit none
 
 character(len=*) :: dsetname ! Dataset name
@@ -183,7 +184,7 @@ integer :: ndims ! Dataset rank (in file)
 
 integer :: hdferr ! Error flag
 integer :: thread_id
-integer :: OMP_GET_THREAD_NUM
+!integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -249,6 +250,7 @@ subroutine shdf5_orec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
 use misc_coms, only: io6
 use mem_para,  only: myrank, mgroupsize
 use rastro_evts
+use omp_lib
 
 implicit none
 
@@ -272,7 +274,7 @@ integer :: hdferr ! Error flag
 
 real, external :: walltime
 integer :: thread_id
-integer :: OMP_GET_THREAD_NUM
+!integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -389,6 +391,7 @@ subroutine shdf5_irec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
 use misc_coms, only: io6
 use mem_para,  only: myrank, mgroupsize
 use rastro_evts
+use omp_lib
         
 implicit none
 
@@ -413,7 +416,7 @@ character(len=2) :: ctype
 
 real, external :: walltime
 integer :: thread_id
-integer :: OMP_GET_THREAD_NUM
+!integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -535,13 +538,14 @@ subroutine shdf5_close()
 use misc_coms, only: io6, iparallel
 use mem_para,  only: myrank, mgroupsize
 use rastro_evts
+use omp_lib
 
 implicit none
 
 integer :: hdferr  ! Error flags
 real, external :: walltime
 integer :: thread_id
-integer :: OMP_GET_THREAD_NUM
+!integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO

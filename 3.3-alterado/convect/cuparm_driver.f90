@@ -65,7 +65,7 @@ integer :: k
 integer :: mrl, mrlw
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_CUPARM_DRIVER_IN,rst_buf)
 #endif
 

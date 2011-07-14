@@ -12,5 +12,15 @@ void rst_event_ii_ptr(rst_buffer_t *ptr, u_int16_t type, u_int32_t i0, u_int32_t
 #define rst_event_ii(type, i0, i1) rst_event_ii_ptr(RST_PTR, type, i0, i1)
 void rst_event_iiiss_ptr(rst_buffer_t *ptr, u_int16_t type, u_int32_t i0, u_int32_t i1, u_int32_t i2, char *s0, char *s1);
 #define rst_event_iiiss(type, i0, i1, i2, s0, s1) rst_event_iiiss_ptr(RST_PTR, type, i0, i1, i2, s0, s1)
+void rst_event_iis_ptr(rst_buffer_t *ptr, u_int16_t type, u_int32_t i0, u_int32_t i1, char *s0);
+#define rst_event_iis(type, i0, i1, s0) rst_event_iis_ptr(RST_PTR, type, i0, i1, s0)
+void rst_event_iii_ptr(rst_buffer_t *ptr, u_int16_t type, u_int32_t i0, u_int32_t i1, u_int32_t i2);
+#define rst_event_iii(type, i0, i1, i2) rst_event_iii_ptr(RST_PTR, type, i0, i1, i2)
+void rst_event_s_ptr(rst_buffer_t *ptr, u_int16_t type, char *s0);
+#define rst_event_s(type, s0) rst_event_s_ptr(RST_PTR, type, s0)
+void rst_event_i_ptr(rst_buffer_t *ptr, u_int16_t type, u_int32_t i0);
+#define rst_event_i(type, i0) rst_event_i_ptr(RST_PTR, type, i0)
+void rst_event_f_ptr(rst_buffer_t *ptr, u_int16_t type, float f0);
+#define rst_event_f(type, f0) rst_event_f_ptr(RST_PTR, type, f0)
 
 #endif

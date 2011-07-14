@@ -99,7 +99,7 @@ End type
 type (grp_var) :: grp(mgroupsize)
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_PARA_DECOMP_IN,rst_buf)
 #endif
 
@@ -645,7 +645,7 @@ real :: volui_temp(nza,nua),volwi_temp(nza,nwa)
 real(kind=8) :: volt_temp(nza,nwa),volti_temp(nza,nwa)
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_PARA_INIT_IN,rst_buf)
 #endif
 

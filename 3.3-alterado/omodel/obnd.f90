@@ -49,7 +49,7 @@ implicit none
 integer :: n,j,iw,iwp,k
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_TRSETS_IN,rst_buf)
 #endif
 

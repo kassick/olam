@@ -87,7 +87,7 @@ real, parameter :: chic = 1.5 + chi
 real, parameter :: chip = -.5 - chi
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_PROG_WRTU_IN,rst_buf)
 #endif
 

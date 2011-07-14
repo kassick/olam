@@ -428,7 +428,7 @@ Contains
    integer :: jsend,iws,jend,mrl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+   character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_FILL_JSEA_IN,rst_buf)
 #endif
 
@@ -442,9 +442,9 @@ call rst_event_s_f(OLAM_FILL_JSEA_IN,rst_buf)
 ! Return if run is not parallel (jtab not needed)
 
    if (iparallel == 0) then
-	#ifdef OLAM_RASTRO
+#ifdef OLAM_RASTRO
 	call rst_event_s_f(OLAM_FILL_JSEA_OUT,rst_buf)
-	#endif
+#endif
 	return
    endif
    

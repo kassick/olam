@@ -39,7 +39,7 @@ subroutine fuliou_radinit()
        redust=(/ 0.1, 0.2, 0.4, 0.8,   1.0, 2.0, 4.0, 8.0/)
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_FULIOU_RADINIT_IN,rst_buf)
 #endif
  

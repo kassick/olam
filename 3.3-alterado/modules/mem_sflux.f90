@@ -235,7 +235,7 @@ Contains
    integer :: mrl,mrlw,isf,ilf,iw,iws,iwl,iloop,jsend,jend
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_FILL_JFLUX_IN,rst_buf)
 #endif
 ! Allocate and initialize JSEAFLUX%JEND

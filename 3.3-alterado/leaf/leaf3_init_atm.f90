@@ -89,7 +89,7 @@ real :: fracliq(nzg,mwl)     ! initial soil liquid fraction (0-1)
 real, external :: rhovsl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_LEAF3_INIT_ATM_IN,rst_buf)
 #endif
 

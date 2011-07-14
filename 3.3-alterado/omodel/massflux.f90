@@ -55,7 +55,7 @@ real, intent(out) :: rho_old(mza,mwa)
 integer :: j,k,iu,iw,mrl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_ZERO_MASSFLUX_IN,rst_buf)
 #endif
 
@@ -138,7 +138,7 @@ integer :: j,k,iu,iw,mrl,mrlu,mrlw
 real :: acoi,acoi2
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_TIMEAVG_MASSFLUX_IN,rst_buf)
 #endif
 

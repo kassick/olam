@@ -71,7 +71,7 @@ real :: soil_tempc
 real, external :: rhovsl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SEA_INIT_ATM_IN,rst_buf)
 #endif
 

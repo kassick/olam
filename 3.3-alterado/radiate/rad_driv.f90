@@ -93,7 +93,7 @@ integer :: jday
 real :: rlong_previous(mwa)
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_RADIATE_IN,rst_buf)
 #endif
 

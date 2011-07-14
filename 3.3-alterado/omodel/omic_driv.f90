@@ -48,7 +48,7 @@ implicit none
 integer :: j,iw,mrl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_MICRO_IN,rst_buf)
 #endif
 

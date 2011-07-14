@@ -54,7 +54,7 @@ subroutine ed_vegetation_dynamics()
   integer :: julday
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_ED_VEGETATION_DYNAMICS_IN,rst_buf)
 #endif
 
@@ -121,7 +121,7 @@ subroutine update_model_time(ctime,dtlong)
   real :: dtlong
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_UPDATE_MODEL_TIME_IN,rst_buf)
 #endif
 

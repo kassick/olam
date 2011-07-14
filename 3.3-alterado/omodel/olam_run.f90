@@ -63,7 +63,7 @@ use consts_coms, only: r8
 
 implicit none
 
-character(len=*), intent(in) :: name_name
+character*1, intent(in) :: name_name
 
 integer :: i,ifm,nndtflg,ifileok,ierr,iplt_file
 integer :: mwa_prog, mua_prog
@@ -459,7 +459,7 @@ character(len=40) :: stepc1,stepc2,stepc3,stepc4,stepc5
 type(simtime) :: begtime
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_MODEL_IN,rst_buf)
 #endif
 
@@ -650,7 +650,7 @@ real(kind=r8) :: frqplt8
 real, external :: walltime
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_O_OUTPUT_IN,rst_buf)
 #endif
 

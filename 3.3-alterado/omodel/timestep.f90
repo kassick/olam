@@ -68,7 +68,7 @@ real :: alpha_press(mza,mwa) !
 real :: rhot       (mza,mwa) ! grid-cell total mass tendency [kg/s]
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_TIMESTEP_IN,rst_buf)
 #endif
 
@@ -318,7 +318,8 @@ real, intent(in) :: rhot
 integer :: n,mrl,j,k,iw,iu
 
 #ifdef OLAM_RASTRO
-call rst_event_r_f(OLAM_TEND0_IN,rhot)
+character*1 :: rst_buf = '_'
+call rst_event_f_f(OLAM_TEND0_IN,rhot)
 #endif
 
 ! SET SCALAR TENDENCIES TO ZERO
@@ -383,7 +384,7 @@ endif
 call rsub('U',11)
 
 #ifdef OLAM_RASTRO
-call rst_event_r_f(OLAM_TEND0_OUT,rhot)
+call rst_event_f_f(OLAM_TEND0_OUT,rhot)
 #endif
 
 return
@@ -404,6 +405,10 @@ implicit none
 real, intent(out) :: vart(mza,mwa)
 
 integer :: j,iw,k,mrl
+
+#ifdef OLAM_RASTRO
+character*1 :: rst_buf = '_'
+#endif
 
 call psub()
 !----------------------------------------------------------------------
@@ -447,7 +452,7 @@ real, intent(in) :: rho_old(mza,mwa)
 integer :: n,mrl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_PREDTR_IN,rst_buf)
 #endif
 
@@ -497,6 +502,9 @@ real, intent(out) :: varp(mza,mwa)
 
 integer :: iw,j,k,mrl
 real :: dtl
+#ifdef OLAM_RASTRO
+character*1 :: rst_buf = '_'
+#endif
 
 call psub()
 !----------------------------------------------------------------------

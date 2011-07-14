@@ -79,7 +79,7 @@ endif
 call makefnam8(hnamel,hfilepref,time8,iyear1,imonth1,idate1,  &
      itime1*100,'H',post,'h5')
 
-inicio = walltime(wtime_start_historywrite)
+!inicio = walltime(wtime_start_historywrite)
 
 inquire(file=hnamel,exist=exans)
 

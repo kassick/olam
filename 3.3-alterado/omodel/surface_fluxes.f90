@@ -100,7 +100,7 @@ real :: vxu1,vxu2,vxu3,vyu1,vyu2,vyu3,vzu1,vzu2,vzu3
 real :: uc1,uc2,uc3,ucs,vcs,wcs
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SURFACE_TURB_FLUX_IN,rst_buf)
 #endif
 
@@ -705,6 +705,7 @@ use mem_basic,   only: press, theta, rho, sh_v
 use leaf_coms,   only: mwl, dt_leaf, mrl_leaf
 use misc_coms,   only: io6, iparallel
 use mem_para,    only: myrank
+use rastro_evts
 
 implicit none
 
@@ -722,7 +723,7 @@ real :: tempc
 real, external :: rhovsl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SURFACE_CUPARM_FLUX_IN,rst_buf)
 #endif
 
@@ -839,6 +840,7 @@ use mem_ijtabs, only: istp, mrl_endl, itabg_w
 use leaf_coms,  only: mwl, mrl_leaf
 use misc_coms,  only: io6, iparallel
 use mem_para,   only: myrank
+use rastro_evts
 
 implicit none
 
@@ -852,7 +854,7 @@ real :: arf_land
 real :: arf_land_dtf
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SURFACE_PRECIP_FLUX_IN,rst_buf)
 #endif
 

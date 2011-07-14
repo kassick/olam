@@ -46,7 +46,7 @@ use rastro_evts
 implicit none
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_INITHH_IN,rst_buf)
 #endif
 

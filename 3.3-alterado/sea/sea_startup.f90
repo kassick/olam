@@ -54,7 +54,7 @@ integer :: ndims, idims(1)
 integer :: iws
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SEA_STARTUP_IN,rst_buf)
 #endif
 

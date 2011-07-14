@@ -61,7 +61,7 @@ integer :: nshort(mrls)  ! automatic array
 integer :: nlong(mrls)   ! automatic array
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_MODSCHED_IN,rst_buf)
 #endif
 

@@ -66,7 +66,7 @@ implicit none
 integer :: ng,nv,ntpts
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_O_MEM_ALLOC_IN,rst_buf)
 #endif
 

@@ -67,7 +67,7 @@ real, dimension(mza,mwa) :: uzonal  ! automatic array
 real, external :: rhovsl
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_FLDSLHI_IN,rst_buf)
 #endif
 

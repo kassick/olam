@@ -66,7 +66,7 @@ logical :: l1,l2
 character*80 dataline,cname
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_MICINIT_IN,rst_buf)
 #endif
 
@@ -361,8 +361,8 @@ use rastro_evts
 implicit none
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
-call rst_event_s_f(OLAN_JNMBINIT_IN,rst_buf)
+character*1 :: rst_buf = '_'
+call rst_event_s_f(OLAM_JNMBINIT_IN,rst_buf)
 #endif
 
 if (level /= 3) then
@@ -411,7 +411,7 @@ else
 
 endif
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAN_JNMBINIT_OUT,rst_buf)
+call rst_event_s_f(OLAM_JNMBINIT_OUT,rst_buf)
 #endif
 return
 end subroutine jnmbinit

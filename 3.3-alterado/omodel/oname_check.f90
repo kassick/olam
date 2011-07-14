@@ -63,7 +63,7 @@ real(kind=8) :: d_huge
 character(len=1), dimension(8) :: tunits = (/ 'd','D','h','H','m','M','s','S' /)
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_ONAME_CHECK_IN,rst_buf)
 #endif
 
@@ -628,8 +628,8 @@ contains
     implicit none
     integer,       intent(inout) :: ivar, nfatal, nwarn
     integer,          intent(in) :: imaxv, iminv, iflag
-    character(len=*), intent(in) :: name
-    character(len=*),   optional :: msgmin, msgmax, msgboth
+    character*1, intent(in) :: name
+    character*1,   optional :: msgmin, msgmax, msgboth
 
     ! CHECK THE BOUNDS OF AN INTEGER NAMELIST VARIABLE. IF THE BOUNDS ARE
     ! EXCEEDED, THEN IT RESPONDS BASED ON THE VALUE OF IFLAG.
@@ -708,8 +708,8 @@ contains
     real,          intent(inout) :: rvar
     real,          intent(in)    :: rmaxv, rminv
 
-    character(len=*), intent(in) :: name
-    character(len=*),   optional :: msgmin, msgmax, msgboth
+    character*1, intent(in) :: name
+    character*1,   optional :: msgmin, msgmax, msgboth
     character(len=6)             :: varformat, minformat, maxformat
 
     ! CHECK THE BOUNDS OF A REAL NAMELIST VARIABLE. IF THE BOUNDS ARE
@@ -786,7 +786,7 @@ contains
 
 
   subroutine rsetformat(fstring, var)
-    character(len=*), intent(out) :: fstring
+    character*1, intent(out) :: fstring
     real,             intent(in)  :: var
     if ((abs(var) >= 1.0e7) .or. (abs(var) <= 1.0e-4)) then
        fstring = "ES12.5"
@@ -806,8 +806,8 @@ contains
     real(kind=8),  intent(inout) :: dvar
     real(kind=8),  intent(in)    :: dmaxv, dminv
 
-    character(len=*), intent(in) :: name
-    character(len=*),   optional :: msgmin, msgmax, msgboth
+    character*1, intent(in) :: name
+    character*1,   optional :: msgmin, msgmax, msgboth
     character(len=6)             :: varformat, minformat, maxformat
 
     ! CHECK THE BOUNDS OF A REAL NAMELIST VARIABLE. IF THE BOUNDS ARE
@@ -884,7 +884,7 @@ contains
 
 
   subroutine dsetformat(fstring, var)
-    character(len=*), intent(out) :: fstring
+    character*1, intent(out) :: fstring
     real(kind=8),     intent(in)  :: var
     if ((abs(var) >= 1.0d7) .or. (abs(var) <= 1.0d-4)) then
        fstring = "ES12.5"

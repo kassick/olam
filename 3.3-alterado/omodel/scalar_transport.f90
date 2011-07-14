@@ -57,7 +57,7 @@ real :: zwt1(mza)
 real :: zwt2(mza)
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SCALAR_TRANSPORT_IN,rst_buf)
 #endif
 

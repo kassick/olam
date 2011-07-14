@@ -54,7 +54,7 @@ real :: dzimo2(mza)   ! automatic array
 real :: dzim2 (mza)   ! automatic array
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_TURB_K_IN,rst_buf)
 #endif
 

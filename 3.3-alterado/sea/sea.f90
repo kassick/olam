@@ -58,7 +58,7 @@ real :: timefac_sst   ! fraction of elapsed time from past to future SST obs
 real :: timefac_seaice   ! fraction of elapsed time from past to future SEA ICE obs
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_SEACELLS_IN,rst_buf)
 #endif
 

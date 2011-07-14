@@ -58,7 +58,7 @@ implicit none
 real, external :: walltime
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_GRIDINIT_IN,rst_buf)
 #endif
 

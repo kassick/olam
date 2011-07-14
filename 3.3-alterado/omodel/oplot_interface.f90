@@ -46,7 +46,7 @@ use rastro_evts
 implicit none
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_OPLOT_INIT_IN,rst_buf)
 #endif
 
@@ -88,7 +88,7 @@ character(len=30) :: ylabel
 real, external :: walltime
 
 #ifdef OLAM_RASTRO
-character(len=*) :: rst_buf = '_'
+character*1 :: rst_buf = '_'
 call rst_event_s_f(OLAM_PLOT_FIELDS_IN,rst_buf)
 #endif
 
@@ -1364,7 +1364,7 @@ use misc_coms,  only: io6
 implicit none
 
 integer, intent(in) :: iplt
-character(len=*), intent(in) :: filltype
+character*1, intent(in) :: filltype
 
 ! Set plot color (black)
 
@@ -1440,7 +1440,7 @@ use misc_coms,  only: io6
 implicit none
 
 integer, intent(in) :: i
-character(len=*), intent(in) :: var
+character*1, intent(in) :: var
 
 real :: hpt,vpt
 integer, save :: jplt=1  ! transform to projection of FIRST field in OLAMIN
@@ -1491,7 +1491,7 @@ use oplot_coms, only: op
 
 implicit none
 
-character(len=*), intent(in) :: fldname
+character*1, intent(in) :: fldname
 integer, intent(in) :: num
 
 integer :: outyear,outmonth,outdate,outhour
