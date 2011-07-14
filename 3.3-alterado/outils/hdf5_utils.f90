@@ -67,6 +67,7 @@ logical :: exists ! File existence
 
 real, external :: walltime
 integer :: thread_id
+integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -182,6 +183,7 @@ integer :: ndims ! Dataset rank (in file)
 
 integer :: hdferr ! Error flag
 integer :: thread_id
+integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -270,6 +272,7 @@ integer :: hdferr ! Error flag
 
 real, external :: walltime
 integer :: thread_id
+integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -410,6 +413,7 @@ character(len=2) :: ctype
 
 real, external :: walltime
 integer :: thread_id
+integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
@@ -537,6 +541,7 @@ implicit none
 integer :: hdferr  ! Error flags
 real, external :: walltime
 integer :: thread_id
+integer :: OMP_GET_THREAD_NUM
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
