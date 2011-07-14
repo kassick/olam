@@ -60,6 +60,7 @@ use mem_grid,    only: wnx, wny, wnz
 use mem_para,    only: myrank
 
 use ed_structure_defs
+use rastro_evts
 
 !$ use omp_lib
 

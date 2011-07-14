@@ -47,6 +47,7 @@ use ed_structure_defs, only: patch,site
 use ed_options,        only: ied_offline
 use leaf3_interface,   only: leaf3_land
 use mem_para,          only: myrank
+use rastro_evts
 
 implicit none
 

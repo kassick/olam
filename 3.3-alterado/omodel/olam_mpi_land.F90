@@ -43,6 +43,7 @@ use mem_para,  only: nsends_wl, nsends_wlf, nrecvs_wl, nrecvs_wlf,  &
                      send_wl, send_wlf, recv_wl, recv_wlf
 use mem_sflux, only: landflux, jlandflux
 use misc_coms, only: io6
+use rastro_evts
 
 implicit none
 

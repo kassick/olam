@@ -51,6 +51,7 @@ use mem_grid,    only: nma, nua, nwa, mma, mua, mwa, mza, nwa, zm, zt,  &
                        alloc_grid1, alloc_grid2
 use mem_nudge,   only: nudflag
 use mem_sflux,   only: init_fluxcells, nlandflux, nseaflux
+use rastro_evts
 
 implicit none
 

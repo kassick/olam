@@ -43,6 +43,7 @@ use mem_para,   only: nsends_ws, nsends_wsf, nrecvs_ws, nrecvs_wsf,  &
                       send_ws, send_wsf, recv_ws, recv_wsf
 use mem_sflux,  only: seaflux, jseaflux
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 

@@ -302,6 +302,7 @@ use mem_ijtabs,  only: istp, jtab_u, jtab_w, itab_u, itab_w, mrl_begl
 use consts_coms, only: erad, eradi
 use mem_tend,    only: umt, thilt, sh_wt
 use isan_coms,   only: ifgfile, s1900_fg
+use rastro_evts
 
 implicit none
 

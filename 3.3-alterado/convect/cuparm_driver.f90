@@ -49,6 +49,7 @@ use mem_tend,    only: thilt, sh_wt
 use mem_basic,   only: uc, wc, theta, press, rho, sh_v
 use consts_coms, only: tkmin, r8
 use mem_micro,   only: sh_c
+use rastro_evts
 
 !$ use omp_lib
 

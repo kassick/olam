@@ -228,6 +228,7 @@ Contains
    use mem_leaf,   only: itab_wl, itabg_wl
    use mem_sea,    only: itab_ws, itabg_ws
    use mem_para,   only: myrank, nsends_wsf, nsends_wlf
+   use rastro_evts
 
    implicit none
 

@@ -42,6 +42,7 @@ subroutine inithh()
 ! _    for horizontally homogeneous fields.                _
 ! +--------------------------------------------------------+
 
+use rastro_evts
 implicit none
 
 #ifdef OLAM_RASTRO

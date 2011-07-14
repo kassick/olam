@@ -47,6 +47,7 @@ use mem_radiate, only: maxadd_rad, nadd_rad, zmrad
 use micro_coms,  only: gnu
 use mem_grid,    only: mza, zm
 use misc_coms,   only: io6
+use rastro_evts
 
 implicit none
 

@@ -41,6 +41,7 @@ subroutine thermo()
 use mem_ijtabs, only: jtab_w, istp, mrl_endl
 use micro_coms, only: level
 use misc_coms,  only: io6
+use rastro_evts
 
 !$ use omp_lib
 

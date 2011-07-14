@@ -41,6 +41,7 @@ subroutine scalar_transport(umarusc,wmarwsc,rho_old)
 use mem_ijtabs, only: istp, jtab_w, mrl_endl
 use mem_grid,   only: mza, mua, mwa, zt, zm, dzim
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 

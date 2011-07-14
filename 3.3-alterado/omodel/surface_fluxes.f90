@@ -70,6 +70,7 @@ use mem_turb,    only: vkm_sfc, sflux_t, sflux_r, sxfer_tk, sxfer_rk,  &
 use mem_basic,   only: press, rho, theta, sh_v, uc
 
 use ed_structure_defs
+use rastro_evts
 
 implicit none
 

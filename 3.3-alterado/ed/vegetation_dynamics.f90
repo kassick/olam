@@ -43,6 +43,7 @@ subroutine ed_vegetation_dynamics()
   use misc_coms, only: simtime, current_time, dtlm
   use leaf_coms, only: dt_leaf
   use ed_options, only: include_fire, frq_phenology
+  use rastro_evts
 
   implicit none
 
@@ -112,6 +113,7 @@ end subroutine ed_vegetation_dynamics
 
 subroutine update_model_time(ctime,dtlong)
   use misc_coms, only: simtime
+  use rastro_evts
 
   implicit none
 

@@ -44,6 +44,7 @@ use mem_basic,  only: rho, thil, wc, press, wmc, ump, umc, uc
 use mem_grid,   only: zt, zm, dzim, lpw, mza, mua, mwa, aru, lpu, lcu,  &
                       volui, volt, unx, volwi, dzm, dzt
 use misc_coms,  only: io6, iparallel, cnum_vel, cnum_sclr
+use rastro_evts
 
 !$ use omp_lib
 

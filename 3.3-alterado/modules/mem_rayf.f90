@@ -39,6 +39,7 @@
 Module mem_rayf
 
 ! Memory for Rayleigh friction layer
+use rastro_evts
 
 real :: rayf_zmin
 real :: rayf_distim

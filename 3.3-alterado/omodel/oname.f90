@@ -41,6 +41,7 @@ subroutine read_nl(file)
 
 use oname_coms, only: nl
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 
@@ -149,6 +150,7 @@ use ed_options,  only: ied_init_mode, istoma_scheme, iphen_scheme,  &
      metcyc1, metcyc2, ed_offline_db,ianth_disturb, runoff_time, ed_hfilin
 
 use disturbance_coms, only: treefall_disturbance_rate
+use rastro_evts
 
 implicit none
 

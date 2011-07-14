@@ -139,6 +139,7 @@ use mem_para,   only: myrank, nrecvs_u, nrecvs_w, nsends_u, nsends_w,  &
                       recv_u, recv_w, recv_uf, send_u, send_w, send_uf
 use misc_coms,  only: io6
 use var_tables, only: nvar_par
+use rastro_evts
 
 implicit none
 

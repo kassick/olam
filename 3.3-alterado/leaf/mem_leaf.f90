@@ -744,6 +744,7 @@ Contains
                          nsends_wlf, nrecvs_wlf
 
    use leaf_coms,   only: mml, mul, mwl, nml, nul, nwl
+   use rastro_evts
    
    implicit none
    

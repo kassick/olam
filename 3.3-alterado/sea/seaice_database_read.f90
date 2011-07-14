@@ -50,6 +50,7 @@ use misc_coms,   only: io6, iyear1, imonth1, idate1, itime1, timmax8,  &
 use consts_coms, only: erad, piu180
 use hdf5_utils,  only: shdf5_open, shdf5_close, shdf5_irec, shdf5_info
 use max_dims,    only: maxsstfiles
+use rastro_evts
 
 implicit none
 

@@ -421,6 +421,7 @@ Contains
                          nsends_wsf, nrecvs_wsf
 
    use sea_coms,   only: mms, mus, mws, nms, nus, nws
+   use rastro_evts
 
    implicit none
    

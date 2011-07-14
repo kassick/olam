@@ -307,6 +307,7 @@ use var_tables, only: scalar_tab, num_scalar
 use mem_grid,   only: mza, mwa, mua, lcu, lpw
 use mem_tend,   only: wmt, umt, thilt
 use misc_coms,  only: io6
+use rastro_evts
 
 !$ use omp_lib
 
@@ -395,6 +396,7 @@ subroutine tnd0(vart)
 use mem_ijtabs, only: jtab_w, istp, mrl_begl
 use mem_grid,   only: mza, mwa, lpw
 use misc_coms,  only: io6
+use rastro_evts
 !$ use omp_lib
 
 implicit none
@@ -436,6 +438,7 @@ use var_tables, only: num_scalar, scalar_tab
 use mem_ijtabs, only: istp, jtab_w, mrl_endl
 use mem_grid,   only: mza, mwa
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 
@@ -482,6 +485,7 @@ use mem_ijtabs, only: jtab_w, istp, itab_w, mrl_endl
 use mem_basic,  only: rho
 use misc_coms,  only: io6, dtlm
 use mem_grid,   only: mza, mwa, lpw
+use rastro_evts
 
 !$ use omp_lib
 

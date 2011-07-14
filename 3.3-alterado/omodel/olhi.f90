@@ -49,6 +49,7 @@ use mem_grid,    only: zt, dzt, xeu, zeu, yeu, unx, uny, mua, zm,  &
 use mem_zonavg,  only: zonz_vect, zonu_vect, zont_vect, zonr_vect,  &
                        zonp_vect, zonz, zonu, zont, zonr
 use misc_coms,   only: io6, iparallel
+use rastro_evts
     
 
 implicit none   

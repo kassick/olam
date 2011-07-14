@@ -51,6 +51,7 @@ use misc_coms,  only: io6, runtype
 use max_dims, only: maxvars
 
 use mem_para, only: myrank
+use rastro_evts
 
 implicit none
 

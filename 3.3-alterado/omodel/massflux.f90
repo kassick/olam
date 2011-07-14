@@ -42,6 +42,7 @@ use mem_ijtabs, only: jtab_u, jtab_w, istp, mrl_begl
 use mem_grid,   only: mza, mua, mwa, lpw
 use mem_basic,  only: rho
 use misc_coms,  only: io6
+use rastro_evts
 
 !$ use omp_lib
 
@@ -124,6 +125,7 @@ subroutine timeavg_massflux(umarusc,wmarwsc)
 use mem_ijtabs, only: jtab_u, itab_u, jtab_w, itab_w, istp, mrl_endl
 use mem_grid,   only: mza, mua, mwa, lpu, lpw
 use misc_coms,  only: io6, nacoust
+use rastro_evts
 
 !$ use omp_lib
 

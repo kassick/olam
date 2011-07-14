@@ -52,6 +52,7 @@ use max_dims,    only: nzgmax, maxgrds, maxsndg, maxsclr, maxnplt, maxisdirs, &
 use oname_coms,  only: nl
 use consts_coms, only: erad, pi1, pi2, p00
 use misc_coms,   only: io6
+use rastro_evts
 
 implicit none
 

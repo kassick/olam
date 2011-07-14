@@ -41,6 +41,7 @@ subroutine oplot_init()
 use oplot_coms, only: op
 use plotcolors, only: gks_colors
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 
@@ -75,6 +76,7 @@ use misc_coms,  only: io6, iyear1, imonth1, idate1, itime1, time_istp8
 use oplot_coms, only: op
 use mem_grid,   only: mza
 use misc_coms,  only: runtype
+use rastro_evts
 
 implicit none
 

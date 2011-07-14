@@ -59,6 +59,7 @@ use misc_coms,   only: io6, naddsc, initial, idiffk, ilwrtyp, iswrtyp,  &
 use micro_coms,  only: jnmb, ihail, igraup, iaggr, isnow, ipris, irain,  &
                        icloud, level
 use max_dims,    only: maxsclr, maxvars
+use rastro_evts
 
 implicit none 
 

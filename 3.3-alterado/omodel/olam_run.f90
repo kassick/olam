@@ -441,6 +441,7 @@ end subroutine olam_run
 
 subroutine model()
 
+use rastro_evts
 use misc_coms, only: io6, time8, timmax8, dtlm, time_istp8, simtime,  &
                      current_time, s1900_init, s1900_sim
 implicit none
@@ -641,6 +642,7 @@ use oplot_coms,  only: op
 use mem_nudge,   only: nudflag
 use isan_coms,   only: ifgfile, s1900_fg
 use consts_coms, only: r8
+use rastro_evts
 implicit none
 
 integer :: ierr,ifm,ifileok

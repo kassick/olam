@@ -4,6 +4,7 @@ subroutine fuliou_radinit()
        sruqcb, truqex, truqsc, truqcb, q55u22, qxdust, refd25, refs25,   &
        srdqex, srsqex, tdust
 
+  use rastro_evts
   implicit none
 
   character(len=256), parameter :: mie_file =   &

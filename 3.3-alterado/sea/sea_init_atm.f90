@@ -49,6 +49,7 @@ use mem_ijtabs,  only: itabg_w
 use mem_para,    only: myrank
                        
 use consts_coms, only: p00i, rocp
+use rastro_evts
 
 implicit none
 

@@ -55,6 +55,7 @@ use micro_coms,  only: level, irain, ipris, isnow, iaggr, igraup, ihail, jnmb,  
                        icloud, ncat, gnu, emb0, emb1, nhcat,  &
                        cfmas, pwmas, cfvt, pwvt, npairc, coltabc, nembc,  &
                        npairr, coltabr, alloc_sedimtab
+use rastro_evts
 
 implicit none
 
@@ -355,6 +356,7 @@ subroutine jnmbinit()
 use micro_coms, only: level, jnmb, icloud, irain, ipris, isnow, iaggr,  &
                       igraup, ihail
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 

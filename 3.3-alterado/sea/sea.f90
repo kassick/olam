@@ -44,6 +44,7 @@ use sea_coms,  only: mws, iupdsst, s1900_sst, isstfile, nsstfiles,  &
 use mem_sea,   only: sea, itab_ws
 use misc_coms, only: io6, time8, s1900_sim, iparallel
 use mem_para,  only: myrank
+use rastro_evts
 
 !$ use omp_lib
 

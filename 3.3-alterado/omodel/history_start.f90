@@ -43,6 +43,7 @@ subroutine history_start(action)
 use misc_coms,  only: io6, hfilin, time8, time_istp8, runtype, iparallel
 use hdf5_utils, only: shdf5_irec, shdf5_open, shdf5_close
 use mem_para,   only: myrank, mgroupsize
+use rastro_evts
 
 implicit none
 character(len=*), intent(in) :: action

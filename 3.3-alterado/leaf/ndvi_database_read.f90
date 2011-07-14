@@ -49,6 +49,7 @@ use misc_coms, only: io6, iyear1, imonth1, idate1, itime1, timmax8,  &
 
 use leaf_db,   only: leaf_database_read
 use mem_para,  only: myrank
+use rastro_evts
 
 implicit none
 

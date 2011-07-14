@@ -43,6 +43,7 @@ use misc_coms,  only: io6, ioutput, hfilepref, time8, iyear1, imonth1, idate1, &
                       itime1, iclobber, iparallel
 use hdf5_utils, only: shdf5_orec, shdf5_open, shdf5_close
 use mem_para,   only: myrank
+use rastro_evts
 
 implicit none
 

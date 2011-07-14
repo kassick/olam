@@ -55,6 +55,7 @@ use consts_coms, only: p00i, rocp, cliq, cice, alli,  &
 
 use ed_options,  only: ied_offline
 use mem_para,    only: myrank
+use rastro_evts
 
 implicit none
 

@@ -42,6 +42,7 @@ use var_tables, only: num_scalar, scalar_tab
 use mem_basic,  only: theta, sh_v
 use micro_coms, only: level
 use misc_coms,  only: io6
+use rastro_evts
 
 implicit none
 

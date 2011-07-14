@@ -42,6 +42,7 @@ use mem_turb,   only: hkm, vkm, vkh
 use mem_ijtabs, only: istp, jtab_w, itab_w, mrl_endl
 use mem_grid,   only: dzim, lpw, mza
 use misc_coms,  only: io6
+use rastro_evts
 
 !$ use omp_lib
 

@@ -41,6 +41,7 @@ subroutine veltend_long()
 use mem_ijtabs, only: jtab_u, jtab_w, istp, mrl_begl
 use mem_grid,   only: mza
 use misc_coms,  only: io6
+use rastro_evts
 
 !$ use omp_lib
 

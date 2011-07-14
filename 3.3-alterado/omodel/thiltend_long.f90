@@ -41,6 +41,7 @@ subroutine thiltend_long(alpha_press,rhot)
 use mem_ijtabs, only: istp, jtab_w, mrl_begl
 use mem_grid,   only: mza, mwa
 use misc_coms,  only: io6
+use rastro_evts
 
 !$ use omp_lib
 

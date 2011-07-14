@@ -45,6 +45,7 @@ use mem_sea,  only: sea, alloc_sea, filltab_sea
 
 use hdf5_utils
 use misc_coms, only: io6, runtype
+use rastro_evts
 
 implicit none
 

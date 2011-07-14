@@ -50,6 +50,7 @@ subroutine shdf5_open(locfn,access,idelete)
 use misc_coms, only: io6
 use mem_para,  only: myrank, mgroupsize
 use omp_lib
+use rastro_evts
 
 implicit none
 
@@ -171,6 +172,7 @@ end subroutine shdf5_open
 subroutine shdf5_info(dsetname,ndims,dims)
 
 use mem_para,  only: myrank, mgroupsize
+use rastro_evts
 implicit none
 
 character(len=*) :: dsetname ! Dataset name
@@ -244,6 +246,7 @@ subroutine shdf5_orec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
                                          ,ivars,rvars,cvars,dvars,lvars)
 use misc_coms, only: io6
 use mem_para,  only: myrank, mgroupsize
+use rastro_evts
 
 implicit none
 
@@ -382,6 +385,7 @@ subroutine shdf5_irec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
 
 use misc_coms, only: io6
 use mem_para,  only: myrank, mgroupsize
+use rastro_evts
         
 implicit none
 
@@ -526,6 +530,7 @@ subroutine shdf5_close()
         
 use misc_coms, only: io6, iparallel
 use mem_para,  only: myrank, mgroupsize
+use rastro_evts
 
 implicit none
 
@@ -560,6 +565,7 @@ end  subroutine
 subroutine shdf5_io(action,ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
                                               ,ivars,rvars,cvars,dvars,lvars)
 
+  use rastro_evts
   implicit none
 
   character(len=*)           :: dsetname, action

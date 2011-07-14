@@ -44,6 +44,7 @@ use isan_coms,  only: innpr, ihour, idate, imonth, iyear, nfgfiles, ifgfile,  &
 use misc_coms,  only: io6, iyear1, imonth1, idate1, itime1, timmax8, initial,  &
                       time8, runtype, s1900_init, s1900_sim
 use mem_zonavg, only: dealloc_zonavg
+use rastro_evts
 
 implicit none
 

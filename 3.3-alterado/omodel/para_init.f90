@@ -53,6 +53,7 @@ use sea_coms,   only: nms, nus, nws
 use mem_sea,    only: itab_us, itab_ws, itabg_ms, itabg_us, itabg_ws, sea
 
 use mem_sflux,  only: nseaflux, nlandflux, seafluxg, landfluxg
+use rastro_evts
 
 implicit none
 
@@ -596,6 +597,7 @@ use leaf_coms,  only: nwl, isfcl
 use mem_sea,    only: itabg_ws
 
 use mem_leaf,   only: itabg_wl
+use rastro_evts
 
 implicit none
 

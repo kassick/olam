@@ -39,6 +39,7 @@
 Module misc_coms
 
 use max_dims, only: maxsndg, maxgrds
+use rastro_evts
 
 type simtime
    integer year

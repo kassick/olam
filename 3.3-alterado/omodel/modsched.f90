@@ -44,6 +44,7 @@ use mem_ijtabs, only: nstp, mrls,  &
 use misc_coms,  only: io6, nacoust, ndtrat, dtlm, dtlong, dtsm, nqparm
 use leaf_coms,  only: dt_leaf, mrl_leaf, isfcl
 use sea_coms,   only: dt_sea
+use rastro_evts
 
 implicit none
 

@@ -101,6 +101,7 @@ end subroutine o_opngks
 subroutine o_clsgks()
 
 use misc_coms, only: io6
+use rastro_evts
 
 implicit none
 

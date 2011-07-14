@@ -44,6 +44,7 @@ subroutine init_offline_met()
        ed_ol_dx, ed_ol_dy, ed_ol_xmin, ed_ol_ymin, ed_ol_nv, ed_ol_vars,  &
        ed_ol_frq, ed_ol_interp, max_ol_vars
   use ed_structure_defs
+  use rastro_evts
 
   implicit none
 
@@ -184,6 +185,7 @@ subroutine read_offline_met_init()
   use misc_coms, only: current_time
   use ed_options, only: metcyc1, metcyc2
   use hdf5_utils, only: shdf5_open, shdf5_close
+  use rastro_evts
 
   implicit none
 

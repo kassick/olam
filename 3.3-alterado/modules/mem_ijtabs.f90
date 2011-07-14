@@ -256,6 +256,7 @@ Contains
    subroutine fill_jtabs(mma,mua,mwa)
 
    use misc_coms,  only: io6, nqparm
+   use rastro_evts
 
    implicit none
 
