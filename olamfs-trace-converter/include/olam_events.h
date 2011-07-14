@@ -1,7 +1,7 @@
 // C++ source code
-// File: "/home/fran/olam/olamfs-trace-converter/include/olam_events.h"
+// File: "/home/kassick/Work/olam/olamfs-trace-converter/include/olam_events.h"
 // Created: "Qui, 02 Jun 2011 10:32:37 -0300 (kassick)"
-// Updated: "Sex, 01 Jul 2011 14:43:05 -0300 (fran)"
+// Updated: "Qui, 14 Jul 2011 16:06:24 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -213,6 +213,7 @@ static evt_name_t  olam_evt_names[] = {
   EVT_NAME_ENTRY(HDF5_DATASET_OPEN),
   EVT_NAME_ENTRY(HDF5_DATASET_GETINFO),
   EVT_NAME_ENTRY(HDF5_DATASET_CLOSE),
+  EVT_NAME_ENTRY(HDF5_CLOSE),
   EVT_NAME_ENTRY(SHDF5_OREC),
   EVT_NAME_ENTRY(HDF5_PREPARE_WRITE),
   EVT_NAME_ENTRY(HDF5_CLOSE_WRITE),

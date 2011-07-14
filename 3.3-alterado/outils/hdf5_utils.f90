@@ -67,7 +67,7 @@ logical :: exists ! File existence
 
 real, external :: walltime
 integer :: thread_id
-thread_id = omp_get_thread_num()
+thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
 call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN, myrank, thread_id, locfn,access)
@@ -182,7 +182,7 @@ integer :: ndims ! Dataset rank (in file)
 
 integer :: hdferr ! Error flag
 integer :: thread_id
-thread_id = omp_get_thread_num()
+thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
 call rst_event_iis_f(OLAM_SHDF5_INFO_IN, myrank, thread_id, dsetname)
@@ -270,7 +270,7 @@ integer :: hdferr ! Error flag
 
 real, external :: walltime
 integer :: thread_id
-thread_id = omp_get_thread_num()
+thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
 call rst_event_iis_f(OLAM_SHDF5_OREC_IN, myrank, thread_id, dsetname)
@@ -410,7 +410,7 @@ character(len=2) :: ctype
 
 real, external :: walltime
 integer :: thread_id
-thread_id = omp_get_thread_num()
+thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
 call rst_event_iis_f(OLAM_SHDF5_IREC_IN, myrank, thread_id, dsetname)
@@ -537,7 +537,7 @@ implicit none
 integer :: hdferr  ! Error flags
 real, external :: walltime
 integer :: thread_id
-thread_id = omp_get_thread_num()
+thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
 call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
