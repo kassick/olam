@@ -52,7 +52,7 @@ OLAM_MPI=yes
 OLAM_RASTRO=yes
 
 # OPTIMIZED:
-F_OPTS=-xW -O3 -fno-alias -prec-div -free -traceback
+F_OPTS=-fpp -xW -O3 -fno-alias -prec-div -free -traceback
 
 # DEBUG:
 #F_OPTS=-g -free -prec-div -fp -check bounds -inline-debug-info -traceback \

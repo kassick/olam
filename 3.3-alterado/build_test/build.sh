@@ -5,7 +5,7 @@ export OMPI_MPIC=icc
 export OMPI_CC=icc
 export OMPI_FC=ifort
 export CC=icc
-exprot FC=ifort
+export FC=ifort
 
 
 make
