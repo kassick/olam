@@ -47,20 +47,11 @@ implicit none
 
 #ifdef OLAM_RASTRO
 character*1 :: rst_buf = '_'
-
-
-
-write(io6,'(/,a)') 'CKPT plot 2'
 call rst_event_s_f(OLAM_OPLOT_INIT_IN,rst_buf)
-write(io6,'(/,a)') 'CKPT plot 3'
 #endif
 
-write(io6,'(/,a)') 'CKPT plot 4'
 call o_opngks()
-
-write(io6,'(/,a)') 'CKPT plot 5'
 call gks_colors(1)
-write(io6,'(/,a)') 'CKPT plot 6'
 
 ! Initialize some oplot parameters (not set in namelist).
 
@@ -70,11 +61,9 @@ op%dualpts  = 'PROG'
 op%icigrnd = 13
 op%iplotback = 0
 
-write(io6,'(/,a)') 'CKPT plot 7'
 #ifdef OLAM_RASTRO
 call rst_event_s_f(OLAM_OPLOT_INIT_OUT,rst_buf)
 #endif
-write(io6,'(/,a)') 'CKPT plot 8'
 
 return
 end subroutine oplot_init
