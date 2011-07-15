@@ -246,27 +246,23 @@ write(io6,'(/,a)') 'CKPT plotf 23'
             ,op%xmin,op%xmax,xinc,labincx                        &
             ,op%ymin,op%ymax,yinc,labincy                        )
       else
-   write(io6,'(/,a)') 'CKPT plotf 27a'
+   write(io6,'(/,a)') 'CKPT plotf 27'
          call niceinc20(.001*op%xmin,.001*op%xmax,xinc,labincx)
-   write(io6,'(/,a)') 'CKPT plotf 27b'
          call niceinc20(.001*op%ymin,.001*op%ymax,yinc,labincy)
-   write(io6,'(/,a)') 'CKPT plotf 27c'
 
          if (op%projectn(iplt) == 'C' .or. op%projectn(iplt) == 'V') then
             ylabel = 'Z (km)'
          else
             ylabel = 'Y (km)'
          endif
-   write(io6,'(/,a)') 'CKPT plotf 27d'
 
          call oplot_xy2(op%panel(iplt),op%colorbar(iplt),1.0,.016   &
             ,1,dummy,dummy                                         &
             ,'X (km)',ylabel                                       &
             ,.001*op%xmin,.001*op%xmax,xinc,labincx                &
             ,.001*op%ymin,.001*op%ymax,yinc,labincy                )
-   write(io6,'(/,a)') 'CKPT plotf 27e'
       endif
-   write(io6,'(/,a)') 'CKPT plotf 29f'
+   write(io6,'(/,a)') 'CKPT plotf 29'
 
    endif
 
