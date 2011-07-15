@@ -1189,64 +1189,46 @@ character(len=20)  :: numbr,numbr2
 
 ! Set plot color (black)
 
-   write(io6,'(/,a)') 'CKPT plotxy 1'
 call o_gsplci(10)
-   write(io6,'(/,a)') 'CKPT plotxy 2'
 call o_gsfaci(10)
-   write(io6,'(/,a)') 'CKPT plotxy 3'
 call o_gstxci(10)
-   write(io6,'(/,a)') 'CKPT plotxy 4'
 call o_sflush()
-   write(io6,'(/,a)') 'CKPT plotxy 5'
 
 ! Scale local working window (0,1,0,1) 
 ! to plotter coordinates (op%hp1,op%hp2,op%vp1,op%vp2)
 
 call oplot_panel(panel,colorbar0,aspect)
-   write(io6,'(/,a)') 'CKPT plotxy 6'
 call o_set(op%hp1,op%hp2,op%vp1,op%vp2,0.,1.,0.,1.,1)
-   write(io6,'(/,a)') 'CKPT plotxy 7'
 
 ! Draw frame
 
 call o_frstpt(op%fx1,op%fy1)
-   write(io6,'(/,a)') 'CKPT plotxy 8'
 call o_vector(op%fx2,op%fy1)
-   write(io6,'(/,a)') 'CKPT plotxy 9'
 call o_vector(op%fx2,op%fy2)
-   write(io6,'(/,a)') 'CKPT plotxy 10'
 call o_vector(op%fx1,op%fy2)
-   write(io6,'(/,a)') 'CKPT plotxy 11'
 call o_vector(op%fx1,op%fy1)
-   write(io6,'(/,a)') 'CKPT plotxy 12'
 
 ! Specify font # and scale font size to designated plotter coordinates
 
 call o_pcseti ('FN',4)  ! set font number to 4 (font 2 is similar but wider spacing)
-   write(io6,'(/,a)') 'CKPT plotxy 13'
 call o_pcsetr('CL',1.)  ! set character line width to 1
-   write(io6,'(/,a)') 'CKPT plotxy 14'
 sizelab = scalelab * (op%hp2 - op%hp1)
 call o_sflush()
-   write(io6,'(/,a)') 'CKPT plotxy 15'
 
 ! Write x axis label
 
 xlabx = .5 * (op%fx1 + op%fx2)
 call o_plchhq(xlabx,op%xlaby,trim(xlab),sizelab, 0.,0.)
-   write(io6,'(/,a)') 'CKPT plotxy 16'
 
 ! Write y axis label
 
 ylaby = .5 * (op%fy1 + op%fy2)
 call o_plchhq(op%ylabx,ylaby,trim(ylab),sizelab,90.,0.)
-   write(io6,'(/,a)') 'CKPT plotxy 17'
 
 ! Scale local working window (xmin,xmax,0.,1.) 
 ! to plotter coordinates (op%h1,op%h2,op%vp1,op%vp2)
 
 call o_set(op%h1,op%h2,op%vp1,op%vp2,xmin,xmax,0.,1.,1)
-   write(io6,'(/,a)') 'CKPT plotxy 18'
 
 ! Plot and label X-axis ticks
 
@@ -1255,7 +1237,6 @@ if (tickval < xmin - .001 * xinc) tickval = tickval + xinc
    
 do while (tickval < xmax + .001 * xinc)
    
-   write(io6,'(/,a)') 'CKPT plotxy 19'
    if (mod(nint(tickval/xinc),labincx) == 0) then  ! Only for long ticks
    	 
       dy = .014
@@ -1274,9 +1255,7 @@ do while (tickval < xmax + .001 * xinc)
          write (numbr,'(f7.4)') tickval
       endif
    
-   write(io6,'(/,a)') 'CKPT plotxy 20'
       call o_plchhq(tickval,op%xtlaby,trim(adjustl(numbr)),sizelab,0.,0.)
-   write(io6,'(/,a)') 'CKPT plotxy 21'
 
    else                                          ! Only for short ticks
       dy = .007
@@ -1284,24 +1263,17 @@ do while (tickval < xmax + .001 * xinc)
    
 ! Plot current X tick
    
-   write(io6,'(/,a)') 'CKPT plotxy 21'
    call o_frstpt(tickval,op%fy1)
-   write(io6,'(/,a)') 'CKPT plotxy 22'
    call o_vector(tickval,op%fy1 + dy)
-   write(io6,'(/,a)') 'CKPT plotxy 23'
    call o_frstpt(tickval,op%fy2)
-   write(io6,'(/,a)') 'CKPT plotxy 23'
    call o_vector(tickval,op%fy2 - dy)
-   write(io6,'(/,a)') 'CKPT plotxy 25'
    
    tickval = tickval + xinc
-   write(io6,'(/,a)') 'CKPT plotxy 26'
 enddo
 
 ! Scale local working window (0.,1.,ymin,ymax) 
 ! to plotter coordinates (op%hp1,op%hp2,op%v1,op%v2)
 
-   write(io6,'(/,a)') 'CKPT plotxy 27'
 call o_set(op%hp1,op%hp2,op%v1,op%v2,0.,1.,ymin,ymax,1)
 
 ! Plot and label Y-axis ticks
@@ -1309,13 +1281,10 @@ call o_set(op%hp1,op%hp2,op%v1,op%v2,0.,1.,ymin,ymax,1)
 tickval = nint(ymin/yinc) * yinc
 if ((tickval - ymax) / (ymin - ymax) > 1.001) tickval = tickval + yinc
    
-   write(io6,'(/,a)') 'CKPT plotxy 28'
 do while ((tickval - ymin) / (ymax - ymin) < 1.001)
-   write(io6,'(/,a)') 'CKPT plotxy 29'
    
    if (mod(nint(tickval/yinc),labincy) == 0) then  ! Only for long ticks
    	 
-   write(io6,'(/,a)') 'CKPT plotxy 30'
       dx = .014
  
 ! Encode current Y tick label
@@ -1361,14 +1330,11 @@ do while ((tickval - ymin) / (ymax - ymin) < 1.001)
             numbr = trim(adjustl(numbr))//'x'//'10:S3:'//trim(adjustl(numbr2))//'        '
          endif
 
-   write(io6,'(/,a)') 'CKPT plotxy 31'
       endif
-   write(io6,'(/,a)') 'CKPT plotxy 32'
 
 ! Plot Y tick label
 
 !      call o_plchhq(op%ytlabx,tickval,numbr(1:len_trim(numbr)),sizelab,0.,1.)
-   write(io6,'(/,a)') 'CKPT plotxy 33'
       call o_plchhq(op%ytlabx,tickval,trim(adjustl(numbr)),sizelab,0.,1.)
 
    else                                          ! Only for short ticks
@@ -1376,13 +1342,11 @@ do while ((tickval - ymin) / (ymax - ymin) < 1.001)
    endif
 
 ! Plot current Y tick
-   write(io6,'(/,a)') 'CKPT plotxy 34'
 
    call o_frstpt(op%fx1     ,tickval)
    call o_vector(op%fx1 + dx,tickval)
    call o_frstpt(op%fx2     ,tickval)
    call o_vector(op%fx2 - dx,tickval)
-   write(io6,'(/,a)') 'CKPT plotxy 35'
    
    tickval = tickval + yinc
 enddo
@@ -1390,20 +1354,14 @@ enddo
 ! Scale local working window (xmin,xmax,ymin,ymax)
 !  to plotter coordinates (op%h1,op%h2,op%v1,op%v2)
 
-   write(io6,'(/,a)') 'CKPT plotxy 36'
 call o_set(op%h1,op%h2,op%v1,op%v2,xmin,xmax,ymin,ymax,1)
-   write(io6,'(/,a)') 'CKPT plotxy 37'
 
 ! Plot values
 
 call o_frstpt(xval(1),yval(1))
-   write(io6,'(/,a)') 'CKPT plotxy 38'
 do i = 2,n
-   write(io6,'(/,a)') 'CKPT plotxy 39'
    call o_vector(xval(i),yval(i))
-   write(io6,'(/,a)') 'CKPT plotxy 40'
 enddo
-   write(io6,'(/,a)') 'CKPT plotxy 41'
 
 return
 end subroutine oplot_xy2
