@@ -13,18 +13,21 @@ rm -rf /tmp/hist
 mkdir /tmp/hist
 
 
+export NCARG_ROOT=$HOME/Work/ncarg
+echo GRID
+
+mpirun -np 1 ./olam-3.3-alterado-mpi -f OLAMIN.makegrid.local
+
+saverastro makegrid
+
+
 
 
 echo SFC
-mpirun -np $np ./olam-3.3-alterado-mpi -f OLAMIN.makesfc.local
+mpirun -np 1 ./olam-3.3-alterado-mpi -f OLAMIN.makesfc.local
 
 saverastro makesfc
 
-echo GRID
-
-mpirun -np $np ./olam-3.3-alterado-mpi -f OLAMIN.makegrid.local
-
-saverastro makegrid
 
 
 echo RUN
