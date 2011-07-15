@@ -50,17 +50,12 @@ character*1 :: rst_buf = '_'
 
 
 
-write(io6,'(/,a)') 'CKPT plot 2'
 call rst_event_s_f(OLAM_OPLOT_INIT_IN,rst_buf)
-write(io6,'(/,a)') 'CKPT plot 3'
 #endif
 
-write(io6,'(/,a)') 'CKPT plot 4'
 call o_opngks()
 
-write(io6,'(/,a)') 'CKPT plot 5'
 call gks_colors(1)
-write(io6,'(/,a)') 'CKPT plot 6'
 
 ! Initialize some oplot parameters (not set in namelist).
 
@@ -70,11 +65,9 @@ op%dualpts  = 'PROG'
 op%icigrnd = 13
 op%iplotback = 0
 
-write(io6,'(/,a)') 'CKPT plot 7'
 #ifdef OLAM_RASTRO
 call rst_event_s_f(OLAM_OPLOT_INIT_OUT,rst_buf)
 #endif
-write(io6,'(/,a)') 'CKPT plot 8'
 
 return
 end subroutine oplot_init
@@ -100,19 +93,29 @@ real, external :: walltime
 
 #ifdef OLAM_RASTRO
 character*1 :: rst_buf = '_'
+
+write(io6,'(/,a)') 'CKPT plotf 1'
 call rst_event_s_f(OLAM_PLOT_FIELDS_IN,rst_buf)
+write(io6,'(/,a)') 'CKPT plotf 2'
 #endif
 
+write(io6,'(/,a)') 'CKPT plotf 3'
 ! Reopen the current graphics output workstation if it is closed
 call o_reopnwk()
 
+write(io6,'(/,a)') 'CKPT plotf 4'
+
 do iplt = 1,op%nplt
+write(io6,'(/,a)') 'CKPT plotf 5'
 
 ! Plot a white background for this frame
 
+write(io6,'(/,a)') 'CKPT plotf 6'
    if (op%iplotback /= 1) then
+write(io6,'(/,a)') 'CKPT plotf 7'
       call plotback()
    endif
+write(io6,'(/,a)') 'CKPT plotf 8'
 
 ! Draw filled-in map if so specified
 
@@ -126,19 +129,23 @@ do iplt = 1,op%nplt
 !   call mkmap(iplt,'FILL')
    endif
 
+write(io6,'(/,a)') 'CKPT plotf 9'
 ! Get units and stagpoint information for this field
 
    call oplot_lib(iplt,1,2,'UNITS',trim(op%fldname(iplt)),fldval,notavail,ko)
+write(io6,'(/,a)') 'CKPT plotf 10'
    
 ! If notavail = 3 is returned from above call, current plot field is unavailable
 
    if (notavail > 2) then
+write(io6,'(/,a)') 'CKPT plotf 11'
       write(io6,*) 'FIELD ',trim(op%fldname(iplt)),' NOT AVAILABLE IN THIS RUN.'
       call oplot_set(iplt)  ! can remove this?
       call o_set (op%hp1,op%hp2,op%vp1,op%vp2,0.,1.,0.,1.,1)
       call o_plchhq(op%fx1,op%fnamey  &
          ,trim(op%fldname(iplt))//' NOT AVAILABLE IN THIS RUN'  &
          ,.012 * (op%hp2 - op%hp1),0.,-1.)
+write(io6,'(/,a)') 'CKPT plotf 12'
       go to 10
    endif 
    
@@ -148,30 +155,38 @@ do iplt = 1,op%nplt
        op%contrtyp(iplt) == 'O') then
 
       op%ifill = 1
+write(io6,'(/,a)') 'CKPT plotf 13'
       call slab(iplt)
    endif
 
+write(io6,'(/,a)') 'CKPT plotf 14'
 ! Plot current field values with contour lines
 
    if (op%contrtyp(iplt) == 'L' .or. op%contrtyp(iplt) == 'O') then
       op%ifill = 0
       call slab(iplt)
+write(io6,'(/,a)') 'CKPT plotf 15'
    endif
 
 ! Plot grid cell indices if so specified
 
+write(io6,'(/,a)') 'CKPT plotf 16'
    if (op%pltindx(iplt) == 'I' .or. op%pltindx(iplt) == 'J') then
       call plot_index(iplt)
+write(io6,'(/,a)') 'CKPT plotf 17'
    endif
 
 ! Plot current field values with printed numbers if so specified
+write(io6,'(/,a)') 'CKPT plotf 18'
 
    if (op%prtval(iplt) == 'P') then
       call slab_val(iplt)
+write(io6,'(/,a)') 'CKPT plotf 19'
    endif
 
 ! Plot T-point or U-point vectors if so specified
 
+write(io6,'(/,a)') 'CKPT plotf 20'
    call vectslab(iplt)
 
 ! SPECIAL HURRICANE FRANCES LOCATION PLOT
@@ -184,30 +199,37 @@ do iplt = 1,op%nplt
       call plot_grid_landsea(iplt)
    endif
 
+write(io6,'(/,a)') 'CKPT plotf 21'
 ! Draw dual grid cell boundaries if so specified
 
    if (op%pltdualgrid(iplt) == 'D' .or. op%pltdualgrid(iplt) == 'd') then
       call plot_dualgrid(iplt)
    endif
 
+write(io6,'(/,a)') 'CKPT plotf 22'
 ! Draw grid cell boundaries if so specified
 
    if (op%pltgrid(iplt) == 'G') then
       call plot_grid(iplt)
    endif
 
+write(io6,'(/,a)') 'CKPT plotf 23'
 ! Draw outer grid (frame) boundary if so specified
 
    if (op%pltborder(iplt) == 'b') then
       call plot_grid_frame()
    endif
 
+   write(io6,'(/,a)') 'CKPT plotf 24'
+
 ! Draw plot frame, tick marks, X and Y tick labels, X and Y axis labels
 !   if so specified.
 
    if (op%pltborder(iplt) == 't') then
+   write(io6,'(/,a)') 'CKPT plotf 25'
 
       if (op%projectn(iplt) == 'L') then
+   write(io6,'(/,a)') 'CKPT plotf 26'
          call niceinc20(op%xmin,op%xmax,xinc,labincx)
          call niceinc20(op%ymin,op%ymax,yinc,labincy)
          
@@ -224,6 +246,7 @@ do iplt = 1,op%nplt
             ,op%xmin,op%xmax,xinc,labincx                        &
             ,op%ymin,op%ymax,yinc,labincy                        )
       else
+   write(io6,'(/,a)') 'CKPT plotf 27'
          call niceinc20(.001*op%xmin,.001*op%xmax,xinc,labincx)
          call niceinc20(.001*op%ymin,.001*op%ymax,yinc,labincy)
 
@@ -239,10 +262,12 @@ do iplt = 1,op%nplt
             ,.001*op%xmin,.001*op%xmax,xinc,labincx                &
             ,.001*op%ymin,.001*op%ymax,yinc,labincy                )
       endif
+   write(io6,'(/,a)') 'CKPT plotf 29'
 
    endif
 
 ! Draw line map if so specified
+   write(io6,'(/,a)') 'CKPT plotf 30'
 
    if ((op%projectn(iplt) == 'L'  .or.   &
         op%projectn(iplt) == 'P'  .or.   & 
@@ -258,6 +283,7 @@ do iplt = 1,op%nplt
    endif
 
 ! Draw colorbar if so specified
+   write(io6,'(/,a)') 'CKPT plotf 31'
 
    if (op%colorbar(iplt) == 'c') call plot_colorbar(iplt,op%icolortab(iplt))
 
@@ -273,30 +299,38 @@ do iplt = 1,op%nplt
          ,time_istp8,outhour,outdate,outmonth,outyear)
    endif
 
+   write(io6,'(/,a)') 'CKPT plotf 32'
 10 continue
 
 ! Complete current frame if so specified
 
+   write(io6,'(/,a)') 'CKPT plotf 33'
    if (op%frameoff(iplt) /= 'f') then
       call o_frame()
    endif
 
 enddo
+   write(io6,'(/,a)') 'CKPT plotf 34'
 
 ! Close the current workstation if not a plotonly run and if output
 ! is to a NCAR graphics meta file. This allows viewing the complete
 ! meta file (including the last frame) during a run and in case the
 ! simulation crashes.
 
+   write(io6,'(/,a)') 'CKPT plotf 35'
 if ((trim(runtype) /= 'PLOTONLY') .and. (op%plttype == 0)) then
 
 
    call o_clswk()
 
 endif
+   write(io6,'(/,a)') 'CKPT plotf 36'
 #ifdef OLAM_RASTRO
+   write(io6,'(/,a)') 'CKPT plotf 37'
 call rst_event_s_f(OLAM_PLOT_FIELDS_OUT,rst_buf)
+   write(io6,'(/,a)') 'CKPT plotf 38'
 #endif
+   write(io6,'(/,a)') 'CKPT plotf 39'
 
 return
 end subroutine plot_fields
