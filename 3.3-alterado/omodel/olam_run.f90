@@ -392,13 +392,21 @@ endif
 
 write(io6,'(/,a)') 'olam_run calling plot_fields'
 
+write(io6,'(/,a)') 'CKPT 1'
+
 call plot_fields()
 
+write(io6,'(/,a)') 'CKPT 2'
+
 if (trim(runtype) /= 'HISTORY') then
+  write(io6,'(/,a)') 'CKPT 3'
    write(io6,'(/,a)') 'olam_run calling history_write'
 
    call history_write('STATE')
+  write(io6,'(/,a)') 'CKPT 4'
 endif
+
+write(io6,'(/,a)') 'CKPT 5'
 
 write(io6,'(/,a)') 'olam_run finished history_write'
 
