@@ -20,6 +20,7 @@
 
 //static timestamp_t first_timestamp = -1;
 static double first_timestamp = -1;
+FILE * paje_ofile = NULL;
 
 static s_paje_event_t paje_events[] = {
   {"PajeDefineContainerType",
@@ -88,7 +89,7 @@ static double paje_event_timestamp(double timestamp)
 void pajeDefineContainerType(const char *alias,
                              const char *containerType, const char *name)
 {
-  printf("%d %s %s %s\n",
+  fprintf(paje_ofile,"%d %s %s %s\n",
          paje_event_id("PajeDefineContainerType"),
          alias, containerType, name);
 }
@@ -96,7 +97,7 @@ void pajeDefineContainerType(const char *alias,
 void pajeDefineStateType(const char *alias,
                          const char *containerType, const char *name)
 {
-  printf("%d %s %s %s\n",
+  fprintf(paje_ofile,"%d %s %s %s\n",
          paje_event_id("PajeDefineStateType"), alias, containerType, name);
 }
 
@@ -105,7 +106,7 @@ void pajeDefineLinkType(const char *alias,
                         const char *sourceContainerType,
                         const char *destContainerType, const char *name)
 {
-  printf("%d %s %s %s %s %s\n",
+  fprintf(paje_ofile,"%d %s %s %s %s %s\n",
          paje_event_id("PajeDefineLinkType"),
          alias, containerType, sourceContainerType, destContainerType,
          name);
@@ -116,7 +117,7 @@ void pajeCreateContainer(double timestamp,
                          const char *type,
                          const char *container, const char *name)
 {
-  printf("%d %f %s %s %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s %s %s\n",
          paje_event_id("PajeCreateContainer"),
          paje_event_timestamp(timestamp), alias, type, container, name);
 }
@@ -124,7 +125,7 @@ void pajeCreateContainer(double timestamp,
 void pajeDestroyContainer(double timestamp,
                           const char *type, const char *container)
 {
-  printf("%d %f %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s\n",
          paje_event_id("PajeDestroyContainer"),
          paje_event_timestamp(timestamp), type, container);
 }
@@ -133,7 +134,7 @@ void pajeSetState(double timestamp,
                   const char *container,
                   const char *type, const char *value)
 {
-  printf("%d %f %s %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s %s\n",
          paje_event_id("PajeSetState"),
          paje_event_timestamp(timestamp), container, type, value);
 }
@@ -142,7 +143,7 @@ void pajePushState(double timestamp,
                    const char *container,
                    const char *type, const char *value)
 {
-  printf("%d %f %s %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s %s\n",
          paje_event_id("PajePushState"),
          paje_event_timestamp(timestamp), container, type, value);
 }
@@ -150,7 +151,7 @@ void pajePushState(double timestamp,
 void pajePopState(double timestamp,
                   const char *container, const char *type)
 {
-  printf("%d %f %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s\n",
          paje_event_id("PajePopState"),
          paje_event_timestamp(timestamp), container, type);
 }
@@ -161,7 +162,7 @@ void pajeStartLink(double timestamp,
                    const char *sourceContainer,
                    const char *value, const char *key)
 {
-  printf("%d %f %s %s %s %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s %s %s %s\n",
          paje_event_id("PajeStartLink"),
          paje_event_timestamp(timestamp),
          container, type, sourceContainer, value, key);
@@ -173,7 +174,7 @@ void pajeEndLink(double timestamp,
                  const char *endContainer,
                  const char *value, const char *key)
 {
-  printf("%d %f %s %s %s %s %s\n",
+  fprintf(paje_ofile,"%d %f %s %s %s %s %s\n",
          paje_event_id("PajeEndLink"),
          paje_event_timestamp(timestamp),
          container, type, endContainer, value, key);
@@ -184,15 +185,56 @@ void paje_header(void)
   int i;
   for (i = 0; paje_events[i].name; i++) {
     paje_events[i].id = i;
-    printf("%%EventDef %s %d\n%s\n%%EndEventDef\n",
+    fprintf(paje_ofile,"%%EventDef %s %d\n%s\n%%EndEventDef\n",
            paje_events[i].name, paje_events[i].id,
            paje_events[i].description);
   }
 }
 
+#define STATE_NAME_MAX 300
 void paje_hierarchy(void)
 {
-  pajeDefineContainerType("PROCESS", "0", "PROCESS");
-  pajeDefineStateType("STATE", "PROCESS", "STATE");
-  pajeDefineLinkType("LINK", "0", "PROCESS", "PROCESS", "LINK");
+  int i;
+  pajeDefineContainerType("MACHINE",    "0"         , "MACHINE");
+  pajeDefineContainerType("APP",        "MACHINE"   , "APP");
+  pajeDefineContainerType("FILESYSTEM", "MACHINE"   , "FS");
+  pajeDefineContainerType("OMP_THREAD", "APP"       , "OMP");
+  pajeDefineContainerType("PROCESS"   , "APP"       , "PROC");
+  pajeDefineContainerType("FILE"      , "FILESYSTEM", "FILE");
+  pajeDefineContainerType("FSPROCESS" , "FILESYSTEM", "FSPROC");
+
+  pajeDefineStateType("STATE", "APP"    , "STATE"); // App has app wide states
+  // Now add an state type for each event in olam
+  for (i = 0; olam_evt_names[i].name != NULL; i++) {
+    char state_name[STATE_NAME_MAX];
+    snprintf(state_name,STATE_NAME_MAX,"STATE_%s",olam_evt_names[i].start_name);
+    pajeDefineStateType(state_name, "PROCESS", state_name);
+  }
+
+  /*
+  for (i = 0; pvfs_evt_names[i].name != NULL; i++) {
+    char state_name[STATE_NAME_MAX];
+    snprintf(state_name,STATE_NAME_MAX,"STATE_%s",pvfs_evt_names[i].start_name);
+    pajeDefineStateType(state_name, "FSPROCESS", state_name);
+    pajeDefineStateType(state_name, "FILE"     , state_name);
+  }
+  */
+  
+  pajeDefineStateType("STATE_OPENED", "FILE"   , "STATE_OPENED");
+
+  pajeDefineLinkType("COMMLINK"  , "APP"    , "PROCESS", "PROCESS" , "COMMLINK");
+  pajeDefineLinkType("FILELINK"  , "MACHINE", "PROCESS", "FILE"    , "FILELINK");
+  pajeDefineLinkType("FILEOPLINK", "MACHINE", "PROCESS", "FSPROC"  , "FILEOPLINK");
+}
+
+int paje_open_file(const char const * fname)
+{
+  paje_ofile = fopen(fname,"w+");
+  if (!paje_ofile)
+  {
+    fprintf(stderr,"Cannot open %s for writing, fallback to stdout\n",fname);
+    paje_ofile = stdout;
+    return 1;
+  }
+  return 0;
 }

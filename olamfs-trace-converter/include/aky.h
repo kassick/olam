@@ -19,6 +19,7 @@
 
 #include <pvfs_events.h>
 #include <olam_events.h>
+#include <stdio.h>
 
 #define MAX_AKY_STATE_NAMES 5002
 
@@ -325,6 +326,9 @@ typedef struct paje_event {
 } s_paje_event_t, *paje_event_t;
 
 //prototypes for aky_paje.c
+
+extern FILE * paje_ofile;
+
 void pajeDefineContainerType (const char *alias,
     const char *containerType,
     const char *name);
@@ -357,6 +361,7 @@ void paje_hierarchy (void);
 //prototypes for aky_names.c
 void name_init (void);
 char *name_get (int id);
+int paje_open_file(const char const * fname);
 
 evt_name_t *data_get(int id);
 

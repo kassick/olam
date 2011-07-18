@@ -227,11 +227,11 @@ int main(int argc, char ** argv)
       evt_name_t *data;
       data = data_get(i);
       
-      printf("Name %s has id %d\n",name,i);
+      fprintf(stdout,"Name %s has id %d\n",name,i);
       
       //if ((OLAM_EVT_BASE <= i) && (i <= OLAM_EVT_MAX)) {
       if (data){
-        printf("\tshort: %s\n\tstart_name: %s\n\tstart_id: %d\n\tevt_type:%d\n",
+        fprintf(stdout,"\tshort: %s\n\tstart_name: %s\n\tstart_id: %d\n\tevt_type:%d\n",
             data->short_name,
             data->start_name,
             data->start_id,

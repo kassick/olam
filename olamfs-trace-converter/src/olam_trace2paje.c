@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Sex, 17 Jun 2011 18:15:11 -0300 (kassick)"
+ * Updated: "Seg, 18 Jul 2011 11:24:49 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -55,7 +55,8 @@ void usage() {
   printf("Usage: %s <options> <file1.rst> <file2.rst> ...\n",PROGNAME);
   printf(" -h                 displays this message\n");
   printf(" -m                 adds MPI messages to the paje file\n");
-  printf(" -o                 disables offset in constants (for olam rastro v>=11)");
+  printf(" -o <outputfile>    writes Pajé output to outputfile\n");
+  //printf(" -o                 disables offset in constants (for olam rastro v>=11)");
   printf(" -somethingels      does some thing else\n");
 }
 
@@ -63,7 +64,7 @@ int main(int argc, char** argv)
 {
   int opt;
   char mpi_messages = FALSE;
-  int const_offset = OLAM_EVT_BASE;
+  //int const_offset = OLAM_EVT_BASE;
 
   evt_name_t * ename;
   
@@ -71,7 +72,7 @@ int main(int argc, char** argv)
   rst_event_t event;
   int i;
 
-
+  paje_ofile = stdout;
 
   while ((opt = getopt(argc,argv, OPTSTR) != -1 ))
   {
@@ -85,11 +86,12 @@ int main(int argc, char** argv)
         exit(0);
 
       case 'o':
-        const_offset = 0;
+        paje_open_file(optarg);
+
         break;
 
       default:
-        printf("Unknown option -%c\n",(char)opt);
+        fprintf(stderr,"Unknown option -%c\n",(char)opt);
         usage();
         exit(1);
     }
@@ -111,7 +113,7 @@ int main(int argc, char** argv)
   for (i = optind; i < argc; i++) {
     int ret = rst_open_file(argv[i], &data, NULL, 100000);
     if (ret == -1) {
-      printf("%s: trace %s could not be opened\n", argv[0], argv[i]);
+      fprintf(stderr,"%s: trace %s could not be opened\n", argv[0], argv[i]);
       return 1;
     }
   }
@@ -429,8 +431,101 @@ int main(int argc, char** argv)
       case MPI_CART_RANK_IN:
       case MPI_CART_SUB_IN:
       case MPI_FINALIZE_IN:
+
+        /*
+      case OLAM_HDF5_OPEN_IN:
+      case OLAM_HDF5_CLOSE_IN:
+      case OLAM_HDF5_CREATE_IN:
+      case OLAM_HDF5_READ_IN:
+      case OLAM_HDF5_WRITE_IN:
+      */
+      case OLAM_THREAD_IN:   // individual thread in/out
+      case OLAM_PARBLOCK_IN: // whole parallel block
+      case OLAM_READ_NL_IN:
+      case OLAM_ONAME_CHECK_IN:
+      case OLAM_HISTORY_START_IN:
+      case OLAM_COPY_NL_IN:
+      case OLAM_GRIDINIT_IN:
+      case OLAM_PARA_DECOMP_IN:
+      case OLAM_PARA_INIT_IN:
+      case OLAM_MODSCHED_IN:
+      case OLAM_FILL_JTABS_IN:
+      case OLAM_FILL_JSEA_IN:
+      case OLAM_FILL_JLAND_IN:
+      case OLAM_FILL_JFLUX_IN:
+      case OLAM_ALLOC_MISC_IN:
+      case OLAM_JNMBINIT_IN:
+      case OLAM_O_MEM_ALLOC_IN:
+      case OLAM_O_ALLOC_MPI_IN:
+      case OLAM_O_ALLOC_MPI_LAND_IN:
+      case OLAM_O_ALLOC_MPI_SEA_IN:
+      case OLAM_INITHH_IN:
+      case OLAM_FLDSLHI_IN:  //WHAT!
+      case OLAM_MICINIT_IN:
+      case OLAM_HARR_RADINIT_IN:
+      case OLAM_FULIOU_RADINIT_IN:
+      case OLAM_LEAF3_STARTUP_IN:
+      case OLAM_INIT_OFFLINE_MET_IN:
+      case OLAM_READ_OFFLINE_MET_INIT_IN:
+      case OLAM_LEAF3_INIT_ATM_IN:
+      case OLAM_SEA_INIT_ATM_IN:
+      case OLAM_ISAN_DRIVER_IN:
+      case OLAM_RAYF_INIT_IN:
+      case OLAM_PLOT_FIELDS_IN:
+      case OLAM_HISTORY_WRITE_IN:
+      case OLAM_MODEL_IN:
+      case OLAM_O_CLSGKS_IN:
+      case OLAM_TIMESTEP_IN:
+      case OLAM_UPDATE_MODEL_TIME_IN:
+      case OLAM_O_OUTPUT_IN:
+      case OLAM_TEND0_IN:
+      case OLAM_RADIATE_IN:
+      case OLAM_SURFACE_TURB_FLUX_IN:
+      case OLAM_TURB_K_IN:
+      case OLAM_CUPARM_DRIVER_IN:
+      case OLAM_SURFACE_CUPARM_FLUX_IN:
+      case OLAM_THILTEND_LONG_IN:
+      case OLAM_VELTEND_LONG_IN:
+      case OLAM_OBS_NUDGE_IN:
+      case OLAM_ZERO_MASSFLUX_IN:
+      case OLAM_PROG_WRTU_IN:
+      case OLAM_TIMEAVG_MASSFLUX_IN:
+      case OLAM_SCALAR_TRANSPORT_IN:
+      case OLAM_PREDTR_IN:
+      case OLAM_THERMO_IN:
+      case OLAM_MICRO_IN:
+      case OLAM_SURFACE_PRECIP_FLUX_IN:
+      case OLAM_TRSETS_IN:
+      case OLAM_LEAF3_IN:
+      case OLAM_SEACELLS_IN:
+      case OLAM_INNERSTEP_IN:
+
+
+      case OLAM_OPLOT_INIT_IN:
+      case OLAM_SEA_STARTUP_IN:
+      case OLAM_SST_DATABASE_READ_IN:
+      case OLAM_SEAICE_DATABASE_READ_IN:
+      case OLAM_NDVI_DATABASE_READ_IN:
+      case OLAM_ED_VEGETATION_DYNAMICS_IN:
+      case OLAM_SHDF5_OPEN_IN:
+      case OLAM_SHDF5_INFO_IN:
+      case OLAM_HDF5_DATASET_OPEN_IN:
+      case OLAM_HDF5_DATASET_GETINFO_IN:
+      case OLAM_HDF5_DATASET_CLOSE_IN:
+      case OLAM_SHDF5_OREC_IN:
+      case OLAM_HDF5_PREPARE_WRITE_IN:
+      case OLAM_HDF5_CLOSE_WRITE_IN:
+      case OLAM_SHDF5_IREC_IN:
+      case OLAM_HDF5_PREPARE_READ_IN:
+      case OLAM_HDF5_CLOSE_READ_IN:
+      case OLAM_SHDF5_CLOSE_IN:
+
+
+
         pajePushState(timestamp, entity_name, "STATE", value);
         break;
+
+
       case MPI_COMM_SPAWN_OUT:
       case MPI_COMM_GET_NAME_OUT:
       case MPI_COMM_SET_NAME_OUT:
@@ -560,6 +655,95 @@ int main(int argc, char** argv)
       case MPI_RECV_IDLE_OUT:
       case MPI_CART_RANK_OUT:
       case MPI_CART_SUB_OUT:
+
+        /*
+      case OLAM_HDF5_OPEN_OUT:
+      case OLAM_HDF5_CLOSE_OUT:
+      case OLAM_HDF5_CREATE_OUT:
+      case OLAM_HDF5_READ_OUT:
+      case OLAM_HDF5_WRITE_OUT:
+      */
+      case OLAM_THREAD_OUT:   // individual thread in/out
+      case OLAM_PARBLOCK_OUT: // whole parallel block
+      case OLAM_READ_NL_OUT:
+      case OLAM_ONAME_CHECK_OUT:
+      case OLAM_HISTORY_START_OUT:
+      case OLAM_COPY_NL_OUT:
+      case OLAM_GRIDINIT_OUT:
+      case OLAM_PARA_DECOMP_OUT:
+      case OLAM_PARA_INIT_OUT:
+      case OLAM_MODSCHED_OUT:
+      case OLAM_FILL_JTABS_OUT:
+      case OLAM_FILL_JSEA_OUT:
+      case OLAM_FILL_JLAND_OUT:
+      case OLAM_FILL_JFLUX_OUT:
+      case OLAM_ALLOC_MISC_OUT:
+      case OLAM_JNMBINIT_OUT:
+      case OLAM_O_MEM_ALLOC_OUT:
+      case OLAM_O_ALLOC_MPI_OUT:
+      case OLAM_O_ALLOC_MPI_LAND_OUT:
+      case OLAM_O_ALLOC_MPI_SEA_OUT:
+      case OLAM_INITHH_OUT:
+      case OLAM_FLDSLHI_OUT:  //WHAT!
+      case OLAM_MICINIT_OUT:
+      case OLAM_HARR_RADINIT_OUT:
+      case OLAM_FULIOU_RADINIT_OUT:
+      case OLAM_LEAF3_STARTUP_OUT:
+      case OLAM_INIT_OFFLINE_MET_OUT:
+      case OLAM_READ_OFFLINE_MET_INIT_OUT:
+      case OLAM_LEAF3_INIT_ATM_OUT:
+      case OLAM_SEA_INIT_ATM_OUT:
+      case OLAM_ISAN_DRIVER_OUT:
+      case OLAM_RAYF_INIT_OUT:
+      case OLAM_PLOT_FIELDS_OUT:
+      case OLAM_HISTORY_WRITE_OUT:
+      case OLAM_MODEL_OUT:
+      case OLAM_O_CLSGKS_OUT:
+      case OLAM_TIMESTEP_OUT:
+      case OLAM_UPDATE_MODEL_TIME_OUT:
+      case OLAM_O_OUTPUT_OUT:
+      case OLAM_TEND0_OUT:
+      case OLAM_RADIATE_OUT:
+      case OLAM_SURFACE_TURB_FLUX_OUT:
+      case OLAM_TURB_K_OUT:
+      case OLAM_CUPARM_DRIVER_OUT:
+      case OLAM_SURFACE_CUPARM_FLUX_OUT:
+      case OLAM_THILTEND_LONG_OUT:
+      case OLAM_VELTEND_LONG_OUT:
+      case OLAM_OBS_NUDGE_OUT:
+      case OLAM_ZERO_MASSFLUX_OUT:
+      case OLAM_PROG_WRTU_OUT:
+      case OLAM_TIMEAVG_MASSFLUX_OUT:
+      case OLAM_SCALAR_TRANSPORT_OUT:
+      case OLAM_PREDTR_OUT:
+      case OLAM_THERMO_OUT:
+      case OLAM_MICRO_OUT:
+      case OLAM_SURFACE_PRECIP_FLUX_OUT:
+      case OLAM_TRSETS_OUT:
+      case OLAM_LEAF3_OUT:
+      case OLAM_SEACELLS_OUT:
+      case OLAM_INNERSTEP_OUT:
+
+
+      case OLAM_OPLOT_INIT_OUT:
+      case OLAM_SEA_STARTUP_OUT:
+      case OLAM_SST_DATABASE_READ_OUT:
+      case OLAM_SEAICE_DATABASE_READ_OUT:
+      case OLAM_NDVI_DATABASE_READ_OUT:
+      case OLAM_ED_VEGETATION_DYNAMICS_OUT:
+      case OLAM_SHDF5_OPEN_OUT:
+      case OLAM_SHDF5_INFO_OUT:
+      case OLAM_HDF5_DATASET_OPEN_OUT:
+      case OLAM_HDF5_DATASET_GETINFO_OUT:
+      case OLAM_HDF5_DATASET_CLOSE_OUT:
+      case OLAM_SHDF5_OREC_OUT:
+      case OLAM_HDF5_PREPARE_WRITE_OUT:
+      case OLAM_HDF5_CLOSE_WRITE_OUT:
+      case OLAM_SHDF5_IREC_OUT:
+      case OLAM_HDF5_PREPARE_READ_OUT:
+      case OLAM_HDF5_CLOSE_READ_OUT:
+      case OLAM_SHDF5_CLOSE_OUT:
+
         pajePopState(timestamp, entity_name, "STATE");
         break;
         locfn = event.v_string[0];
