@@ -40,6 +40,7 @@ program main
 
 use misc_coms, only: io6, iparallel
 use mem_para,  only: myrank, mgroupsize
+use rastro_evts
 
 implicit none
 
