@@ -40,6 +40,8 @@ program main
 
 use misc_coms, only: io6, iparallel
 use mem_para,  only: myrank, mgroupsize
+use rastro_evts
+use ifport only hostnm
 
 implicit none
 
@@ -58,6 +60,8 @@ integer :: time_array_0(8), time_array_1(8)
 integer(kind=4) :: start_time, end_time
 real :: omp_time1, omp_time2
 real, external :: omp_get_wtime
+character(len=80) :: hostname
+integer hn_status
 
 
 ! Determine if this run is parallel, and determine myrank and mgroupsize
@@ -66,6 +70,9 @@ call olam_mpi_init()
 
 rastro_id=10
 call rst_init_f(myrank,rastro_id)
+
+hn_status = hostnm(hostname)
+call rst_event_s_f(OLAM_INIT,hostname)
 
 iparallel = 0
 if (mgroupsize > 1) iparallel = 1
