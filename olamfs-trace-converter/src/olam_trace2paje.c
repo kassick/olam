@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Seg, 18 Jul 2011 11:24:49 -0300 (kassick)"
+ * Updated: "Seg, 18 Jul 2011 23:34:07 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -42,8 +42,8 @@
 #define OPTSTR "mho"
 #define PROGNAME "olam_trace2paje"
 
-#define OLAM_CONTAINER "OLAM"
-#define PVFS_CONTAINER "FS"
+#define OLAM_CONTAINER "APP"
+#define PVFS_CONTAINER "FSPROCESS"
 #define PAJE_ROOT_CONTAINER "0"
 
 #define PROCESS_TYPE  "PROCESS"
@@ -72,6 +72,7 @@ int main(int argc, char** argv)
   rst_event_t event;
   int i;
 
+  //A function would do better...
   paje_ofile = stdout;
 
   while ((opt = getopt(argc,argv, OPTSTR) != -1 ))
@@ -108,7 +109,7 @@ int main(int argc, char** argv)
   // Done with all the bureocracies
 
 
-  hcreate(1000000);
+  hcreate(1000000); // Hash table to deal with lost arrows
 
   for (i = optind; i < argc; i++) {
     int ret = rst_open_file(argv[i], &data, NULL, 100000);
@@ -123,24 +124,22 @@ int main(int argc, char** argv)
   paje_hierarchy();
   
   // Separate OLAM events (App and MPI Events) from FS events
-  pajeCreateContainer(0,OLAM_CONTAINER,
-                        OLAM_CONTAINER,
-                        PAJE_ROOT_CONTAINER,
-                        OLAM_CONTAINER);
-  
+  /*
   pajeCreateContainer(0,PVFS_CONTAINER,
                         PVFS_CONTAINER,
                         PAJE_ROOT_CONTAINER,
                         PVFS_CONTAINER);
-
+*/
   while (rst_decode_event(&data, &event)) {
-    char entity_name[100];
+    char entity_name[100], app_name[100];
     char value[100];
     char state[100];
     double timestamp;
     int type;
     char key[AKY_DEFAULT_STR_SIZE];
     char *locfn,*locfn_access;
+    ENTRY he;
+    
 
     if (event.id2 >= PVFS_VERSION_BASE)
     {
@@ -149,7 +148,8 @@ int main(int argc, char** argv)
       snprintf(entity_name, 100, "pvfs_%" PRIu64 ,event.id1);
     } else { 
       // this is olam event -- identified by the process number
-      snprintf(entity_name, 100, "rank%" PRIu64, event.id1);
+      snprintf(entity_name, 100, "rank%" PRIu64, event.id1); // this one is for container type PROCESS
+      snprintf(app_name,    100, "olam_r%" PRIu64, event.id1); // this one for container type APP
     }
     
     snprintf(value, 100, "%s", name_get(event.type));
@@ -160,26 +160,57 @@ int main(int argc, char** argv)
     switch (event.type) {
       // OLAM and PVFS events here
       case OLAM_INIT:
-      case MPI_INIT:
-        pajeCreateContainer(timestamp, entity_name,
-                            PROCESS_TYPE, OLAM_CONTAINER, entity_name);
+      case MPI_INIT: // event_s -- hostname
+        assert(event.ct.n_string == 1);
+
+        //Container for the machine
+        //Does it exist?
+        he.key = event.v_string[0];
+        if (!hsearch(he,FIND)) {
+          if (!hsearch(he,ENTER)) {
+            fprintf(stderr,"Could not add host %s to hash!\n",event.v_string[0]);
+            exit(1);
+          }
+          pajeCreateContainer(timestamp,
+                                event.v_string[0],
+                                "MACHINE",
+                                "0", event.v_string[0] );
+        }
+ 
+        // Create a container to the app
+        pajeCreateContainer(timestamp,
+                              app_name, // OLAM container
+                              "APP", // of type APP
+                              event.v_string[0],app_name); //in the machine
+
+        // Create container to the rank
+        pajeCreateContainer(timestamp,
+                            entity_name, // rank_something
+                            "PROCESS",
+                            app_name, entity_name); //child of olam_something
         break;
 
       case PVFS_INIT:
+        /*
         pajeCreateContainer(timestamp, entity_name,
                             SERVER_TYPE, PVFS_CONTAINER, entity_name);
+                            */
         break;
 
       
+#if 0
       case OLAM_HDF5_OPEN_IN:
-        // Creates the container /filename/ 
-        // Creates arrow from rank%d to filename
-        // Creates an state "opened"
+        // Creates the container /filename/  -- Ignore for now
+        // Creates arrow from rank%d to filename -- Ignore for now
+        // Creates an state "opened" -- Ignore for now
         // open is iiss, myrank, thread_id, locfn,access
         assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
-      
+     
+        // Hierarchy has changed, there'll be no more duplicated file
+        // elements
+
         //Create the container for the /locfn/ file
         // Type here is FILE -- Hope paje does not go crazy... ;)
         pajeCreateContainer(timestamp, locfn,
@@ -202,10 +233,14 @@ int main(int argc, char** argv)
         pajeEndLink  (timestamp, PVFS_CONTAINER, "LINK", locfn      , "PTP", key);
         
         break;
+#endif
 
 
+      case OLAM_HDF5_OPEN_IN:
       case OLAM_HDF5_CLOSE_IN:
       case OLAM_HDF5_CREATE_IN:
+      case OLAM_HDF5_WRITE_IN:
+      case OLAM_HDF5_READ_IN:
         // Creates arrow from rank%d to filename
         // Creates an state with event
 
@@ -215,29 +250,18 @@ int main(int argc, char** argv)
        
        // pop state open
         snprintf(state,100, "STATE_%s",value);
-        pajePushState(timestamp, locfn, state, value);
+        pajePushState(timestamp, entity_name, state, locfn);
 
+        /*
         // id is "open W ## myrank ## /file/name"
         snprintf(key,AKY_DEFAULT_STR_SIZE,"%s#%" PRIu64 "#%s",
             entity_name, event.id1, locfn);
         pajeStartLink(timestamp, "0", "LINK", entity_name, "PTP", key);
         pajeEndLink  (timestamp, "0", "LINK", locfn      , "PTP", key);
-        
+        */
         break;
 
-      case OLAM_HDF5_OPEN_OUT:
-      case OLAM_HDF5_CREATE_OUT:
-        // Closes an state "open"
-        // open is iiss, myrank, thread_id, locfn,access
-        assert(event.ct.n_string == 2);
-        locfn = event.v_string[0];
-        locfn_access = event.v_string[1];
-      
-        snprintf(state,100, "STATE_%s",ename->start_name);
-        pajePopState(timestamp, locfn, state);
-
-        break;
-
+        /*
       case OLAM_HDF5_WRITE_IN:
       case OLAM_HDF5_READ_IN:
         assert(event.ct.n_string == 2);
@@ -261,18 +285,23 @@ int main(int argc, char** argv)
 
         break;
 
+        */
 
       case OLAM_HDF5_WRITE_OUT:
       case OLAM_HDF5_READ_OUT:
+      case OLAM_HDF5_CLOSE_OUT:
+      case OLAM_HDF5_OPEN_OUT:
+      case OLAM_HDF5_CREATE_OUT:
         assert(event.ct.n_string == 2);
         locfn = event.v_string[0];
         locfn_access = event.v_string[1];
       
         snprintf(state,100, "STATE_%s",ename->start_name);
-        pajePopState(timestamp, locfn, state);
+        pajePopState(timestamp, entity_name, state);
 
         // key for arrow:
         // id is "open W ## myrank ## /file/name"
+        /*
         snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
                                       locfn_access, 
                                       event.id1, locfn);
@@ -280,11 +309,11 @@ int main(int argc, char** argv)
           pajeEndLink  (timestamp, PVFS_CONTAINER, "LINK", locfn      , "PTP", key);
         } else {
           pajeEndLink  (timestamp, OLAM_CONTAINER, "LINK", entity_name, "PTP", key);
-        }
+        }*/
 
         break;
 
-
+      /*
       case OLAM_HDF5_CLOSE_OUT:
         // Destroys the container /filename/ 
         // Creates arrow from rank%d to filename
@@ -300,6 +329,7 @@ int main(int argc, char** argv)
       
         pajeDestroyContainer(timestamp, FILE_TYPE, locfn);
         break;
+      */
 
       case MPI_COMM_SPAWN_IN:
       case MPI_COMM_GET_NAME_IN:
@@ -431,9 +461,11 @@ int main(int argc, char** argv)
       case MPI_CART_RANK_IN:
       case MPI_CART_SUB_IN:
       case MPI_FINALIZE_IN:
+        pajePushState(timestamp, entity_name, "MPI_STATE", value);
+        break;
 
         /*
-      case OLAM_HDF5_OPEN_IN:
+      case OLAM_HDF5_OPEN_IN: // create the state for open -- see later
       case OLAM_HDF5_CLOSE_IN:
       case OLAM_HDF5_CREATE_IN:
       case OLAM_HDF5_READ_IN:
@@ -499,8 +531,12 @@ int main(int argc, char** argv)
       case OLAM_LEAF3_IN:
       case OLAM_SEACELLS_IN:
       case OLAM_INNERSTEP_IN:
+        snprintf(state,100, "APP_STATE_%s",ename->start_name);
+        pajePushState(timestamp, app_name, state,value);
 
+        break;
 
+      //These ones use entity name as container
       case OLAM_OPLOT_INIT_IN:
       case OLAM_SEA_STARTUP_IN:
       case OLAM_SST_DATABASE_READ_IN:
@@ -519,10 +555,9 @@ int main(int argc, char** argv)
       case OLAM_HDF5_PREPARE_READ_IN:
       case OLAM_HDF5_CLOSE_READ_IN:
       case OLAM_SHDF5_CLOSE_IN:
+        snprintf(state,100, "STATE_%s",ename->start_name);
+        pajePushState(timestamp, entity_name, state,value);
 
-
-
-        pajePushState(timestamp, entity_name, "STATE", value);
         break;
 
 
@@ -655,6 +690,8 @@ int main(int argc, char** argv)
       case MPI_RECV_IDLE_OUT:
       case MPI_CART_RANK_OUT:
       case MPI_CART_SUB_OUT:
+        pajePopState(timestamp, entity_name, "MPI_STATE");
+        break;
 
         /*
       case OLAM_HDF5_OPEN_OUT:
@@ -723,6 +760,9 @@ int main(int argc, char** argv)
       case OLAM_LEAF3_OUT:
       case OLAM_SEACELLS_OUT:
       case OLAM_INNERSTEP_OUT:
+        snprintf(state,100, "APP_STATE_%s",ename->start_name);
+        pajePopState(timestamp, app_name, state);
+        break;
 
 
       case OLAM_OPLOT_INIT_OUT:
@@ -743,14 +783,14 @@ int main(int argc, char** argv)
       case OLAM_HDF5_PREPARE_READ_OUT:
       case OLAM_HDF5_CLOSE_READ_OUT:
       case OLAM_SHDF5_CLOSE_OUT:
-
-        pajePopState(timestamp, entity_name, "STATE");
+        snprintf(state,100, "STATE_%s",ename->start_name);
+        pajePopState(timestamp, entity_name, state);
         break;
-        locfn = event.v_string[0];
-        pajePopState(timestamp, locfn , "STATE");
+
       case MPI_FINALIZE_OUT:
         pajePopState(timestamp, entity_name, "STATE");
-        pajeDestroyContainer(timestamp, PROCESS_TYPE, entity_name);
+        pajeDestroyContainer(timestamp, "PROCESS", entity_name);
+        pajeDestroyContainer(timestamp, "APP",     app_name);
         break;
       
 

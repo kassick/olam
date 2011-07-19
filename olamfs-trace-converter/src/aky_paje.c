@@ -203,7 +203,8 @@ void paje_hierarchy(void)
   pajeDefineContainerType("FILE"      , "FILESYSTEM", "FILE");
   pajeDefineContainerType("FSPROCESS" , "FILESYSTEM", "FSPROC");
 
-  pajeDefineStateType("STATE", "APP"    , "STATE"); // App has app wide states
+  pajeDefineStateType("APP_STATE"    , "APP"    , "APP_STATE"); // App has app wide states
+  pajeDefineStateType("MPI_STATE", "PROCESS", "MPI_STATE"); // App has app wide states
   // Now add an state type for each event in olam
   for (i = 0; olam_evt_names[i].name != NULL; i++) {
     char state_name[STATE_NAME_MAX];
