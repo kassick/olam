@@ -151,6 +151,8 @@ if (iparallel == 1) then
    close(io6)
 endif
 
+call rst_event_s_f(MPI_FINALIZE_OUT,trim(hostname)//CHAR(0))
+
 call rst_finalize_f()
 stop 'olam_end'
 end program main

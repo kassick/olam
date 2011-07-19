@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Seg, 18 Jul 2011 23:34:07 -0300 (kassick)"
+ * Updated: "Ter, 19 Jul 2011 14:44:36 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -330,6 +330,8 @@ int main(int argc, char** argv)
         pajeDestroyContainer(timestamp, FILE_TYPE, locfn);
         break;
       */
+
+#if 0 // Commenting out for tests
 
       case MPI_COMM_SPAWN_IN:
       case MPI_COMM_GET_NAME_IN:
@@ -786,6 +788,8 @@ int main(int argc, char** argv)
         snprintf(state,100, "STATE_%s",ename->start_name);
         pajePopState(timestamp, entity_name, state);
         break;
+#endif // here finishes he test
+
 
       case MPI_FINALIZE_OUT:
         pajePopState(timestamp, entity_name, "STATE");
