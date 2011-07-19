@@ -71,7 +71,7 @@ integer :: thread_id
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
 
@@ -95,12 +95,12 @@ if (access(1:1) == 'R') then
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_OPEN_IN, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_HDF5_OPEN_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
     call fh5f_open(trim(locfn)//char(0), iaccess, hdferr)
      
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
  
       if (hdferr < 0) then
@@ -118,11 +118,11 @@ elseif (access(1:1) == 'W') then
       iaccess=2
     
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
       call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
     
 
@@ -144,11 +144,11 @@ call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, locfn,access)
          iaccess=1
       
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
          call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
     
 
@@ -162,7 +162,7 @@ call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, locfn,access)
 endif
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT, myrank, thread_id, locfn,access)
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
 return
@@ -188,19 +188,19 @@ integer :: thread_id
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_INFO_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_INFO_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 ! Open the dataset.
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_DATASET_OPEN_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_DATASET_OPEN_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 call fh5d_open( trim(dsetname)//char(0), hdferr)
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_DATASET_OPEN_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_DATASET_OPEN_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 if (hdferr < 0) then
@@ -209,7 +209,7 @@ if (hdferr < 0) then
    ndims   = 0
    dims(1) = 0
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_INFO_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_INFO_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
    return
 endif
@@ -217,27 +217,27 @@ endif
 ! Get dataset's dimensions
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_DATASET_GETINFO_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_DATASET_GETINFO_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 call fh5s_get_ndims(ndims)
 call fh5s_get_dims(dims)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_DATASET_GETINFO_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_DATASET_GETINFO_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 !print*,'ndims: ',ndims
 !print*,'dims: ',dims(1:ndims)
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_DATASET_CLOSE_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_DATASET_CLOSE_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 call fh5d_close(hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_DATASET_CLOSE_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_DATASET_CLOSE_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_INFO_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_INFO_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 return
 end subroutine shdf5_info
@@ -278,7 +278,7 @@ integer :: thread_id
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_OREC_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_OREC_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 
@@ -307,18 +307,18 @@ endif
 dimsh(1:ndims) = dims(1:ndims)
      
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_PREPARE_WRITE_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_PREPARE_WRITE_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 ! Prepare memory and options for the write
 call fh5_prepare_write(ndims, dimsh, hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_PREPARE_WRITE_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_PREPARE_WRITE_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 if (hdferr /= 0) then
    print*,'shdf5_orec: can''t prepare requested field:',trim(dsetname)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_OREC_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_OREC_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
    return
 endif
@@ -332,7 +332,7 @@ if (ctype(1:1) == 'l') h5_type=5
 
 ! Write the dataset.
 #ifdef OLAM_RASTRO
-call rst_event_iiiss_f(OLAM_HDF5_WRITE_IN, myrank, thread_id, h5_type, ctype, dsetname)
+call rst_event_iiiss_f(OLAM_HDF5_WRITE_IN, myrank, thread_id, h5_type, trim(ctype)//CHAR(0), trim(dsetname)//CHAR(0))
 #endif
 if (ctype == 'is') then
    call fh5_write(h5_type, ivars, trim(dsetname)//char(0), hdferr)
@@ -357,7 +357,7 @@ elseif (ctype == 'la') then
 endif
 
 #ifdef OLAM_RASTRO
-call rst_event_iiiss_f(OLAM_HDF5_WRITE_OUT, myrank, thread_id, h5_type, ctype, dsetname)
+call rst_event_iiiss_f(OLAM_HDF5_WRITE_OUT, myrank, thread_id, h5_type, trim(ctype)//CHAR(0), trim(dsetname)//CHAR(0))
 #endif
 
 if (hdferr /= 0) then
@@ -369,15 +369,15 @@ endif
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_CLOSE_WRITE_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_CLOSE_WRITE_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 call fh5_close_write(hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_CLOSE_WRITE_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_CLOSE_WRITE_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_OREC_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_OREC_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 return
@@ -420,7 +420,7 @@ integer :: thread_id
 thread_id = OMP_GET_THREAD_NUM()
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_IREC_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_IREC_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 
@@ -452,19 +452,19 @@ dimsh(1:ndims) = dims(1:ndims)
     
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_PREPARE_READ_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_PREPARE_READ_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 ! Prepare file and memory space for the read
 call fh5_prepare_read(trim(dsetname)//char(0), ndims, dimsh, hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_PREPARE_READ_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_PREPARE_READ_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 
 if (hdferr < 0) then
    print*,'shdf5_irec: can''t prepare requested field:',trim(dsetname)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_IREC_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_IREC_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
    return
 endif
@@ -478,7 +478,7 @@ if (ctype(1:1) == 'l') h5_type=5
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iiiss_f(OLAM_HDF5_READ_IN, myrank, thread_id, h5_type, ctype, dsetname)
+call rst_event_iiiss_f(OLAM_HDF5_READ_IN, myrank, thread_id, h5_type,trim( ctype)//CHAR(0), trim(dsetname)//CHAR(0))
 #endif
 if (ctype == 'is') then
    call fh5d_read(h5_type,ivars,hdferr)
@@ -502,7 +502,7 @@ elseif (ctype == 'la') then
    call fh5d_read(h5_type,lvara,hdferr)
 endif
 #ifdef OLAM_RASTRO
-call rst_event_iiiss_f(OLAM_HDF5_READ_OUT, myrank, thread_id, h5_type, ctype, dsetname)
+call rst_event_iiiss_f(OLAM_HDF5_READ_OUT, myrank, thread_id, h5_type, trim(ctype)//CHAR(0), trim(dsetname)//CHAR(0))
 #endif
 
 
@@ -516,17 +516,17 @@ endif
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_CLOSE_READ_IN, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_CLOSE_READ_IN, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 call fh5_close_read(hdferr)
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_HDF5_CLOSE_READ_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_HDF5_CLOSE_READ_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iis_f(OLAM_SHDF5_IREC_OUT, myrank, thread_id, dsetname)
+call rst_event_iis_f(OLAM_SHDF5_IREC_OUT, myrank, thread_id, trim(dsetname)//CHAR(0))
 #endif
 return
 end subroutine

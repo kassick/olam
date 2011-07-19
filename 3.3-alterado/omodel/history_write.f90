@@ -59,7 +59,7 @@ integer            :: nv, nvcnt, ndims, idims(3)
 real, external :: walltime
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_HISTORY_WRITE_IN,vtype)
+call rst_event_s_f(OLAM_HISTORY_WRITE_IN,trim(vtype)//CHAR(0))
 #endif
 
 
@@ -155,7 +155,7 @@ call shdf5_close()
 ! call write_ed_output()
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_HISTORY_WRITE_OUT,vtype)
+call rst_event_s_f(OLAM_HISTORY_WRITE_OUT,trim(vtype)//CHAR(0))
 #endif
 
 return

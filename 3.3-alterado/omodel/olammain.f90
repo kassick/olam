@@ -72,7 +72,7 @@ rastro_id=10
 call rst_init_f(myrank,rastro_id)
 
 hn_status = hostnm(hostname)
-call rst_event_s_f(OLAM_INIT,hostname)
+call rst_event_s_f(OLAM_INIT,trim(hostname) // CHAR(0))
 
 iparallel = 0
 if (mgroupsize > 1) iparallel = 1

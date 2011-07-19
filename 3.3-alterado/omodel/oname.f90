@@ -55,7 +55,7 @@ real, external :: walltime
 namelist /OLAMIN/ nl
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_READ_NL_IN,file)
+call rst_event_s_f(OLAM_READ_NL_IN,trim(file)//CHAR(0))
 #endif
 
 ! OPEN THE NAMELIST FILE
@@ -100,7 +100,7 @@ enddo
 close(10)
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_READ_NL_OUT,file)
+call rst_event_s_f(OLAM_READ_NL_OUT,trim(file)//CHAR(0))
 #endif
 
 end subroutine read_nl
@@ -159,7 +159,7 @@ integer :: i,j
 real(kind=8) :: tfact
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_COPY_NL_IN,copy_type)
+call rst_event_s_f(OLAM_COPY_NL_IN,trim(copy_type)//CHAR(0))
 #endif
 
 if (copy_type == 'ALL_CASES') then
@@ -445,7 +445,7 @@ elseif (copy_type == 'NOT_HISTORY') then
 endif
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_COPY_NL_OUT,copy_type)
+call rst_event_s_f(OLAM_COPY_NL_OUT,trim(copy_type)//CHAR(0))
 #endif
 
 end subroutine copy_nl

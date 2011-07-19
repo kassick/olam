@@ -56,7 +56,7 @@ character(len=10) :: number
 ! Check if history files exist
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_HISTORY_START_IN,action)
+call rst_event_s_f(OLAM_HISTORY_START_IN,trim(action) // CHAR(0))
 #endif
 
 exanp = .false.
@@ -83,7 +83,7 @@ if (iparallel == 1 .and. exanz) then
       inquire(file=hfilinp, exist=exanp)
       if (.not. exanp) then
 #ifdef OLAM_RASTRO
-	call rst_event_s_f(OLAM_HISTORY_START_OUT,action)
+	call rst_event_s_f(OLAM_HISTORY_START_OUT,trim(action)//CHAR(0))
 #endif
 	exit
       endif
@@ -152,7 +152,7 @@ elseif (exanz .and. iparallel == 0) then
          inquire(file=hfilinp, exist=exanp)
          if (.not. exanp) then
 #ifdef OLAM_RASTRO
-		call rst_event_s_f(OLAM_HISTORY_START_OUT,action)
+		call rst_event_s_f(OLAM_HISTORY_START_OUT,trim(action)//CHAR(0))
 #endif
 		exit
 	 endif
@@ -207,7 +207,7 @@ else
 endif
 
 #ifdef OLAM_RASTRO
-call rst_event_s_f(OLAM_HISTORY_START_OUT,action)
+call rst_event_s_f(OLAM_HISTORY_START_OUT,trim(action)//CHAR(0))
 #endif
 
 return
