@@ -72,7 +72,12 @@ call rst_event_s_f(OLAM_MICINIT_IN,rst_buf)
 
 call micinit_gam()
 
-if (level < 3) return
+if (level < 3) then
+  #ifdef OLAM_RASTRO
+  call rst_event_s_f(OLAM_MICINIT_OUT,rst_buf)
+  #endif
+  return
+endif
 
 call make_autotab()
 call haznuc()
