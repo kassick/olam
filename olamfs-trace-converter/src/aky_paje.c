@@ -204,13 +204,21 @@ void paje_hierarchy(void)
   pajeDefineContainerType("FSPROCESS" , "FILESYSTEM", "FSPROC");
 
   pajeDefineStateType("APP_STATE"    , "APP"    , "APP_STATE"); // App has app wide states
+  pajeDefineStateType("P_STATE"    , "PROCESS"    , "P_STATE"); // App has app wide states
+  pajeDefineStateType("T_STATE"    , "OMP_THREAD"    , "T_STATE"); // App has app wide states
+  
+  //pajeDefineStateType("APP_STATE"    , "APP"    , "APP_STATE"); // App has app wide states
   pajeDefineStateType("MPI_STATE", "PROCESS", "MPI_STATE"); // App has app wide states
   // Now add an state type for each event in olam
+  /*
   for (i = 0; olam_evt_names[i].name != NULL; i++) {
     char state_name[STATE_NAME_MAX];
-    snprintf(state_name,STATE_NAME_MAX,"STATE_%s",olam_evt_names[i].start_name);
+    snprintf(state_name,STATE_NAME_MAX,"%s",olam_evt_names[i].short_name);
+        //start_name);
     pajeDefineStateType(state_name, "PROCESS", state_name);
+    pajeDefineStateType(state_name, "APP", state_name);
   }
+  */
 
   /*
   for (i = 0; pvfs_evt_names[i].name != NULL; i++) {
@@ -223,14 +231,14 @@ void paje_hierarchy(void)
   
   pajeDefineStateType("STATE_OPENED", "FILE"   , "STATE_OPENED");
 
-  pajeDefineLinkType("COMMLINK"  , "APP"    , "PROCESS", "PROCESS" , "COMMLINK");
-  pajeDefineLinkType("FILELINK"  , "MACHINE", "PROCESS", "FILE"    , "FILELINK");
-  pajeDefineLinkType("FILEOPLINK", "MACHINE", "PROCESS", "FSPROC"  , "FILEOPLINK");
+  //pajeDefineLinkType("COMMLINK"  , "APP"    , "PROCESS", "PROCESS" , "COMMLINK");
+  //pajeDefineLinkType("FILELINK"  , "MACHINE", "PROCESS", "FILE"    , "FILELINK");
+  //pajeDefineLinkType("FILEOPLINK", "MACHINE", "PROCESS", "FSPROC"  , "FILEOPLINK");
 }
 
 int paje_open_file(const char const * fname)
 {
-  paje_ofile = fopen(fname,"w+");
+  paje_ofile = fopen(fname,"w");
   if (!paje_ofile)
   {
     fprintf(stderr,"Cannot open %s for writing, fallback to stdout\n",fname);

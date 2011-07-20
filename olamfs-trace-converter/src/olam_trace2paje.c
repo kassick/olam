@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/olamfs-trace-converter/src/olam_trace2paje.c"
  * Created: "Ter, 31 Mai 2011 11:11:38 -0300 (kassick)"
- * Updated: "Ter, 19 Jul 2011 14:44:36 -0300 (kassick)"
+ * Updated: "Ter, 19 Jul 2011 19:26:43 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -23,6 +23,7 @@
  * ==========================================================================
  */
 
+#include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -39,7 +40,7 @@
 #define FALSE (0)
 #define TRUE (!FALSE)
 
-#define OPTSTR "mho"
+#define OPTSTR "mho:v"
 #define PROGNAME "olam_trace2paje"
 
 #define OLAM_CONTAINER "APP"
@@ -55,6 +56,7 @@ void usage() {
   printf("Usage: %s <options> <file1.rst> <file2.rst> ...\n",PROGNAME);
   printf(" -h                 displays this message\n");
   printf(" -m                 adds MPI messages to the paje file\n");
+  printf(" -v                 Adds the string values of some events to the value of paje events\n");
   printf(" -o <outputfile>    writes Pajé output to outputfile\n");
   //printf(" -o                 disables offset in constants (for olam rastro v>=11)");
   printf(" -somethingels      does some thing else\n");
@@ -62,7 +64,7 @@ void usage() {
 
 int main(int argc, char** argv)
 {
-  int opt;
+  int opt,nfiles = 0;
   char mpi_messages = FALSE;
   //int const_offset = OLAM_EVT_BASE;
 
@@ -71,11 +73,12 @@ int main(int argc, char** argv)
   rst_file_t data;
   rst_event_t event;
   int i;
+  int add_value_name = 0;
 
   //A function would do better...
   paje_ofile = stdout;
 
-  while ((opt = getopt(argc,argv, OPTSTR) != -1 ))
+  while ((opt = getopt(argc,argv, OPTSTR)) != -1 )
   {
     switch(opt) {
       case 'm':
@@ -85,16 +88,22 @@ int main(int argc, char** argv)
       case 'h':
         usage();
         exit(0);
+        break;
 
       case 'o':
         paje_open_file(optarg);
 
         break;
 
+      case 'v':
+        add_value_name = TRUE;
+        break;
+
+        /*
       default:
         fprintf(stderr,"Unknown option -%c\n",(char)opt);
         usage();
-        exit(1);
+        exit(1); */
     }
   }
 
@@ -117,6 +126,7 @@ int main(int argc, char** argv)
       fprintf(stderr,"%s: trace %s could not be opened\n", argv[0], argv[i]);
       return 1;
     }
+    nfiles++;
   }
 
   name_init();
@@ -134,6 +144,7 @@ int main(int argc, char** argv)
     char entity_name[100], app_name[100];
     char value[100];
     char state[100];
+    char info[200];
     double timestamp;
     int type;
     char key[AKY_DEFAULT_STR_SIZE];
@@ -156,6 +167,26 @@ int main(int argc, char** argv)
     ename = data_get(event.type); // only one of these will be valid, but ok
     timestamp = (double) event.timestamp / 1000000;
 
+    if (add_value_name && (event.ct.n_string > 0)) {
+      
+      snprintf(info,200,"%s(%s",ename->short_name,event.v_string[0]);
+
+      for (i = 1; i < event.ct.n_string; i++) {
+        strncat(info,"_",200);
+        strncat(info,event.v_string[i],200);
+      }
+      
+      strcat(info,")");
+      
+      for (i = 0; i < strlen(info); i++)
+      {
+        if(info[i] == ' ') info[i] = '_';
+      }
+      //fprintf(stderr,"Adding value to event %s %s\n",ename->short_name,info);
+    } else {
+      snprintf(info,200,"%s",ename->short_name);
+    }
+
 
     switch (event.type) {
       // OLAM and PVFS events here
@@ -171,6 +202,7 @@ int main(int argc, char** argv)
             fprintf(stderr,"Could not add host %s to hash!\n",event.v_string[0]);
             exit(1);
           }
+          fprintf(stderr,"got entry for machine %s\n",event.v_string[0]);
           pajeCreateContainer(timestamp,
                                 event.v_string[0],
                                 "MACHINE",
@@ -236,21 +268,35 @@ int main(int argc, char** argv)
 #endif
 
 
+      case OLAM_SHDF5_INFO_IN:
+      case OLAM_HDF5_CLOSE_READ_IN:
+      case OLAM_SHDF5_OREC_IN:
+      case OLAM_SHDF5_IREC_IN:
+      case OLAM_HDF5_CLOSE_WRITE_IN:
+      case OLAM_SHDF5_OPEN_IN:
+      case OLAM_HDF5_DATASET_CLOSE_IN:
+      case OLAM_HDF5_DATASET_GETINFO_IN:
+      case OLAM_HDF5_DATASET_OPEN_IN:
+      case OLAM_HDF5_PREPARE_READ_IN:
+      case OLAM_HDF5_PREPARE_WRITE_IN:
       case OLAM_HDF5_OPEN_IN:
-      case OLAM_HDF5_CLOSE_IN:
       case OLAM_HDF5_CREATE_IN:
       case OLAM_HDF5_WRITE_IN:
       case OLAM_HDF5_READ_IN:
         // Creates arrow from rank%d to filename
         // Creates an state with event
 
-        assert(event.ct.n_string == 2);
+        //fprintf(stderr,"n = %d\n",event.ct.n_string);
+        assert(event.ct.n_string >= 1);
         locfn = event.v_string[0];
         //locfn_access = event.v_string[1];
        
        // pop state open
-        snprintf(state,100, "STATE_%s",value);
-        pajePushState(timestamp, entity_name, state, locfn);
+        snprintf(state,100, "%s","P_STATE");
+        //snprintf(state,100, "%s",ename->short_name);
+        //snprintf(info,200,"%s %s",ename->short_name,locfn);
+
+        pajePushState(timestamp, entity_name, state, info);
 
         /*
         // id is "open W ## myrank ## /file/name"
@@ -287,9 +333,9 @@ int main(int argc, char** argv)
 
         */
 
+        /*
       case OLAM_HDF5_WRITE_OUT:
       case OLAM_HDF5_READ_OUT:
-      case OLAM_HDF5_CLOSE_OUT:
       case OLAM_HDF5_OPEN_OUT:
       case OLAM_HDF5_CREATE_OUT:
         assert(event.ct.n_string == 2);
@@ -301,7 +347,7 @@ int main(int argc, char** argv)
 
         // key for arrow:
         // id is "open W ## myrank ## /file/name"
-        /*
+        
         snprintf(key,AKY_DEFAULT_STR_SIZE,"open %s#%" PRIu64 "#%s",
                                       locfn_access, 
                                       event.id1, locfn);
@@ -331,7 +377,6 @@ int main(int argc, char** argv)
         break;
       */
 
-#if 0 // Commenting out for tests
 
       case MPI_COMM_SPAWN_IN:
       case MPI_COMM_GET_NAME_IN:
@@ -533,8 +578,9 @@ int main(int argc, char** argv)
       case OLAM_LEAF3_IN:
       case OLAM_SEACELLS_IN:
       case OLAM_INNERSTEP_IN:
-        snprintf(state,100, "APP_STATE_%s",ename->start_name);
-        pajePushState(timestamp, app_name, state,value);
+        snprintf(state,100, "%s","APP_STATE");
+        //snprintf(state,100, "%s",ename->short_name);
+        pajePushState(timestamp, app_name, state,ename->short_name);
 
         break;
 
@@ -545,23 +591,13 @@ int main(int argc, char** argv)
       case OLAM_SEAICE_DATABASE_READ_IN:
       case OLAM_NDVI_DATABASE_READ_IN:
       case OLAM_ED_VEGETATION_DYNAMICS_IN:
-      case OLAM_SHDF5_OPEN_IN:
-      case OLAM_SHDF5_INFO_IN:
-      case OLAM_HDF5_DATASET_OPEN_IN:
-      case OLAM_HDF5_DATASET_GETINFO_IN:
-      case OLAM_HDF5_DATASET_CLOSE_IN:
-      case OLAM_SHDF5_OREC_IN:
-      case OLAM_HDF5_PREPARE_WRITE_IN:
-      case OLAM_HDF5_CLOSE_WRITE_IN:
-      case OLAM_SHDF5_IREC_IN:
-      case OLAM_HDF5_PREPARE_READ_IN:
-      case OLAM_HDF5_CLOSE_READ_IN:
+      case OLAM_HDF5_CLOSE_IN:
       case OLAM_SHDF5_CLOSE_IN:
-        snprintf(state,100, "STATE_%s",ename->start_name);
-        pajePushState(timestamp, entity_name, state,value);
+        snprintf(state,100, "%s","P_STATE");
+        //snprintf(state,100, "%s",ename->short_name);
+        pajePushState(timestamp, entity_name, state,ename->short_name);
 
         break;
-
 
       case MPI_COMM_SPAWN_OUT:
       case MPI_COMM_GET_NAME_OUT:
@@ -762,7 +798,8 @@ int main(int argc, char** argv)
       case OLAM_LEAF3_OUT:
       case OLAM_SEACELLS_OUT:
       case OLAM_INNERSTEP_OUT:
-        snprintf(state,100, "APP_STATE_%s",ename->start_name);
+        snprintf(state,100, "%s","APP_STATE");
+        //snprintf(state,100, "%s",ename->short_name);
         pajePopState(timestamp, app_name, state);
         break;
 
@@ -773,26 +810,32 @@ int main(int argc, char** argv)
       case OLAM_SEAICE_DATABASE_READ_OUT:
       case OLAM_NDVI_DATABASE_READ_OUT:
       case OLAM_ED_VEGETATION_DYNAMICS_OUT:
-      case OLAM_SHDF5_OPEN_OUT:
-      case OLAM_SHDF5_INFO_OUT:
-      case OLAM_HDF5_DATASET_OPEN_OUT:
-      case OLAM_HDF5_DATASET_GETINFO_OUT:
-      case OLAM_HDF5_DATASET_CLOSE_OUT:
-      case OLAM_SHDF5_OREC_OUT:
-      case OLAM_HDF5_PREPARE_WRITE_OUT:
-      case OLAM_HDF5_CLOSE_WRITE_OUT:
-      case OLAM_SHDF5_IREC_OUT:
-      case OLAM_HDF5_PREPARE_READ_OUT:
-      case OLAM_HDF5_CLOSE_READ_OUT:
       case OLAM_SHDF5_CLOSE_OUT:
-        snprintf(state,100, "STATE_%s",ename->start_name);
+
+      case OLAM_SHDF5_INFO_OUT:
+      case OLAM_HDF5_CLOSE_READ_OUT:
+      case OLAM_SHDF5_OREC_OUT:
+      case OLAM_SHDF5_IREC_OUT:
+      case OLAM_HDF5_CLOSE_WRITE_OUT:
+      case OLAM_SHDF5_OPEN_OUT:
+      case OLAM_HDF5_DATASET_CLOSE_OUT:
+      case OLAM_HDF5_DATASET_GETINFO_OUT:
+      case OLAM_HDF5_DATASET_OPEN_OUT:
+      case OLAM_HDF5_PREPARE_READ_OUT:
+      case OLAM_HDF5_PREPARE_WRITE_OUT:
+      case OLAM_HDF5_OPEN_OUT:
+      case OLAM_HDF5_CREATE_OUT:
+      case OLAM_HDF5_WRITE_OUT:
+      case OLAM_HDF5_READ_OUT:
+      case OLAM_HDF5_CLOSE_OUT:
+        snprintf(state,100, "%s","P_STATE");
+        //snprintf(state,100, "%s",ename->short_name);
         pajePopState(timestamp, entity_name, state);
         break;
-#endif // here finishes he test
 
 
       case MPI_FINALIZE_OUT:
-        pajePopState(timestamp, entity_name, "STATE");
+        pajePopState(timestamp, entity_name, "MPI_STATE");
         pajeDestroyContainer(timestamp, "PROCESS", entity_name);
         pajeDestroyContainer(timestamp, "APP",     app_name);
         break;
