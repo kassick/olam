@@ -1,0 +1,77 @@
+RASTRO(id1,id2)
+
+DEFAULTTYPE FMTEDNAME
+
+CONTAINER TYPENAME {
+	EVENTTYPE ANAME
+	LINKTYPE  ANAME
+	
+	NAME FMTEDNAME
+	CREATE EVTNAME  #creates with fmtedname when evtname, format fields from event
+	CREATE PARENT  #creates with parent, format fields from parent generating event
+	DESTROY EVTNAME|CHILDREN #destroy when all children are destroyed
+	
+	CONTAINER TYPENAME {
+		...
+	}
+}
+
+STATE NAME {
+	TYPE FMTEDNAME
+	RASTROTYPE VALUENAME
+	i v1    #type char as in rastro ; name of the "variable"
+	s v2
+...
+}
+
+EVENT NAME {
+	TYPE FMTEDNAME
+	RASTROTYPE VALUENAME
+	...
+}
+
+ACCEPT EVENTS {
+	@ALL
+	EVENT1
+	EVENT2
+	...
+}
+
+IGNORE EVENTS {
+	@ALL
+	EVENT1
+	EVENT2
+}
+
+INCLUDE filename
+
+VALUE STATENAME FORMATSTR    #convert values for STATENAME into a formated string according to FORMATSTR
+VALUE EVENT1 %{NAME}_%{value1:format}_%{value2:format}   # see http://www.hanselman.com/blog/ASmarterOrPureEvilToStringWithExtensionMethods.aspx     and http://www.codeproject.com/KB/string/string_format.aspx
+
+
+
+-----
+
+=== Eventos ===
+
+Tem que ter uma lista de eventos; cada eventos/estados. Cada um tem vetores
+   vet_i = ["v1"]
+   vet_s = ["v2","v3"]
+   ...
+Percorre o vetor de valores de cada tipo da estrutura de evento do rastro, mapeia pra um mapping "current_event_names" ("v1" -> event.v_i[0], "v2" -> event.v_s[0], "v3" -> event.v_s[1]) que é passado como parâmetro, ou é global...
+
+Para cada state/event tem que ter também um vetor TRIGGER que vai chamar funções (i.e. CreateContainer) recebendo como parâmetro o mapping de nomes de parâmetros do evento para valores obtidos no rastro
+
+=== Containers ===
+Cria uma árvore com a hierarquia. No início, percorre a árvore e define os tipos de container.
+
+Adiciona na descrição do evento CREATE e DESTROY que tem que chamar 
+
+
+=== idéia geral ===
+
+Parseia o código; gera a árvore a hierarquia de containeres/tipos. Gera lista de eventos/estados
+
+Lê eventos de rastro; pra cada um, procura o nome equivalente ao código, preenche o mapping com os valores; chama os triggers, cria/destroi o evento/estado
+
+
