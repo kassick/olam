@@ -1,26 +1,39 @@
 %{
   #include <stdio.h>
   #include <string.h>
+  #include "tree.hh"
+  #include "container.hh"
   #include "descriptionfileparser.hpp"
 
   #include <iostream>
   using namespace std;
 
+  typedef tree<Paje::Container*> hierarchy_t;
 
-extern "C"
-{
-        int yylex(void);
-        int yyparse(void);
+  extern "C"
+  {
+          int yylex(void);
+          int yyparse(void);
 
-}
-int yywrap()
-{
-        return 1;
-}
-void yyerror(const char *str)
-{
-  fprintf(stderr,"error: %s\n",str);
-}
+  }
+  int yywrap()
+  {
+          return 1;
+  }
+  void yyerror(const char *str)
+  {
+    fprintf(stderr,"error: %s\n",str);
+  }
+
+
+  hierarchy_t * toplevel_hierarchy;
+
+
+
+
+  void init_desc_parser() {
+    toplevel_hierarchy = new tree<Paje::Container*>();
+  }
 
 %}
 
@@ -67,8 +80,8 @@ void yyerror(const char *str)
 %%
 
 code:
-          header 
-          definitions 
+          header
+          definitions
             {$$ = $1}
         ;
 
@@ -85,11 +98,21 @@ definitions: definition
            ;
 
 definition:
-          container_definition
+          container_definition { 
+              toplevel_hierarchy->insert_subtree(toplevel_hierarchy->begin(), $1)
+            }
           ;
 
 container_definition:
-          TOK_CONTAINER IDENTIFIER '{' container_params '}'  { cout << "Creating container " << $2 <<endl;}
+          TOK_CONTAINER IDENTIFIER '{' container_params '}'  { 
+              cout << "Creating container " << $2 <<endl;
+              Paje::Container * c = new Paje::Container();
+              c->typeName = $2;
+
+              $$ = new tree<Paje::Container*>();
+              $$->set_head(c);
+
+            }
           ;
 
 
@@ -125,5 +148,4 @@ destroy_param: TOK_DESTROY IDENTIFIER {
 
 
 idf: IDENTIFIER { $$ = $1} ;
-
 

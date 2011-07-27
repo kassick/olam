@@ -13,9 +13,11 @@ BISON_TARGET(DescriptionFileParser descriptionfile.y ${CMAKE_CURRENT_BINARY_DIR}
 FLEX_TARGET(DescriptionFileScanner descriptionfile.l ${CMAKE_CURRENT_BINARY_DIR}/descriptionfilescanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(DescriptionFileScanner DescriptionFileParser)
 
+include_directories(tree)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(rastro2paje
 rastro2paje.cc
+container.cc
 ${BISON_DescriptionFileParser_OUTPUTS}
 ${FLEX_DescriptionFileScanner_OUTPUTS}
 )
