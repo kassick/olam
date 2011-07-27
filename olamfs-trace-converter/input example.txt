@@ -3,7 +3,11 @@ RASTRO(id1,id2)
 DEFAULTTYPE FMTEDNAME
 
 CONTAINER TYPENAME {
-	EVENTTYPE ANAME
+	EVENTTYPE ANAME {
+          ACCEPT {
+            @ALL
+          }
+        }
 	LINKTYPE  ANAME
 	
 	NAME FMTEDNAME
@@ -45,6 +49,7 @@ IGNORE EVENTS {
 
 INCLUDE filename
 
+TYPE STATENAME FORMATSTR
 VALUE STATENAME FORMATSTR    #convert values for STATENAME into a formated string according to FORMATSTR
 VALUE EVENT1 %{NAME}_%{value1:format}_%{value2:format}   # see http://www.hanselman.com/blog/ASmarterOrPureEvilToStringWithExtensionMethods.aspx     and http://www.codeproject.com/KB/string/string_format.aspx
 
