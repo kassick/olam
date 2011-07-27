@@ -1,0 +1,10 @@
+RASTRO(var1,var2)
+
+CONTAINER ANAME {
+  NAME "Container%(varname:.8d)"
+  CREATE PARENT
+  DESTROY ANOTHERNAME
+  CONTAINER ACHILD {
+    CREATE PARENT
+  }
+}
