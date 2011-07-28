@@ -41,6 +41,9 @@
   char* string;
   long int_lit;
   void * ptr;
+  tree<Paje::Container*>::iterator hierarchy_iterator;
+  Paje::Container* container;
+
 }
 
 
@@ -70,9 +73,9 @@
 %type<ptr> header
 %type<ptr> definition
 %type<ptr> definitions
-%type<ptr> container_definition
-%type<ptr> container_param
-%type<ptr> container_params
+%type<hierarchy_iterator> container_definition
+%type<container> container_param
+%type<container> container_params
 %type<string> idf
 
 
@@ -98,33 +101,30 @@ definitions: definition
            ;
 
 definition:
-          container_definition { 
-              toplevel_hierarchy->insert_subtree(toplevel_hierarchy->begin(), $1)
-            }
+          toplevel_container_definition 
           ;
+
+toplevel_container_definition:
+                             {$1 = tr->begin(); } container_definition 
+                             ;
 
 container_definition:
-          TOK_CONTAINER IDENTIFIER '{' container_params '}'  { 
-              cout << "Creating container " << $2 <<endl;
-              Paje::Container * c = new Paje::Container();
-              c->typeName = $2;
-
-              $$ = new tree<Paje::Container*>();
-              $$->set_head(c);
-
-            }
+          TOK_CONTAINER IDENTIFIER {
+                //bottom up approach here; send the iterators
+                $3 = new Paje::Container();
+                $3->typeName = $2;
+                $3->where = toplevel_hierarchy->append_child($$,c);
+            } '{' container_params '}'
           ;
 
-
-
-container_params: container_param
-                | container_params container_param
+container_params: {$1 = $$} container_param
+                | {$1 = $2 = $$;} container_params container_param
                 ;
 
 container_param: name_param
                 |create_param
                 |destroy_param
-                |container_definition
+                |{$1 = $$->where } container_definition
                 ;
 
 name_param: TOK_NAME STRING_LIT { cout << "Name: " << $2 <<endl; } ;
