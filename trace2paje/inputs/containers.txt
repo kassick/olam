@@ -8,4 +8,26 @@ CONTAINER ANAME {
     NAME "OtherName"
     CREATE PARENT
   }
+  CONTAINER OTHERCHILD {
+    NAME "OtherChild"
+    CONTAINER SUBSUB {
+      NAME "OOOO"
+    }
+  }
+}
+
+CONTAINER BNAME {
+  NAME "Container%(varname:.8d)"
+  CREATE PARENT
+  DESTROY ANOTHERNAME
+  CONTAINER ACHILD {
+    CONTAINER SUBSUB {
+      NAME "OOOO"
+    }
+    NAME "OtherName"
+    CREATE PARENT
+  }
+  CONTAINER OTHERCHILD {
+    NAME "OtherChild"
+  }
 }

@@ -9,3 +9,5 @@ find_package(FLEX)
 find_package(BISON)
 
 add_subdirectory(src/)
+set_property(DIRECTORY src/ PROPERTY COMPILE_FLAGS -std=c++0x)
+

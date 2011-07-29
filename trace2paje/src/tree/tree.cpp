@@ -1,7 +1,7 @@
 // C++ source code
-// File: "/home/kassick/Work/olam/trace2paje/src/mytree/tree.cpp"
+// File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.cpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Qui, 28 Jul 2011 23:52:23 -0300 (kassick)"
+// Updated: "Sex, 29 Jul 2011 18:59:05 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -59,6 +59,14 @@ class thing_t {
     }
 
 
+struct change_id_cb {
+  bool operator ()(thing_t *t, int level) const {
+    t->_id++;
+    return false;
+  }
+};
+
+
 int main( ) {
   thing_t *a, *b, *c, *d, *e,*f,*g,*h;
 
@@ -89,6 +97,17 @@ int main( ) {
    node4->addChild(node8);
 
    print_tree<thing_t*>(node1);
+
+   cout << "Now walk tree" <<endl;
+   //walk_tree<thing_t* , change_id_cb>(node1);
+   //[&](const string& s){return s != myname && s.size() > y;}
+
+   int inc = 22;
+
+   walk_tree(node1, [&](thing_t *t, int level){t->_id += inc; return false;});
+   walk_tree(node1, print_tree_cb<thing_t*>());
+   
+   //walk_tree<thing_t* , print_tree_cb<thing_t*>  >(node1);
 
    //delete node2;
    //node1->removeChild(node2);

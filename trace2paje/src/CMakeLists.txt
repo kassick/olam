@@ -9,6 +9,10 @@ add_library(rastro SHARED IMPORTED)
 
 set_property(TARGET rastro PROPERTY IMPORTED_LOCATION "${RASTRO_LIBRARY}")
 
+
+
+
+
 BISON_TARGET(DescriptionFileParser descriptionfile.y ${CMAKE_CURRENT_BINARY_DIR}/descriptionfileparser.cpp)
 FLEX_TARGET(DescriptionFileScanner descriptionfile.l ${CMAKE_CURRENT_BINARY_DIR}/descriptionfilescanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(DescriptionFileScanner DescriptionFileParser)
@@ -18,9 +22,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(rastro2paje
 rastro2paje.cc
 container.cc
+tree/tree.hpp # my tree implementation
 ${BISON_DescriptionFileParser_OUTPUTS}
 ${FLEX_DescriptionFileScanner_OUTPUTS}
 )
+set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
+set_property(SOURCE container.cc PROPERTY COMPILE_FLAGS "-std=c++0x")
 target_link_libraries(rastro2paje fl)
 
 
@@ -28,13 +35,20 @@ target_link_libraries(rastro2paje fl)
 
 add_executable(scanner_test 
   container.cc
+  tree/tree.hpp # my tree implementation
   ${FLEX_DescriptionFileScanner_OUTPUTS} 
   ${BISON_DescriptionFileParser_OUTPUTS}
   )
 set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
 target_link_libraries(scanner_test fl)
 
+add_executable(tree/tree_test
+  tree/tree.cpp
+  tree/tree.hpp
+  )
 
+
+set_property(TARGET tree/tree_test PROPERTY COMPILE_FLAGS "-std=c++0x")
 
 #FLEX_TARGET(test_tokens descriptionfile.l descriptionfile.yy.c) #[COMPILE_FLAGS <string>])
 

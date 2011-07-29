@@ -1,7 +1,7 @@
 // C++ source code
-// File: "/home/kassick/Work/olam/trace2paje/src/mytree/tree.hpp"
+// File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Qui, 28 Jul 2011 23:53:24 -0300 (kassick)"
+// Updated: "Sex, 29 Jul 2011 18:58:26 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -132,6 +132,53 @@ class TreeNode {
        children.push_back(p);
      }
 
+};
+
+
+
+//**********************
+// Walk tree functions
+//
+// Use with a callback object (see print_tree_cb) receiveing type T and a
+// int indicating the level
+// */
+
+template <typename T, typename callable>
+void walk_tree_( T val, typename TreeNode<T>::iterator it1, typename TreeNode<T>::iterator it2, int level, callable callback) {
+
+  if (callback(val,level))
+    return;
+
+  while (it1 != it2) {
+    walk_tree_((*it1)->getVal(), (*it1)->begin(), (*it1)->end(),level+1,callback);
+    ++it1;
+  }
+}
+
+
+
+template <typename T, typename callable>
+void walk_tree(TreeNode<T> * t, callable cb )
+{
+  walk_tree_<T>(t->getVal(), t->begin(),t->end(),0, cb);
+}
+
+
+
+
+template <typename T>
+struct print_tree_cb {
+  bool operator ()(T &t, int level) const {
+    int i = level;
+
+    while (i)
+    {
+      cout << " ";
+      --i;
+    }
+    cout << *t <<endl;
+    return false;
+  }
 };
 
 

@@ -1,7 +1,7 @@
 %{
   #include <stdio.h>
   #include <string.h>
-  #include "tree.hh"
+  #include "tree.hpp"
   #include "container.hh"
   #include "descriptionfileparser.hpp"
 
@@ -26,6 +26,8 @@
   }
 
 
+SemanticAttribute * attr;
+attribs_t *n;
 
 
 
@@ -37,7 +39,8 @@
   long int_lit;
   void * ptr;
   Paje::Container   * container;
-  tree<struct semantic_attribute*>::iterator *attrib_iterator;
+  attribs_t * attr_node;
+  //tree<struct semantic_attribute*>::iterator *attrib_iterator;
 
 }
 
@@ -69,13 +72,13 @@
 %type<ptr> header
 %type<ptr> definition
 %type<ptr> definitions
-%type<ptr> container_definition
-%type<ptr> toplevel_container_definition
-%type<attrib_iterator> container_param
-%type<attrib_iterator> container_params
-%type<attrib_iterator> name_param
-%type<attrib_iterator> create_param
-%type<attrib_iterator> destroy_param
+%type<attr_node> container_definition
+%type<container> toplevel_container_definition
+%type<attr_node> container_param
+%type<attr_node> container_params
+%type<attr_node> name_param
+%type<attr_node> create_param
+%type<attr_node> destroy_param
 %type<string> idf
 
 
@@ -105,39 +108,46 @@ definition:
           ;
 
 toplevel_container_definition:
-                             container_definition
+                             container_definition {
+                                hierarchy_t * top = attr_to_container_hierarchy($1,toplevel_hierarchy);
+                                
+                                cout << "toplevel hierarchy:" <<endl;
+
+                                print_tree(top);
+
+                                cout <<"----?" <<endl;
+
+                                //toplevel_hierarchy->addChild(top);
+                              
+                                Container * c = $1->getVal()->vals.container;
+                                cout << "Defined a toplevel container:" << *c <<endl;
+
+
+                                //free_subtree($1,true);
+                                $$ = NULL;
+                              }
                              ;
 
 container_definition:
           TOK_CONTAINER IDENTIFIER '{' container_params '}' {
-              attribs_t::iterator *it = $4;
+            cout << "Container " << $2 << " has attributes : " << endl;
+            print_tree<SemanticAttribute *>($4);
+            cout << "----" <<endl;
 
-              Paje::Container* c = new Paje::Container(*it);
-              print_tree(attributes,attributes->begin(),
-              attributes->end());
-
-              reparent_containers(c, *it);
-
-            }
+            Container * c = new Container($4);
+            c->typeName = $2;
+            attr = new SemanticAttribute();
+            attr->id = ID_CONTAINER;
+            attr->vals.container = c;
+            $$ = new attribs_t(attr);
+            $$->addChild($4);
+            cout << "Finished container_definition" <<endl;
+          }
           ;
 
 container_params:
                   container_params container_param {
-                    attribs_t::iterator *it;
-                    it = new attribs_t::iterator();
-
-                    if ( (*(*$1))->id == ID_NOP ) {
-                      attributes->reparent(*$1,*$2);
-                      $$ = $1;
-                    } else {
-                      struct semantic_attribute * nop = new_semantic_attribute();
-                      nop->id = ID_NOP;
-
-                      *it = attributes->insert(attributes->begin(),nop);
-                      attributes->reparent(*it,*$1);
-                      attributes->reparent(*it,*$2);
-                      $$ = it;
-                    }
+                    $1->addChild($2);
                   }
                 | container_param { $$ = $1}
                 ;
@@ -149,99 +159,58 @@ container_param: name_param
                 ;
 
 name_param: TOK_NAME STRING_LIT {
-                    struct semantic_attribute * attr;
-                    attribs_t::iterator *it;
-
-                    it = new attribs_t::iterator();
                     attr = new_semantic_attribute();
-
                     attr->id = ID_NAME;
                     attr->vals.name = $2;
 
-                    *it = attributes->insert(attributes->begin(),attr);
+                    n = new attribs_t(attr);
 
-                    //print_tree(attributes,(*it),(*it).end());
-                    //print_tree(attributes,attributes->begin(),attributes->end());
-
-                    $$ = it;
+                    $$ = n;
                     cout << "Name: " << $2 <<endl;
                   } ;
 
           
 
 create_param: TOK_CREATE IDENTIFIER {
-                  struct semantic_attribute * attr;
-                  attribs_t::iterator *it;
-
-                  it = new attribs_t::iterator();
                   attr = new_semantic_attribute();
-
                   attr->id = ID_CREATE_EVENT;
                   attr->vals.create_event = $2;
 
-                  *it = attributes->insert(attributes->begin(),attr);
+                  n = new attribs_t(attr);
+                  $$ = n;
 
-                  //print_tree(attributes,(*it),(*it).end());
-                  //print_tree(attributes,attributes->begin(),attributes->end());
-
-                  $$ = it;
                   cout << "Create on event " << $2 <<endl; 
                 }
             | TOK_CREATE TOK_PARENT {
-                  struct semantic_attribute * attr;
-                  attribs_t::iterator *it;
-
-                  it = new attribs_t::iterator();
                   attr = new_semantic_attribute();
-
                   attr->id = ID_CREATE_PARENT;
                   attr->vals.create_parent = true;
 
-                  *it = attributes->insert(attributes->begin(),attr);
-
-                  //print_tree(attributes,(*it),(*it).end());
-                  //print_tree(attributes,attributes->begin(),attributes->end());
-
-                  $$ = it;
+                  n = new attribs_t(attr);
+                  $$ = n;
                   cout << "Create on parent" <<endl;
                 }
             ;
 
 
 destroy_param: TOK_DESTROY IDENTIFIER {
-                  struct semantic_attribute * attr;
-                  attribs_t::iterator *it;
-
-                  it = new attribs_t::iterator();
                   attr = new_semantic_attribute();
-
                   attr->id = ID_DESTROY_EVENT;
                   attr->vals.destroy_event = $2;
 
-                  *it = attributes->insert(attributes->begin(),attr);
+                  n = new attribs_t(attr);
+                  $$ = n;
 
-                  //print_tree(attributes,(*it),(*it).end());
-                  //print_tree(attributes,attributes->begin(),attributes->end());
-
-                  $$ = it;
                   cout << "Destroy on event " << $2 <<endl; 
                 }
             | TOK_DESTROY TOK_CHILDREN {
-                  struct semantic_attribute * attr;
-                  attribs_t::iterator *it;
-
-                  it = new attribs_t::iterator();
                   attr = new_semantic_attribute();
-
-                  attr->id = ID_DESTROY_EVENT;
+                  attr->id = ID_DESTROY_CHILDREN;
                   attr->vals.destroy_children = true;
 
-                  *it = attributes->insert(attributes->begin(),attr);
+                  n = new attribs_t(attr);
+                  $$ = n;
 
-                  //print_tree(attributes,(*it),(*it).end());
-                  //print_tree(attributes,attributes->begin(),attributes->end());
-
-                  $$ = it;
                   cout << "Destroy on children" <<endl;
                 }
             ;
