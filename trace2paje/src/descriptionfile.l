@@ -1,6 +1,9 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include "container.hh"
+#include "tree.hh"
+
 #include "descriptionfileparser.hpp"
 
 #define BUFFER_SIZE 512
@@ -53,7 +56,7 @@ TYPE                    return TOK_TYPE     ;
                           return yytext[0];
                         }
 
-\n                      /* ignore end of line */;
+\n                      /* */
 [ \t]+                  /* ignore whitespace */;
 .                       {
                           printf("Unexpected token `` %c ''\n",yytext[0]) ;

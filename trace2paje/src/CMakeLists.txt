@@ -26,7 +26,11 @@ target_link_libraries(rastro2paje fl)
 
 
 
-add_executable(scanner_test ${FLEX_DescriptionFileScanner_OUTPUTS} ${BISON_DescriptionFileParser_OUTPUTS})
+add_executable(scanner_test 
+  container.cc
+  ${FLEX_DescriptionFileScanner_OUTPUTS} 
+  ${BISON_DescriptionFileParser_OUTPUTS}
+  )
 set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
 target_link_libraries(scanner_test fl)
 
