@@ -1,8 +1,10 @@
 %{
   #include <stdio.h>
   #include <string.h>
+  #include "paje.hh"
   #include "tree.hpp"
   #include "container.hh"
+  #include "semantics.hh"
   #include "descriptionfileparser.hpp"
 
   #include <iostream>
@@ -12,6 +14,7 @@
 
   extern "C"
   {
+          extern int yyline;
           int yylex(void);
           int yyparse(void);
 
@@ -22,13 +25,12 @@
   }
   void yyerror(const char *str)
   {
-    fprintf(stderr,"error: %s\n",str);
+    fprintf(stderr,"error in line %d: %s\n",yyline,str);
   }
 
 
 SemanticAttribute * attr;
 attribs_t *n;
-
 
 
 
@@ -80,6 +82,9 @@ attribs_t *n;
 %type<attr_node> create_param
 %type<attr_node> destroy_param
 %type<string> idf
+%type<attr_node> accept_item;
+%type<attr_node> accept_list;
+%type<attr_node> accept_param;
 
 
 
@@ -111,16 +116,15 @@ toplevel_container_definition:
                              container_definition {
                                 hierarchy_t * top = attr_to_container_hierarchy($1,toplevel_hierarchy);
                                 
-                                cout << "toplevel hierarchy:" <<endl;
+                                //cout << "toplevel hierarchy:" <<endl;
 
-                                print_tree(top);
+                                //print_tree(top);
 
-                                cout <<"----?" <<endl;
+                                //cout <<"----?" <<endl;
 
                                 //toplevel_hierarchy->addChild(top);
                               
-                                Container * c = $1->getVal()->vals.container;
-                                cout << "Defined a toplevel container:" << *c <<endl;
+                                //cout << "Defined a toplevel container:" << $1->getVal()->vals.container_type <<endl;
 
 
                                 //free_subtree($1,true);
@@ -130,18 +134,21 @@ toplevel_container_definition:
 
 container_definition:
           TOK_CONTAINER IDENTIFIER '{' container_params '}' {
-            cout << "Container " << $2 << " has attributes : " << endl;
-            print_tree<SemanticAttribute *>($4);
-            cout << "----" <<endl;
+            //cout << "Container " << $2 << " has attributes : " << endl;
+            //print_tree<SemanticAttribute *>($4);
+            //cout << "----" <<endl;
 
-            Container * c = new Container($4);
-            c->typeName = $2;
+
+
+            //Container * c = new Container($2,$4);
             attr = new SemanticAttribute();
             attr->id = ID_CONTAINER;
-            attr->vals.container = c;
+            //attr->vals.container = c;
+            attr->vals.container_type = $2;
             $$ = new attribs_t(attr);
             $$->addChild($4);
-            cout << "Finished container_definition" <<endl;
+            
+            //cout << "Finished container_definition" <<endl;
           }
           ;
 
@@ -153,8 +160,9 @@ container_params:
                 ;
 
 container_param: name_param  
-                |create_param 
-                |destroy_param 
+                | create_param 
+                | destroy_param 
+                | accept_param
                 | container_definition
                 ;
 
@@ -166,7 +174,7 @@ name_param: TOK_NAME STRING_LIT {
                     n = new attribs_t(attr);
 
                     $$ = n;
-                    cout << "Name: " << $2 <<endl;
+                    //cout << "Name: " << $2 <<endl;
                   } ;
 
           
@@ -179,7 +187,7 @@ create_param: TOK_CREATE IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
 
-                  cout << "Create on event " << $2 <<endl; 
+                  //cout << "Create on event " << $2 <<endl; 
                 }
             | TOK_CREATE TOK_PARENT {
                   attr = new_semantic_attribute();
@@ -188,7 +196,7 @@ create_param: TOK_CREATE IDENTIFIER {
 
                   n = new attribs_t(attr);
                   $$ = n;
-                  cout << "Create on parent" <<endl;
+                  //cout << "Create on parent" <<endl;
                 }
             ;
 
@@ -201,7 +209,7 @@ destroy_param: TOK_DESTROY IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
 
-                  cout << "Destroy on event " << $2 <<endl; 
+                  //cout << "Destroy on event " << $2 <<endl; 
                 }
             | TOK_DESTROY TOK_CHILDREN {
                   attr = new_semantic_attribute();
@@ -211,10 +219,35 @@ destroy_param: TOK_DESTROY IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
 
-                  cout << "Destroy on children" <<endl;
+                  //cout << "Destroy on children" <<endl;
                 }
             ;
 
+
+accept_param: TOK_ACCEPT '{' accept_list '}' {
+
+              //cout << "Accept! " <<endl;
+              //print_tree($3);
+
+              $$ = $3;
+            }
+            ;
+
+accept_list: accept_list accept_item {
+                    $1->addChild($2);
+                    $$ = $1;
+                  }
+               | accept_item {$$ = $1;}
+               ;
+
+accept_item: IDENTIFIER {
+                    attr = new_semantic_attribute();
+                    attr->id = ID_ACCEPT_LIST;
+                    attr->vals.identifier_name = $1;
+
+                    $$ = new attribs_t(attr);
+                  }
+          ;
 
 idf: IDENTIFIER { $$ = $1} ;
 

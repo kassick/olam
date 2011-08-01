@@ -10,6 +10,7 @@
 
 extern "C"
 {
+        int yyline;
         int yylex(void);
 
 }
@@ -34,7 +35,6 @@ STATE                   return TOK_STATE    ;
 EVENT                   return TOK_EVENT    ;
 ACCEPT                  return TOK_ACCEPT   ;
 IGNORE                  return TOK_IGNORE   ;
-@ALL                    return TOK_ALL     ;
 INCLUDE                 return TOK_INCLUDE  ;
 VALUE                   return TOK_VALUE    ;
 TYPE                    return TOK_TYPE     ;
@@ -43,7 +43,7 @@ TYPE                    return TOK_TYPE     ;
                           yylval.int_lit = atol(yytext);
                           return NUMBER;
                         }
-[a-zA-Z][a-zA-Z_0-9]*   {
+[\@a-zA-Z][a-zA-Z_0-9]*   {
                           yylval.string = strdup(yytext);
                           return IDENTIFIER;
                         }
@@ -56,7 +56,7 @@ TYPE                    return TOK_TYPE     ;
                           return yytext[0];
                         }
 
-\n                      /* */
+\n                      { yyline++ ;}
 [ \t]+                  /* ignore whitespace */;
 .                       {
                           printf("Unexpected token `` %c ''\n",yytext[0]) ;

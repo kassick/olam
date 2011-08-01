@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Sex, 29 Jul 2011 18:58:26 -0300 (kassick)"
+// Updated: "Seg, 01 Ago 2011 16:47:46 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -99,6 +99,10 @@ class TreeNode {
        val_ = val;
      }
 
+     TreeNode<T> * getParent() {
+       return this->parent_;
+     }
+
      void removeChild(TreeNode<T>* p ) {
       removeChild(p->getVal());
        /*
@@ -163,6 +167,44 @@ void walk_tree(TreeNode<T> * t, callable cb )
   walk_tree_<T>(t->getVal(), t->begin(),t->end(),0, cb);
 }
 
+
+template <typename T, typename callable>
+bool walk_tree_head_first(TreeNode<T> * t, callable cb, int level=0)
+{
+  bool ret = false;
+  if (!cb (t,level) ) {
+    for (typename TreeNode<T>::iterator it = t->begin(); 
+        (it != t->end()) && (!ret);
+        ++it)
+    {
+      ret = walk_tree_head_first(*it,cb, level+1);
+
+    }
+
+    return ret;
+  } else {
+    return true; //FFFFOUND!
+  }
+
+}
+
+template <typename T, typename callable>
+bool walk_tree_depth_first(TreeNode<T> * t, callable cb, int level=0)
+{
+  bool ret = false;
+  for (typename TreeNode<T>::iterator it = t->begin(); 
+      (it != t->end()) && (!ret);
+      ++it)
+  {
+    ret = walk_tree_head_first(*it, cb, level+1);
+
+  }
+  if (ret)
+    return true; //FFFOUND
+
+  return cb (t,level); // may find on this
+
+}
 
 
 
