@@ -142,7 +142,11 @@ write(io6,*) 'OLAM input namelist file: ',trim(name_name)
 
 ! Initialize, execute, and end olam run
 
+call shdf5_utils_init()
+
 call olam_run(name_name)
+
+call shdf5_force_close()
 
 ! If this run is parallel, finalize MPI and close io6 file
 

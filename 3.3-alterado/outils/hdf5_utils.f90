@@ -38,12 +38,27 @@
 !===============================================================================
 Module hdf5_utils
 
+integer :: file_opened
+
+
 !integer :: OLAM_EVT_HDF5_OPEN_START   = Z'beef'
 !integer :: OLAM_EVT_HDF5_OPEN_END     = Z'bef0'
 !integer :: OLAM_EVT_HDF5_CREATE_START = Z'bef1'
 !integer :: OLAM_EVT_HDF5_CREATE_END   = Z'bef2'
 
 Contains
+
+
+
+subroutine shdf5_utils_init()
+
+file_opened = 0
+
+end subroutine
+
+
+
+
 
 subroutine shdf5_open(locfn,access,idelete)
 
@@ -68,10 +83,18 @@ logical :: exists ! File existence
 real, external :: walltime
 integer :: thread_id
 !integer :: OMP_GET_THREAD_NUM
-thread_id = OMP_GET_THREAD_NUM()
+thread_id = 0
+
+
+if (file_opened == 1)
+  call shdf5_force_close()
+endif
+
+
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN,
+      myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
 
@@ -84,88 +107,102 @@ inquire(file=trim(locfn),exist=exists)
 
 ! Create a new file or open an existing RAMS file.
 if (access(1:1) == 'R') then
-   if (.not.exists) then
-      print*,'shdf5_open:'
-      print*,'   Attempt to open a file for reading that does not exist.'
-      print*,'   Filename: ',trim(locfn)
-      stop 'shdf5_open: no file'
-   else
-      if (caccess == 'R ') iaccess = 1
-      if (caccess == 'RW') iaccess = 2
 
-
+  if (.not.exists) then
+    print*,'shdf5_open:'
+    print*,'   Attempt to open a file for reading that does not exist.'
+    print*,'   Filename: ',trim(locfn)
+    stop 'shdf5_open: no file'
+  else
+    if (caccess == 'R ') iaccess = 1
+    if (caccess == 'RW') iaccess = 2
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_OPEN_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_OPEN_IN,
+          myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
+
     call fh5f_open(trim(locfn)//char(0), iaccess, hdferr)
      
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT,
+          myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
  
-      if (hdferr < 0) then
-         print*,'shdf5_open:'
-         print*,'   Error opening hdf5 file - error -',hdferr
-         print*,'   Filename: ',trim(locfn)
-         stop 'shdf5_open: open error'      
-      endif
-   endif
+    if (hdferr < 0) then
+      print*,'shdf5_open:'
+      print*,'   Error opening hdf5 file - error -',hdferr
+      print*,'   Filename: ',trim(locfn)
+      stop 'shdf5_open: open error'      
+    endif
 
+    file_opened = 1
+
+  endif
 
 elseif (access(1:1) == 'W') then
-   if (.not.exists) then
-      
-      iaccess=2
+
+  if (.not.exists) then
+    iaccess=2
     
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_CREATE_IN,
+          myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
-      call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
-#ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
-#endif
-    
 
+    call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
 
-    else
-      if(.not.present(idelete) ) then
-         print*,'shdf5_open: idelete not specified when access=W'
-         stop 'shdf5_open: no idelete'
-      endif
-      
-      if(idelete == 0) then
-         print*,'In shdf5_open:'
-         print*,'   Attempt to open an existing file for writing, '
-         print*,'      but overwrite is disabled. idelete=',idelete
-         print*,'   Filename: ',trim(locfn)
-         stop 'shdf5_open'
-      else
-         call system('rm -f '//trim(locfn)//char(0))
-         iaccess=1
-      
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
-         call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
-#ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
-#endif
-    
 
+  else
+    if(.not.present(idelete) ) then
+      print*,'shdf5_open: idelete not specified when access=W'
+      stop 'shdf5_open: no idelete'
     endif
-   endif
-   if(hdferr < 0) then
-      print*,'HDF5 file create failed:',hdferr
-      print*,'file name:',trim(locfn),' ',trim(access), idelete
-      stop 'shdf5_open: bad create'
-   endif
+
+    if(idelete == 0) then
+      print*,'In shdf5_open:'
+      print*,'   Attempt to open an existing file for writing, '
+      print*,'      but overwrite is disabled. idelete=',idelete
+      print*,'   Filename: ',trim(locfn)
+      stop 'shdf5_open'
+    else
+      call system('rm -f '//trim(locfn)//char(0))
+      iaccess=1
+
+#ifdef OLAM_RASTRO
+      call rst_event_iiss_f(OLAM_HDF5_CREATE_IN,
+            myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+#endif
+
+      call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
+
+#ifdef OLAM_RASTRO
+      call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT,
+            myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+#endif
+    endif
+  endif
+
+
+  if(hdferr < 0) then
+    print*,'HDF5 file create failed:',hdferr
+    print*,'file name:',trim(locfn),' ',trim(access), idelete
+    stop 'shdf5_open: bad create'
+  endif
+
+  file_opened = 1
+
 endif
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT,
+  myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
 return
+
 end subroutine shdf5_open
 
 !===============================================================================
@@ -546,7 +583,47 @@ integer :: hdferr  ! Error flags
 real, external :: walltime
 integer :: thread_id
 !integer :: OMP_GET_THREAD_NUM
-thread_id = OMP_GET_THREAD_NUM()
+!thread_id = OMP_GET_THREAD_NUM()
+!thread_id = 0
+
+!#ifdef OLAM_RASTRO
+!call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
+!#endif
+
+! Close RAMS hdf file.
+
+!#ifdef OLAM_RASTRO
+!call rst_event_ii_f(OLAM_HDF5_CLOSE_IN,myrank, thread_id)
+!#endif
+!call fh5f_close(hdferr)
+!#ifdef OLAM_RASTRO
+!call rst_event_ii_f(OLAM_HDF5_CLOSE_OUT,myrank, thread_id)
+!#endif
+
+
+!#ifdef OLAM_RASTRO
+!call rst_event_ii_f(OLAM_SHDF5_CLOSE_OUT,myrank, thread_id)
+!#endif
+return
+end  subroutine
+
+!===================================================
+
+subroutine shdf5_force_close()
+
+use misc_coms, only: io6, iparallel
+use mem_para,  only: myrank, mgroupsize
+use rastro_evts
+use omp_lib
+
+implicit none
+
+integer :: hdferr  ! Error flags
+real, external :: walltime
+integer :: thread_id
+!integer :: OMP_GET_THREAD_NUM
+
+thread_id = 0
 
 #ifdef OLAM_RASTRO
 call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
@@ -557,7 +634,12 @@ call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
 #ifdef OLAM_RASTRO
 call rst_event_ii_f(OLAM_HDF5_CLOSE_IN,myrank, thread_id)
 #endif
+
+if (file_opened == 0)
+  stop 'file not opened!'
+endif
 call fh5f_close(hdferr)
+
 #ifdef OLAM_RASTRO
 call rst_event_ii_f(OLAM_HDF5_CLOSE_OUT,myrank, thread_id)
 #endif
@@ -566,6 +648,9 @@ call rst_event_ii_f(OLAM_HDF5_CLOSE_OUT,myrank, thread_id)
 #ifdef OLAM_RASTRO
 call rst_event_ii_f(OLAM_SHDF5_CLOSE_OUT,myrank, thread_id)
 #endif
+
+file_opened = 0
+
 return
 end  subroutine
 
