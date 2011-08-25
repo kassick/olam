@@ -7,6 +7,7 @@ find_path(RASTRO_INCLUDES NAMES rastro.h PATHS ENV RASTRO_PREFIX
 
 find_package(FLEX)
 find_package(BISON)
+find_package(Boost)
 
 add_subdirectory(src/)
 set_property(DIRECTORY src/ PROPERTY COMPILE_FLAGS -std=c++0x)

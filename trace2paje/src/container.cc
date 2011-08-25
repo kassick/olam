@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Seg, 01 Ago 2011 18:11:17 -0300 (kassick)"
+// Updated: "Qua, 03 Ago 2011 16:13:35 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -97,8 +97,9 @@ namespace Paje {
           return false; // go on
         } );
 
+
+    // Fill in accept_list
     walk_tree(t,[&](SemanticAttribute * attr, int level) {
-      
       if ((attr->id == ID_CONTAINER) && (level > 0))
         return true; // we're done
 

@@ -30,7 +30,7 @@ ${FLEX_DescriptionFileScanner_OUTPUTS}
 )
 set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
 set_property(SOURCE 
-  container.cc semantics.cc paje.cc rastri2paje.cc
+  container.cc semantics.cc paje.cc rastri2paje.cc symbols.cc
   PROPERTY COMPILE_FLAGS "-std=c++0x")
 target_link_libraries(rastro2paje fl)
 
@@ -44,6 +44,13 @@ add_executable(scanner_test
   ${FLEX_DescriptionFileScanner_OUTPUTS} 
   ${BISON_DescriptionFileParser_OUTPUTS}
   )
+
+add_executable(symbols_test
+  symbols.cc
+  symbols.hh
+  )
+target_link_libraries(symbols_test boost_regex)
+
 set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
 target_link_libraries(scanner_test fl)
 

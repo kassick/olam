@@ -159,9 +159,9 @@ container_params:
                 | container_param { $$ = $1}
                 ;
 
-container_param: name_param  
-                | create_param 
-                | destroy_param 
+container_param: name_param
+                | create_param
+                | destroy_param
                 | accept_param
                 | container_definition
                 ;
@@ -248,6 +248,7 @@ accept_item: IDENTIFIER {
                     $$ = new attribs_t(attr);
                   }
           ;
+
 
 idf: IDENTIFIER { $$ = $1} ;
 
