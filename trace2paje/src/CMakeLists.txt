@@ -40,6 +40,7 @@ target_link_libraries(rastro2paje fl)
 add_executable(scanner_test 
   container.cc
   semantics.cc
+  paje.cc
   tree/tree.hpp # my tree implementation
   ${FLEX_DescriptionFileScanner_OUTPUTS} 
   ${BISON_DescriptionFileParser_OUTPUTS}

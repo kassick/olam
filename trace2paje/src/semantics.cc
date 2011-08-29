@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Seg, 01 Ago 2011 17:26:55 -0300 (kassick)"
+// Updated: "Seg, 29 Ago 2011 19:14:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -22,6 +22,7 @@
  * ==========================================================================
  */
 
+#include "paje.hh"
 #include "tree.hpp"
 #include <iostream>
 #include <map>
@@ -149,5 +150,28 @@ void check_unique_types()
       }) )
   {
     exit(1);
+  }
+}
+
+
+
+
+
+void hierarchy_to_paje(ostream &out)
+{
+  if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level) {
+        Paje::Container * c = h->getVal();
+        Paje::Container * parent;
+
+        if (c->typeName == "0")
+          return false; // skip container 0
+
+        parent = h->getParent()->getVal();
+
+        pajeDefineContainerType(c->typeName, parent->typeName, c->typeName,out);
+
+        return false;
+      })) {
+    cerr << "Error while dumping paje hierarchy. What on earth!? " <<endl;
   }
 }

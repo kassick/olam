@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Seg, 01 Ago 2011 18:02:40 -0300 (kassick)"
+// Updated: "Seg, 29 Ago 2011 19:25:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -22,10 +22,12 @@
  * ==========================================================================
  */
 
+#include <fstream>
 #include <iostream>
 #include <algorithm>
 #include "semantics.hh"
 #include "container.hh"
+#include "paje.hh"
 
 extern "C"
 {
@@ -42,6 +44,9 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+  ofstream *fout;
+
+
   cout << "Hello World!" << endl;
 
   init_desc_parser();
@@ -65,5 +70,12 @@ int main(int argc, char** argv)
         cout << endl;
       } );
 
+
+  fout = new ofstream("out.test");
+  init_paje_events();
+  paje_header(*fout);
+  hierarchy_to_paje(*fout);
+
+  fout->close();
 
 }
