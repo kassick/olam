@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.hh"
 // Created: "Qui, 25 Ago 2011 14:38:26 -0300 (kassick)"
-// Updated: "Qui, 25 Ago 2011 18:10:43 -0300 (kassick)"
+// Updated: "Seg, 29 Ago 2011 11:30:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -81,6 +81,12 @@ namespace Paje {
 
 
 
-typedef map<string,Paje::Symbol> symbols_table_t;
+typedef map<string,Paje::Symbol *> symbols_table_t;
+
+
+extern symbols_table_t * symbol_table;
+void init_symbols();
+
+string format_values(string & tpl, symbols_table_t *symbols);
 
 #endif
