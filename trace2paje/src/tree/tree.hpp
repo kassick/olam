@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Seg, 01 Ago 2011 16:47:46 -0300 (kassick)"
+// Updated: "Qui, 01 Set 2011 14:13:28 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -132,8 +132,10 @@ class TreeNode {
 
 
      void addChild(TreeNode<T>* p) {
-       p->parent_ = this;
-       children.push_back(p);
+       if (p) {
+         p->parent_ = this;
+         children.push_back(p);
+       }
      }
 
 };

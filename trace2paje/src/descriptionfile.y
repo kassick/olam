@@ -85,6 +85,7 @@ attribs_t *n;
 %type<attr_node> accept_item;
 %type<attr_node> accept_list;
 %type<attr_node> accept_param;
+%type<attr_node> eventtype_param;
 
 
 
@@ -135,7 +136,7 @@ toplevel_container_definition:
 container_definition:
           TOK_CONTAINER IDENTIFIER '{' container_params '}' {
             //cout << "Container " << $2 << " has attributes : " << endl;
-            //print_tree<SemanticAttribute *>($4);
+            print_tree<SemanticAttribute *>($4);
             //cout << "----" <<endl;
 
 
@@ -163,6 +164,7 @@ container_param: name_param
                 | create_param
                 | destroy_param
                 | accept_param
+                | eventtype_param
                 | container_definition
                 ;
 
@@ -224,21 +226,50 @@ destroy_param: TOK_DESTROY IDENTIFIER {
             ;
 
 
+eventtype_param: TOK_EVENT_TYPE IDENTIFIER '{' accept_list '}' {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_EVENT_TYPE;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  n->addChild($4);
+                  $$ = n;
+                  
+               }
+               | TOK_EVENT_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_EVENT_TYPE;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  $$ = n;
+                  
+               }
+
 accept_param: TOK_ACCEPT '{' accept_list '}' {
 
               //cout << "Accept! " <<endl;
               //print_tree($3);
 
               $$ = $3;
-            }
-            ;
+              }
+            | TOK_ACCEPT '{' '}' {
 
-accept_list: accept_list accept_item {
+              //cout << "Accept! " <<endl;
+              //print_tree($3);
+
+              $$ = NULL;
+            }
+
+
+
+
+accept_list: accept_item {$$ = $1;}
+           | accept_list accept_item {
                     $1->addChild($2);
                     $$ = $1;
                   }
-               | accept_item {$$ = $1;}
-               ;
+          ;
 
 accept_item: IDENTIFIER {
                     attr = new_semantic_attribute();

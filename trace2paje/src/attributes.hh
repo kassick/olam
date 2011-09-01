@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Qua, 03 Ago 2011 16:09:13 -0300 (kassick)"
+// Updated: "Qui, 01 Set 2011 13:48:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -38,6 +38,7 @@ enum _attrib_ids {
   ID_CONTAINER,
   ID_ACCEPT_LIST,
   ID_IGNORE_LIST,
+  ID_EVENT_TYPE,
 
   ID_NOP
 };

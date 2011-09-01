@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Seg, 29 Ago 2011 19:14:56 -0300 (kassick)"
+// Updated: "Qui, 01 Set 2011 13:49:34 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -70,6 +70,9 @@ const string SemanticAttribute::toString() const {
     case ID_ACCEPT_LIST:
       s << "Accept event " << vals.identifier_name;
       break;
+
+    case ID_EVENT_TYPE:
+      s << "Event type " << vals.name;
 
   }
 
