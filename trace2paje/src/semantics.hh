@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Seg, 29 Ago 2011 19:12:54 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 14:34:14 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -57,6 +57,7 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top);
 void init_desc_parser();
 void check_unique_types();
 void hierarchy_to_paje(ostream &out);
+void event_types_to_paje(ostream &out);
 
 
 template <typename CharT, typename Traits>

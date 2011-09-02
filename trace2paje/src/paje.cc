@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje.cc"
 // Created: "Seg, 01 Ago 2011 15:39:46 -0300 (kassick)"
-// Updated: "Seg, 29 Ago 2011 19:37:13 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 15:06:45 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -183,9 +183,9 @@ void pajeDefineStateType(string &alias,
       
 {
   out << paje_event_id("PajeDefineStateType")
-      << alias
-      << containerType
-      << name
+      << " " << alias
+      << " " << containerType
+      << " " << name
       << endl;
 }
 

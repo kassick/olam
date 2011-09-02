@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qua, 31 Ago 2011 16:08:40 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 14:34:41 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -192,6 +192,7 @@ int main(int argc, char** argv)
   init_paje_events();
   paje_header(*fout);
   hierarchy_to_paje(*fout);
+  event_types_to_paje(*fout);
 
   ((ofstream *)fout)->close();
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Qua, 03 Ago 2011 16:13:35 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 14:35:17 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -46,7 +46,8 @@ namespace Paje {
   const string Container::toString() const{
     stringstream s;
 
-    s << "Container " << typeName << " accepting ";
+    s << "Container " << typeName ;
+    /*<< " accepting ";
     if (accept_all)
       s << "ALL EVENTS";
     else {
@@ -60,7 +61,7 @@ namespace Paje {
       }
       s << "]";
 
-    }
+    } */
     return s.str();
   }
   
@@ -98,12 +99,16 @@ namespace Paje {
         } );
 
 
-    // Fill in accept_list
+    // Fill in event types
     walk_tree(t,[&](SemanticAttribute * attr, int level) {
       if ((attr->id == ID_CONTAINER) && (level > 0))
         return true; // we're done
 
+      if (attr->id == ID_EVENT_TYPE) {
+        event_types.push_back(attr->vals.name);
+      }
 
+        /*
       if (attr->id == ID_ACCEPT_LIST) {
         //cout << "On container " << this->typeName <<endl;
         if (!strcmp("@ALL",attr->vals.identifier_name))
@@ -116,6 +121,7 @@ namespace Paje {
           accept_all = false;
         }
       }
+      */
 
       return false;
 

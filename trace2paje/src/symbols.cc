@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Seg, 29 Ago 2011 12:13:16 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 18:11:14 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,15 +45,16 @@ void init_symbols() {
 
 namespace Paje {
 
+  impl_set_type(uint8_t,c)
   impl_set_type(char,c)
   impl_set_type(uint16_t,w)
   impl_set_type(uint32_t,i)
   impl_set_type(uint64_t,l)
   //impl_set_type(float,f)
   impl_set_type(double,d)
-  impl_set_type(char*,s)
+  impl_set_type(const char*,s)
 
-  void Symbol::format(string fmt,stringstream &ss)
+  void Symbol::format(string fmt,ostream &ss)
   {
     string format =  "%" + fmt;
     char cc = fmt[fmt.length()-1];
@@ -103,9 +104,18 @@ namespace Paje {
 #define FMT_REGEX "[#0-9\\.\\- \\+'IhlLqjztdiouxXeEfFgGaAcsCSpnm]+"
 //#define FMT_REGEX "[#0-9]+"
 
-string format_values(string & tpl, symbols_table_t *symbols)
-{
+
+string format_values(string & tpl, symbols_table_t *symbols) {
   stringstream out;
+
+  format_values(tpl,symbols,out);
+
+  return out.str();
+}
+
+
+void format_values(string & tpl, symbols_table_t *symbols, ostream &out)
+{
   string tmp = tpl;
   smatch res;
   string fmt_regex("%\\((?P<id>" ID_REGEX ")(:(?P<fmt>" FMT_REGEX "))?\\)");
@@ -115,10 +125,18 @@ string format_values(string & tpl, symbols_table_t *symbols)
   while (tmp.length() > 0) {
     string id;
     string fmt;
-    if (regex_search(tmp,res,rx)) {
+    bool had_fmt = false;
+
+    bool found = regex_search(tmp,res,rx);
+    /*
+    cerr << "+ prefix: " << res.prefix().str() <<endl;
+    cerr << "+ suffix: " << res.suffix().str() <<endl;
+    cerr << "+ tmp:    " << tmp <<endl;
+    */
+
+    if (found) {
 
       out << res.prefix().str();
-
       try{
         id = res["id"];
       } catch (...) {
@@ -129,6 +147,7 @@ string format_values(string & tpl, symbols_table_t *symbols)
 
       try {
         fmt = res["fmt"];
+        had_fmt = true;
       } catch (...) {
         // no format, let default
         fmt = "";
@@ -141,17 +160,27 @@ string format_values(string & tpl, symbols_table_t *symbols)
         Paje::Symbol *s = (*it).second;
         s->format(fmt,out);
       } else {
+        // unknown symbol; just dump the fmt string 
+        out << "(" << id;
+        if (had_fmt)
+          out << ":" << fmt;
+        out << ")";
         cerr << "No symbol ``" << id << "´´, ignoring" << endl;
       }
+    
+      tmp = res.suffix().str();
+    } else {
+      //cerr << "not found" <<endl;
+      out << tmp;
+      tmp = "";
     }
 
-    tmp = res.suffix().str();
   }
-
-  return out.str();
 
 }
 
+
+#ifdef UNIT_TEST
 int main(int argc, char ** argv)
 {
   cout << "hello" <<endl;
@@ -181,10 +210,19 @@ int main(int argc, char ** argv)
 
   string tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:10.2G)";
 
+  cout << "template: " << tpl << endl;
   cout << format_values(tpl,symbol_table) << endl;
+  cout << "---" << endl;
+  
+  tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:10.2G) and a trailiing";
+  cout << "template: " << tpl << endl;
+  cout << format_values(tpl,symbol_table) << endl;
+  cout << "---" << endl;
  
   tpl = "nothing to see here";
+  cout << "template: " << tpl << endl;
   cout << format_values(tpl,symbol_table) << endl;
+  cout << "---" << endl;
 
 
 
@@ -211,3 +249,4 @@ int main(int argc, char ** argv)
   return 0;
 }
 
+#endif

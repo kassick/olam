@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.hh"
 // Created: "Qui, 25 Ago 2011 14:38:26 -0300 (kassick)"
-// Updated: "Seg, 29 Ago 2011 11:30:58 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 18:04:18 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,6 +25,7 @@
 #ifndef __SYMBOLS_HH__
 #define __SYMBOLS_HH__
 
+#include <iostream>
 #include <string>
 #include <map>
 #include <stdint.h>
@@ -46,6 +47,11 @@ using namespace std;
   // trick?
 
 namespace Paje {
+  
+  typedef enum {
+        c, w, i, l, f, d, s,
+      } basic_types_t;
+
 
   class Symbol {
     private:
@@ -56,23 +62,23 @@ namespace Paje {
         uint64_t l;
         float f;
         double d;
-        char *s;
+        const char *s;
       } val;
 
-      enum {
-        c, w, i, l, f, d, s,
-      } holds;
+      basic_types_t holds;
+
 
     public:
+      decl_set_type(uint8_t,c);
       decl_set_type(char,c);
       decl_set_type(uint16_t,w);
       decl_set_type(uint32_t,i);
       decl_set_type(uint64_t,l);
       //decl_set_type(float,f);
       decl_set_type(double,d);
-      decl_set_type(char*,s);
+      decl_set_type(const char*,s);
 
-      void format(string fmt,stringstream &s);
+      void format(string fmt,ostream &s);
 
   } ;
 
@@ -88,5 +94,6 @@ extern symbols_table_t * symbol_table;
 void init_symbols();
 
 string format_values(string & tpl, symbols_table_t *symbols);
+void format_values(string & tpl, symbols_table_t *symbols, ostream &out);
 
 #endif

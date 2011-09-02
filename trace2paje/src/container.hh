@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.hh"
 // Created: "Qua, 27 Jul 2011 11:08:49 -0300 (kassick)"
-// Updated: "Qua, 03 Ago 2011 16:13:35 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 14:22:32 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -61,7 +61,7 @@ namespace Paje {
 
       Container(string);
       Container(string,attribs_t * attr_head);
-      list<string> accept_list;
+      list<string> event_types;
       bool accept_all;
       string typeName;
       string formatName;
@@ -69,7 +69,6 @@ namespace Paje {
       string destroyEvent;
       bool triggerParent,destroyChildren;
       string triggerEvent;
-      void * eventTypes;
 
       string toPaje();
 

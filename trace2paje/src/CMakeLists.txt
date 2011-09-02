@@ -21,9 +21,11 @@ include_directories(tree)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(rastro2paje
 rastro2paje.cc
+event.cc
 container.cc
 semantics.cc
 paje.cc
+symbols.cc
 tree/tree.hpp # my tree implementation
 ${BISON_DescriptionFileParser_OUTPUTS}
 ${FLEX_DescriptionFileScanner_OUTPUTS}
@@ -32,7 +34,7 @@ set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
 set_property(SOURCE 
   container.cc semantics.cc paje.cc rastri2paje.cc symbols.cc
   PROPERTY COMPILE_FLAGS "-std=c++0x")
-target_link_libraries(rastro2paje fl)
+target_link_libraries(rastro2paje fl rastro)
 
 
 
@@ -51,6 +53,7 @@ add_executable(symbols_test
   symbols.hh
   )
 target_link_libraries(symbols_test boost_regex)
+set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
 
 set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
 target_link_libraries(scanner_test fl)

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje.hh"
 // Created: "Seg, 01 Ago 2011 15:34:40 -0300 (kassick)"
-// Updated: "Seg, 29 Ago 2011 19:31:48 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 17:51:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -44,6 +44,12 @@ void pajeDefineContainerType(string &alias,
                              string &containerType, 
                              string &name,
                              ostream &out);
+
+void pajeDefineStateType(string &alias,
+                         string &containerType, 
+                         string &name,
+                         ostream &out);
+
 void pajeDefineLinkType(string &alias,
                         string &containerType,
                         string &sourceContainerType,

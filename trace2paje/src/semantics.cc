@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qui, 01 Set 2011 13:49:34 -0300 (kassick)"
+// Updated: "Sex, 02 Set 2011 15:06:03 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -176,5 +176,22 @@ void hierarchy_to_paje(ostream &out)
         return false;
       })) {
     cerr << "Error while dumping paje hierarchy. What on earth!? " <<endl;
+  }
+}
+
+void event_types_to_paje(ostream &out)
+{
+  if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level) {
+        Paje::Container * c = h->getVal();
+
+        list<string>::iterator it;
+        for (it = c->event_types.begin(); it != c->event_types.end(); ++it)
+        {
+          pajeDefineStateType(*it, c->typeName, *it, out);
+        }
+
+        return false;
+      })) {
+    cerr << "Error while dumping paje event types. What on earth!? " << endl;
   }
 }
