@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 15:06:03 -0300 (kassick)"
+// Updated: "Ter, 06 Set 2011 17:58:19 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -35,8 +35,11 @@
 //Globals
 attribs_t *attributes;
 hierarchy_t *toplevel_hierarchy;
-container_ids_t * container_ids;
+container_type_names_t * container_type_names;
 
+event_type_name_map_t * eventtype_names;
+event_name_map_t      * event_names;
+event_id_map_t        * event_ids;
 
 
 const string SemanticAttribute::toString() const {
@@ -81,12 +84,14 @@ const string SemanticAttribute::toString() const {
 
 //Utility functions
 
+// Create a new semantic attribute
 SemanticAttribute *new_semantic_attribute()
 {
   return new SemanticAttribute();
 }
 
 
+// Create a tree of Paje::Container* from a tree of SemanticAttribute
 hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
 {
   hierarchy_t * top_, *h;
@@ -125,30 +130,47 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
 
 
 
-void init_desc_parser()
-{
-  using namespace Paje;
-  Paje::Container * zero;
-  
-
-  zero = new Container("0");
-
-  toplevel_hierarchy = new TreeNode < Paje::Container * >(zero);
-  attributes = new TreeNode < SemanticAttribute *>(NULL);
-  container_ids = new container_ids_t();// must happen before creating a container
-}
 
 
-void check_unique_types()
+// Fill in container ids and check for unique types
+void check_unique_container_types()
 {
   if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level) {
         Paje::Container * c = h->getVal();
-        if (container_ids->find(c->typeName) != container_ids->end())
+        if (container_type_names->find(c->typeName) != container_type_names->end())
         {
           cerr << "Error: A container with type " << c->typeName << " has already been defined" <<endl;
           return true;
         }
-        (*container_ids)[c->typeName] = h;
+        (*container_type_names)[c->typeName] = h;
+        return false;
+      }) )
+  {
+    exit(1);
+  }
+}
+
+// Fill in container ids and check for unique types
+void check_unique_event_types()
+{
+  if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level)
+      {
+        Paje::Container * c = h->getVal();
+
+
+        list<string>::iterator it;
+        for (it = c->event_types.begin(); it != c->event_types.end(); ++it)
+        {
+          if (eventtype_names->find(*it) != eventtype_names->end())
+          {
+            cerr << "Error: An event type named " << *it << " has already been defined" <<endl;
+            return true;
+          }
+
+          EventType &t = (*eventtype_names)[*it];
+          t.typeName = *it;
+          t.container = c;
+        }
         return false;
       }) )
   {
@@ -157,9 +179,15 @@ void check_unique_types()
 }
 
 
+void check_unique_types() 
+{
+  check_unique_container_types();
+  check_unique_event_types();
+}
 
 
 
+// walk the hierarchy dump paje formated output
 void hierarchy_to_paje(ostream &out)
 {
   if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level) {
@@ -179,6 +207,7 @@ void hierarchy_to_paje(ostream &out)
   }
 }
 
+// Walk the hierarchy and dump event types
 void event_types_to_paje(ostream &out)
 {
   if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level) {
@@ -195,3 +224,34 @@ void event_types_to_paje(ostream &out)
     cerr << "Error while dumping paje event types. What on earth!? " << endl;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+// Initialization Function -- Parser wide
+
+void init_desc_parser()
+{
+  using namespace Paje;
+  Paje::Container * zero;
+  
+
+  zero = new Container("0");
+
+  toplevel_hierarchy = new TreeNode < Paje::Container * >(zero);
+  attributes = new TreeNode < SemanticAttribute *>(NULL);
+  container_type_names = new container_type_names_t();// must happen before creating a container
+
+  eventtype_names = new event_type_name_map_t();
+  event_names     = new event_name_map_t();
+  event_ids       = new event_id_map_t();
+}
+
+

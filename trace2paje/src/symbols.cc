@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 18:11:14 -0300 (kassick)"
+// Updated: "Ter, 06 Set 2011 15:17:28 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -52,7 +52,29 @@ namespace Paje {
   impl_set_type(uint64_t,l)
   //impl_set_type(float,f)
   impl_set_type(double,d)
-  impl_set_type(const char*,s)
+  impl_set_type_funct(const char*,s, SYMBOL_FREE_STR_PRE, strdup)
+
+
+  Symbol::Symbol() {
+    //cout <<" Hey, created a new one at" << this << endl;
+    this->holds = invalid;
+  }
+
+  Symbol::~Symbol() {
+    SYMBOL_FREE_STR_PRE ;
+  }
+
+  Symbol& Symbol::operator= (const Symbol & org)
+  {
+    if (this == &org)
+      return *this;
+
+    memcpy( & (this->val), & (org.val), sizeof(org.val));
+    this->holds = org.holds;
+
+    return *this;
+  }
+
 
   void Symbol::format(string fmt,ostream &ss)
   {
@@ -157,8 +179,8 @@ void format_values(string & tpl, symbols_table_t *symbols, ostream &out)
       symbols_table_t::iterator it;
       it = symbols->find(id);
       if (it != symbols->end()) {
-        Paje::Symbol *s = (*it).second;
-        s->format(fmt,out);
+        Paje::Symbol &s = (*it).second;
+        s.format(fmt,out);
       } else {
         // unknown symbol; just dump the fmt string 
         out << "(" << id;
@@ -184,28 +206,36 @@ void format_values(string & tpl, symbols_table_t *symbols, ostream &out)
 int main(int argc, char ** argv)
 {
   cout << "hello" <<endl;
-  Paje::Symbol * s1;
+  Paje::Symbol * s1, s2, s3;
   stringstream s;
   string id;
 
+  cout << "init symbols and create s1" << endl;
   init_symbols();
-  
+ 
   s1 = new Paje::Symbol();
+
+
+
+  cout << "Symbol uint32" <<endl;
   s1->set_value((uint32_t)10);
   id = "int1";
-  (*symbol_table)[id] = s1;
+  (*symbol_table)[id] = *s1;
   
-  s1 = new Paje::Symbol();
+  cout << "Symbol str" <<endl;
   s1->set_value("hello");
-  (*symbol_table)[string("str1")] = s1;
+  (*symbol_table)[string("str1")] = *s1;
   
-  s1 = new Paje::Symbol();
+  cout << "Symbol float" <<endl;
   s1->set_value((float)56.23453);
-  (*symbol_table)[string("float1")] = s1;
+  (*symbol_table)[string("float1")] = *s1;
   
-  s1 = new Paje::Symbol();
+  cout << "Symbol double" <<endl;
   s1->set_value((double)52.23);
-  (*symbol_table)[string("double1")] = s1;
+  (*symbol_table)[string("double1")] = *s1;
+
+
+  cout << "now format it" << endl;
 
 
   string tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:10.2G)";
@@ -223,6 +253,25 @@ int main(int argc, char ** argv)
   cout << "template: " << tpl << endl;
   cout << format_values(tpl,symbol_table) << endl;
   cout << "---" << endl;
+
+
+
+  cout << "Now test copy operator " << endl;
+
+  s2.set_value("hello motto");
+
+  s3 = s2;
+
+  (*symbol_table)["s2"] = s2;
+  (*symbol_table)["s3"] = s3;
+
+  Paje::Symbol &tmp = (*symbol_table)["undefined"];
+  tmp.set_value("undefined I am");
+
+  tpl = "s2 is %(s2) and s3 is %(s3) \"%(undefined)\"";
+
+  format_values(tpl, symbol_table, cout);
+  cout << endl;
 
 
 

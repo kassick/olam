@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 18:09:54 -0300 (kassick)"
+// Updated: "Ter, 06 Set 2011 15:42:28 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -78,6 +78,10 @@ bool Paje::Event::load_symbols(rst_event_t *event, symbols_table_t * symbols)
   for (it = identifier_names.begin(); it != identifier_names.end(); ++it)
   {
     string &field_name = (*it).field_name;
+    // automatically creates an entry and allocate symbol, I don't need to
+    // worry yay! \o/
+    Paje::Symbol &symbol = (*symbols)[field_name];
+
     switch ((*it).type) {
       CASE_TYPE( c , uint8);
       CASE_TYPE( w , uint16);
@@ -93,10 +97,8 @@ bool Paje::Event::load_symbols(rst_event_t *event, symbols_table_t * symbols)
         break;
     }
 
-    (*symbols)[field_name] = symbol;
-
   }
 
-  (*symbols)["EVT_NAME"]->set_value(this->name.c_str());
+  (*symbols)["EVT_NAME"].set_value(this->name.c_str());
 
 }

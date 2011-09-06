@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 14:34:14 -0300 (kassick)"
+// Updated: "Ter, 06 Set 2011 17:58:19 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,6 +33,7 @@
 #include "tree.hpp"
 #include "container.hh"
 #include "attributes.hh"
+#include "event.hh"
 
 
 using namespace Paje;
@@ -41,12 +42,21 @@ using namespace std;
 
 
 typedef TreeNode<Paje::Container*> hierarchy_t;
-typedef map<string,hierarchy_t *> container_ids_t;
+
+typedef map<string,hierarchy_t *> container_type_names_t;
+
+typedef std::map<std::string      , Paje::Event >      event_name_map_t;
+typedef std::map<Paje::event_id_t , Paje::Event >      event_id_map_t;
+typedef std::map<std::string      , Paje::EventType >  event_type_name_map_t;
 
 extern attribs_t * attributes;
 
 extern hierarchy_t * toplevel_hierarchy;
-extern container_ids_t * container_ids;
+extern container_type_names_t * container_type_names;
+
+extern event_type_name_map_t * eventtype_names;
+extern event_name_map_t      * event_names;
+extern event_id_map_t        * event_ids;
 
 
 

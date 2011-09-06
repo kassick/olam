@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 18:05:52 -0300 (kassick)"
+// Updated: "Ter, 06 Set 2011 16:53:31 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -83,17 +83,13 @@ namespace Paje {
   } ;
 }
 
-typedef std::map<std::string      , Paje::Event *>      event_name_map_t;
-typedef std::map<Paje::event_id_t , Paje::Event *>      event_id_map_t;
-typedef std::map<std::string      , Paje::EventType *>  event_type_name_map_t;
 
 
 
 #define CASE_TYPE(SHORT_NAME , PAJE_NAME) \
         case SHORT_NAME:                                                             \
           if (count_ ## SHORT_NAME < event->ct.n_ ## PAJE_NAME) {              \
-            symbol = new Paje::Symbol();                                         \
-            symbol->set_value( event->v_ ## PAJE_NAME [ count_ ## SHORT_NAME ] );\
+            symbol.set_value( event->v_ ## PAJE_NAME [ count_ ## SHORT_NAME ] );\
             count_ ## SHORT_NAME ++  ;                                      \
           } else {                                                          \
             cerr << "Not enought values of type " << #SHORT_NAME  <<endl;   \

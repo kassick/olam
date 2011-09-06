@@ -48,6 +48,9 @@ add_executable(scanner_test
   ${BISON_DescriptionFileParser_OUTPUTS}
   )
 
+set_property(TARGET scanner_test PROPERTY COMPILE_FLAGS "-std=c++0x")
+
+
 add_executable(symbols_test
   symbols.cc
   symbols.hh

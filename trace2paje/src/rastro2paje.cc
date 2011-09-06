@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 14:34:41 -0300 (kassick)"
+// Updated: "Ter, 06 Set 2011 16:57:02 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
 
   check_unique_types();
 
-  std::for_each(container_ids->begin(), container_ids->end(),
+  std::for_each(container_type_names->begin(), container_type_names->end(),
       [&](pair<string,hierarchy_t * > p) {
         hierarchy_t * cn = p.second;
         cout << p.first << " => " << *(cn->getVal()) ;
