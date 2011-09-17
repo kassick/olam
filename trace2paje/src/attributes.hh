@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Qui, 01 Set 2011 13:48:58 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 20:19:03 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,6 +26,8 @@
 #define _ATTRIBUTES_HH_H
 
 #include "tree.hpp"
+#include "rastro_helper.hh"
+
 using namespace std;
 
 enum _attrib_ids {
@@ -39,6 +41,12 @@ enum _attrib_ids {
   ID_ACCEPT_LIST,
   ID_IGNORE_LIST,
   ID_EVENT_TYPE,
+  ID_STATE,
+  ID_STATE_TYPE,
+  ID_PAJE_TYPENAME,
+  ID_RASTRO_TYPE,
+  ID_RASTRO_VALUE_NAME,
+  ID_IDF,
 
   ID_NOP
 };
@@ -55,6 +63,8 @@ class SemanticAttribute {
       char *identifier_name;
       bool create_parent;
       bool destroy_children;
+      rastro_basic_types_t rastro_type;
+      rastro_basic_val_t rastro_val;
       //Paje::Container *container;
     } vals;
 

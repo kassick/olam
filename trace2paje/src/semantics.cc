@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Ter, 06 Set 2011 17:58:19 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 16:24:59 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -40,6 +40,7 @@ container_type_names_t * container_type_names;
 event_type_name_map_t * eventtype_names;
 event_name_map_t      * event_names;
 event_id_map_t        * event_ids;
+queue<string> files_to_parse;
 
 
 const string SemanticAttribute::toString() const {

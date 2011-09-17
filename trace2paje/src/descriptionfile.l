@@ -38,6 +38,10 @@ IGNORE                  return TOK_IGNORE   ;
 INCLUDE                 return TOK_INCLUDE  ;
 VALUE                   return TOK_VALUE    ;
 TYPE                    return TOK_TYPE     ;
+[icwlfds]               { // rastro type tokens, kind of symplistic but functional
+                          yylval.string = strdup(yytext);
+                          return RST_TYPE;
+                        }
 
 [0-9]+                  {
                           yylval.int_lit = atol(yytext);
@@ -63,7 +67,7 @@ TYPE                    return TOK_TYPE     ;
                         }
 %%
 
-#ifdef UNIT_TEST
+#ifdef SCANNER_UNIT_TEST
 
 int main(int argc, char** argv)
 {

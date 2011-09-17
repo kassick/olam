@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 06 Set 2011 15:42:28 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 21:03:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -23,6 +23,7 @@
  */
 
 
+#include "attributes.hh"
 #include "paje.hh"
 #include "event.hh"
 #include "symbols.hh"
@@ -41,8 +42,12 @@ bool Paje::Event::trigger(event_id_t evt_id, double timestamp,
   return false;
 }
 
+void Paje::Event::fill_from_attr(attribs_t * attrs)
+{
+  cerr << "Abstract class, dumbass!" << endl;
+}
 
-bool Paje::StateEvent::trigger(event_id_t evt_id, double timestamp,
+bool Paje::State::trigger(event_id_t evt_id, double timestamp,
     symbols_table_t * symbols, ostream &out)
 {
   string containerName, eventValue;
@@ -101,4 +106,9 @@ bool Paje::Event::load_symbols(rst_event_t *event, symbols_table_t * symbols)
 
   (*symbols)["EVT_NAME"].set_value(this->name.c_str());
 
+}
+
+void Paje::State::fill_from_attr(attribs_t * attrs)
+{
+  return;
 }

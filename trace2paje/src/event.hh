@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Ter, 06 Set 2011 16:53:31 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 21:03:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,6 +26,7 @@
 #ifndef __EVENT_H__
 #define __EVENT_H__
 
+#include "attributes.hh"
 #include "paje.hh"
 #include "event.hh"
 #include "symbols.hh"
@@ -36,6 +37,7 @@
 #include <list>
 #include <iostream>
 #include <rastro.h>
+#include "rastro_helper.hh"
 
 namespace Paje {
 
@@ -43,7 +45,7 @@ namespace Paje {
 
   typedef struct _identifier_entry_t {
     string field_name;
-    Paje::basic_types_t type;
+    rastro_basic_types_t type;
   } identifier_entry_t;
 
   typedef list<identifier_entry_t> identifier_list_t;
@@ -63,8 +65,10 @@ namespace Paje {
 
       identifier_list_t identifier_names;
 
-      bool trigger(event_id_t evt_id, double timestamp,
+      virtual bool trigger(event_id_t evt_id, double timestamp,
           symbols_table_t * symbols, ostream &out);
+
+      virtual void fill_from_attr(attribs_t * attrs);
 
   
      bool load_symbols(rst_event_t *event, symbols_table_t * symbols);
@@ -72,14 +76,20 @@ namespace Paje {
   };
 
 
-  class StateEvent : Event {
+  class State: public Event {
     public:
       event_id_t start_id, end_id;
 
-      StateEvent(event_id_t _start_id, event_id_t _end_id): start_id{_start_id}, end_id{_end_id} {};
+      State(string &_name, event_id_t _start_id, event_id_t _end_id):
+        start_id{_start_id}, end_id{_end_id} 
+      {
+        this->name = name;
+      };
 
       bool trigger(event_id_t evt_id, double timestamp,
           symbols_table_t * symbols, ostream &out);
+      
+      void fill_from_attr(attribs_t * attrs);
   } ;
 }
 

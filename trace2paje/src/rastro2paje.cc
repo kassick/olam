@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Ter, 06 Set 2011 16:57:02 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 17:55:00 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,11 +25,14 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <queue>
 #include "semantics.hh"
 #include "container.hh"
 #include "paje.hh"
 #include <getopt.h>
 #include <string.h>
+#include <set>
+#include <boost/filesystem.hpp>
 
 extern "C"
 {
@@ -44,6 +47,7 @@ extern "C"
 }
 
 using namespace std;
+namespace fs = boost::filesystem;
 
 
 // ***********************************************************************
@@ -122,10 +126,14 @@ int parse_opts(int argc, char ** argv)
 
 int main(int argc, char** argv)
 {
-
   int oind;
   ostream *fout;
   FILE *fin; // dammed yacc
+  
+  fs::path pathname; // path of the first file
+  fs::path dirname; // dirname of the first file
+
+  queue<string> rst_files_to_open;
 
   oind = parse_opts(argc, argv);
 
@@ -137,13 +145,20 @@ int main(int argc, char** argv)
 
 
   while (oind < argc) {
+    rst_files_to_open.push(string(argv[oind]));
     cerr << "opening rastro " << argv[oind] <<endl;
     oind ++;
   }
 
+
   if (global_opts.fin_name == "stdin") {
-    yyin = stdin;
+    pathname = "";
+    files_to_parse.push("/dev/stdin");
+    //yyin = stdin;
   } else {
+    pathname = global_opts.fin_name;
+    files_to_parse.push(pathname.filename());
+    /*
     fin = fopen(global_opts.fin_name.c_str(),"r");
     if (!fin) {
       cerr << "Could not open file " << global_opts.fin_name << endl;
@@ -151,7 +166,68 @@ int main(int argc, char** argv)
     }
 
     yyin = fin;
+    */
   }
+  
+  
+  
+  cerr << "Hello World!" << endl;
+
+  init_desc_parser();
+  // Here we parse every description file we have in the INCLUDE directives
+
+  set<string> parsed_files;
+ 
+
+  while (!files_to_parse.empty()) {
+    string file_name = files_to_parse.front();
+    files_to_parse.pop();
+
+    dirname = pathname.parent_path();
+    dirname /= file_name;
+
+    string fin_name = dirname.string();
+
+
+    if (parsed_files.find(fin_name) != parsed_files.end())
+    {
+      cerr << "Ignoring file " << fin_name << " (already parsed)" << endl;
+    } else {
+
+      cerr << "Parsing "<<fin_name << "... ";
+      
+      fin = fopen(fin_name.c_str(),"r");
+      if (!fin) {
+        cerr << "Could not open file " << global_opts.fin_name << endl;
+        exit(1);
+      }
+
+      yyin = fin;
+      yyline = 1;
+      yyparse();
+
+      cout << " [done]" << endl;
+      fclose(fin);
+
+      parsed_files.insert(fin_name);
+    
+    
+    }
+
+
+      //cerr << "Container hierarchy at the end:" <<endl;
+      //print_tree(toplevel_hierarchy);
+
+  }
+  check_unique_types();
+
+  //cerr << "(idf1,idf2) = (" << Paje::idf1_name << "," << Paje::idf2_name << ")" << endl;
+
+
+
+
+
+  // Here begins the parsing of events and the output
 
   if (global_opts.fout_name == "stdout") {
     fout = &cout;
@@ -160,39 +236,26 @@ int main(int argc, char** argv)
   }
 
 
-
-
-
-
-
-  cout << "Hello World!" << endl;
-
-  init_desc_parser();
-
-  yyline = 1;
-  yyparse();
-
-
-  cout << "Container hierarchy at the end:" <<endl;
-  print_tree(toplevel_hierarchy);
-
-
-  check_unique_types();
-
+  /*
   std::for_each(container_type_names->begin(), container_type_names->end(),
       [&](pair<string,hierarchy_t * > p) {
         hierarchy_t * cn = p.second;
-        cout << p.first << " => " << *(cn->getVal()) ;
+        cerr << p.first << " => " << *(cn->getVal()) ;
         if (cn->getParent())
-          cout << " child of " << *(cn->getParent()->getVal()) ;
-        cout << endl;
-      } );
+          cerr << " child of " << *(cn->getParent()->getVal()) ;
+        cerr << endl;
+      } ); */
 
 
+
+  // Here's the output
   init_paje_events();
   paje_header(*fout);
   hierarchy_to_paje(*fout);
   event_types_to_paje(*fout);
+
+
+  // Here loop around the paje events and dumps the events
 
   ((ofstream *)fout)->close();
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Ter, 06 Set 2011 15:17:28 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 17:04:54 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -44,6 +44,8 @@ void init_symbols() {
 
 
 namespace Paje {
+
+  string idf1_name, idf2_name;
 
   impl_set_type(uint8_t,c)
   impl_set_type(char,c)
@@ -202,7 +204,7 @@ void format_values(string & tpl, symbols_table_t *symbols, ostream &out)
 }
 
 
-#ifdef UNIT_TEST
+#ifdef SYMBOL_UNIT_TEST
 int main(int argc, char ** argv)
 {
   cout << "hello" <<endl;

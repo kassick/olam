@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.hh"
 // Created: "Qui, 25 Ago 2011 14:38:26 -0300 (kassick)"
-// Updated: "Ter, 06 Set 2011 15:18:32 -0300 (kassick)"
+// Updated: "Sex, 16 Set 2011 18:25:47 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -29,6 +29,8 @@
 #include <string>
 #include <map>
 #include <stdint.h>
+
+#include "rastro_helper.hh"
 
 
 
@@ -58,25 +60,15 @@ using namespace std;
 #define impl_set_type(type,id) impl_set_type_funct(type, id, SYMBOL_FREE_STR_PRE, SYMBOL_NO_FUNCT)
 
 namespace Paje {
-  
-  typedef enum {
-        c, w, i, l, f, d, s, invalid,
-      } basic_types_t;
 
+  extern string idf1_name, idf2_name;
+  
 
   class Symbol {
     private:
-      union {
-        char c;
-        uint16_t w;
-        uint32_t i;
-        uint64_t l;
-        float f;
-        double d;
-        char *s;
-      } val;
+      rastro_basic_val_t val;
 
-      basic_types_t holds;
+      rastro_basic_types_t holds;
 
 
     public:

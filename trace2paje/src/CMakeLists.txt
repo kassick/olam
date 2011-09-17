@@ -34,12 +34,14 @@ set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
 set_property(SOURCE 
   container.cc semantics.cc paje.cc rastri2paje.cc symbols.cc
   PROPERTY COMPILE_FLAGS "-std=c++0x")
-target_link_libraries(rastro2paje fl rastro)
+target_link_libraries(rastro2paje fl rastro boost_regex boost_filesystem)
 
 
 
 
 add_executable(scanner_test 
+  symbols.cc
+  event.cc
   container.cc
   semantics.cc
   paje.cc
@@ -56,9 +58,9 @@ add_executable(symbols_test
   symbols.hh
   )
 target_link_libraries(symbols_test boost_regex)
-set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
+set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS SYMBOL_UNIT_TEST=1)
 
-set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS UNIT_TEST=1)
+set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS SCANNER_UNIT_TEST=1)
 target_link_libraries(scanner_test fl)
 
 add_executable(tree/tree_test

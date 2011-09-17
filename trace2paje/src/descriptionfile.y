@@ -6,6 +6,7 @@
   #include "container.hh"
   #include "semantics.hh"
   #include "descriptionfileparser.hpp"
+  #include "symbols.hh"
 
   #include <iostream>
   using namespace std;
@@ -49,11 +50,12 @@ attribs_t *n;
 
 
 %token ENDL;
-%token<string> IDENTIFIER
-%token<string> STRING_LIT
-%token<int_lit> NUMBER
+%token<string> IDENTIFIER ;
+%token<string> STRING_LIT ;
+%token<int_lit> NUMBER   ;
+%token<string> RST_TYPE  ;
 %token<ptr> TOK_CONTAINER;
-%token<ptr> TOK_RASTRO_HEADER
+%token<ptr> TOK_RASTRO_HEADER ;
 %token<ptr> TOK_EVENT_TYPE;
 %token<ptr> TOK_LINKTYPE ;
 %token<ptr> TOK_NAME     ;
@@ -86,6 +88,15 @@ attribs_t *n;
 %type<attr_node> accept_list;
 %type<attr_node> accept_param;
 %type<attr_node> eventtype_param;
+%type<ptr> include_statement;
+
+%type<attr_node> idf_list;
+%type<attr_node> idf_idlist;
+%type<attr_node> idf_list_item;
+
+%type<attr_node> state_param;
+%type<attr_node> state_params;
+%type<ptr>       state_statement;
 
 
 
@@ -99,9 +110,15 @@ code:
 
 header:
         TOK_RASTRO_HEADER '(' idf ',' idf ')'  { 
-                  cout <<   "Rastro !" << $3 <<" " << $5 << endl;
+                  //cout <<   "Rastro !" << $3 <<" " << $5 << endl;
+                  Paje::idf1_name = $3;
+                  Paje::idf2_name = $5;
                   $$ = NULL;
                   }
+        | { // In the case of files included, we do not expect them to have
+            // RASTRO definitions
+            $$ = NULL;
+          }
         ;
 
 
@@ -110,7 +127,9 @@ definitions: definition
            ;
 
 definition:
-          toplevel_container_definition {} 
+           toplevel_container_definition {} 
+          |include_statement {}
+          |state_statement {}
           ;
 
 toplevel_container_definition:
@@ -136,7 +155,7 @@ toplevel_container_definition:
 container_definition:
           TOK_CONTAINER IDENTIFIER '{' container_params '}' {
             //cout << "Container " << $2 << " has attributes : " << endl;
-            print_tree<SemanticAttribute *>($4);
+            //print_tree<SemanticAttribute *>($4);
             //cout << "----" <<endl;
 
 
@@ -281,5 +300,127 @@ accept_item: IDENTIFIER {
           ;
 
 
+
+
+idf_list: no_commas idf_idlist no_commas { $$ = $2; }
+        ;
+
+idf_idlist: idf_list_item {$$ = $1;}
+          | idf_idlist one_comma idf_list_item {
+                  $1->addChild($3);
+                  $$ = $1;
+              }
+          ;
+one_comma: commas
+         |                 {}
+         ;
+no_commas: commas          {}
+         |
+         ;
+commas   : commas ','      {}
+         | ','
+         ;
+
+idf_list_item: IDENTIFIER {
+                    attr = new_semantic_attribute();
+                    attr->id = ID_IDF;
+                    attr->vals.identifier_name = $1;
+
+                    $$ = new attribs_t(attr);
+                  }
+          ;
+
+
+
 idf: IDENTIFIER { $$ = $1} ;
+
+
+
+
+include_statement: TOK_INCLUDE STRING_LIT {
+                  $$ = NULL;
+                  char *str = $2;
+
+                  // it's a strlit so we have "something" (or "")
+                  str[strlen(str)-1] = '\0';
+                  str++;
+
+                  
+                  files_to_parse.push(str);
+                }
+                
+
+
+state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
+            // create a new state instance
+            // call fill_from_attr
+
+            Paje::State *state = (Paje::State * )(*event_names)[$2];
+            if (!state)
+            {
+              string name($2);
+              state = new Paje::State(name,0,0);
+              (*event_names)[$2] = state;
+            }
+            state->fill_from_attr($4);
+
+            $$ = NULL;
+          }
+
+state_params: state_params state_param    {
+                    $1->addChild($2);
+                    $$ = $1;
+              }
+            | state_param {$$ = $1;}
+
+
+state_param: TOK_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_STATE_TYPE;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  $$ = n;
+
+               }
+          | RST_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_RASTRO_TYPE;
+                  attr->vals.name = $1;
+
+                  n = new attribs_t(attr);
+
+                  SemanticAttribute * attr2 = new_semantic_attribute();
+                  attr2->id = ID_IDF;
+                  attr2->vals.name = $2;
+
+                  attribs_t *n2 = new attribs_t(attr2);
+
+                  n->addChild(n2);
+
+                  $$ = n;
+                }
+          | RST_TYPE '{' idf_list '}' {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_RASTRO_TYPE;
+                  attr->vals.name = $1;
+
+                  n = new attribs_t(attr);
+                  n->addChild($3);
+
+                  $$ = n;
+                }
+          | TOK_VALUE STRING_LIT {
+                  // remove ""
+                  char * str = $2;
+                  str[strlen(str)-1] = '\0';
+                  str++;
+
+                  attr = new_semantic_attribute();
+                  attr->id = ID_FORMAT_NAME;
+                  attr->vals.name = str;
+            }
+          ;
+
+
 
