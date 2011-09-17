@@ -1,0 +1,17 @@
+CONTAINER BNAME {
+  NAME "Container%(varname:.8d)"
+  CREATE PARENT
+  DESTROY ANOTHERNAME
+  CONTAINER ACHILD2 {
+    CONTAINER SUBSUB1 {
+      NAME "OOOO"
+    }
+    NAME "OtherName"
+    CREATE PARENT
+  }
+  CONTAINER OTHERCHILD2 {
+    NAME "OtherChild"
+  }
+}
+
+INCLUDE "cyclic_include.txt"
