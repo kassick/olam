@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Sex, 16 Set 2011 17:55:00 -0300 (kassick)"
+// Updated: "Seg, 19 Set 2011 18:45:38 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -219,11 +219,23 @@ int main(int argc, char** argv)
       //print_tree(toplevel_hierarchy);
 
   }
+
+  print_tree(late_parse_tree);
+  walk_tree_depth_first(late_parse_tree,[&](attribs_t * n, int level) {
+      while (level--)
+        cout << " ";
+      cout << "attr id is " << n->getVal()->id;
+      cout << endl;
+      return false;
+    });
+
   check_unique_types();
 
   //cerr << "(idf1,idf2) = (" << Paje::idf1_name << "," << Paje::idf2_name << ")" << endl;
 
 
+
+  parse_late_tree();
 
 
 

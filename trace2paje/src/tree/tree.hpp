@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Qui, 01 Set 2011 14:13:28 -0300 (kassick)"
+// Updated: "Seg, 19 Set 2011 18:47:02 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -149,6 +149,8 @@ class TreeNode {
 // int indicating the level
 // */
 
+// walk tree, stops when cb is true
+// parameter to cb is value
 template <typename T, typename callable>
 void walk_tree_( T val, typename TreeNode<T>::iterator it1, typename TreeNode<T>::iterator it2, int level, callable callback) {
 
@@ -170,6 +172,9 @@ void walk_tree(TreeNode<T> * t, callable cb )
 }
 
 
+
+// Walk tree, stops when cb is true
+// Parameter to callbeck is a tree node
 template <typename T, typename callable>
 bool walk_tree_head_first(TreeNode<T> * t, callable cb, int level=0)
 {
@@ -190,6 +195,9 @@ bool walk_tree_head_first(TreeNode<T> * t, callable cb, int level=0)
 
 }
 
+
+// Walks tree, stops when cb is true;
+// visits leaf first
 template <typename T, typename callable>
 bool walk_tree_depth_first(TreeNode<T> * t, callable cb, int level=0)
 {
@@ -198,7 +206,7 @@ bool walk_tree_depth_first(TreeNode<T> * t, callable cb, int level=0)
       (it != t->end()) && (!ret);
       ++it)
   {
-    ret = walk_tree_head_first(*it, cb, level+1);
+    ret = walk_tree_depth_first(*it, cb, level+1);
 
   }
   if (ret)

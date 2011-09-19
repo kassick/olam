@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Sex, 16 Set 2011 20:19:03 -0300 (kassick)"
+// Updated: "Seg, 19 Set 2011 18:09:27 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -47,6 +47,10 @@ enum _attrib_ids {
   ID_RASTRO_TYPE,
   ID_RASTRO_VALUE_NAME,
   ID_IDF,
+  ID_EVENT_ID = 50,
+  ID_EVENT_START,
+  ID_STATE_START,
+  ID_STATE_END,
 
   ID_NOP
 };
@@ -63,6 +67,7 @@ class SemanticAttribute {
       char *identifier_name;
       bool create_parent;
       bool destroy_children;
+      unsigned long event_id;
       rastro_basic_types_t rastro_type;
       rastro_basic_val_t rastro_val;
       //Paje::Container *container;

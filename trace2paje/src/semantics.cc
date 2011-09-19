@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 16 Set 2011 16:24:59 -0300 (kassick)"
+// Updated: "Seg, 19 Set 2011 19:31:07 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -42,6 +42,8 @@ event_name_map_t      * event_names;
 event_id_map_t        * event_ids;
 queue<string> files_to_parse;
 
+attribs_t * late_parse_tree; // treee to hold ids, values and types statements that must be parsed AFTER all the rest of the parsing
+
 
 const string SemanticAttribute::toString() const {
   stringstream s;
@@ -77,6 +79,27 @@ const string SemanticAttribute::toString() const {
 
     case ID_EVENT_TYPE:
       s << "Event type " << vals.name;
+      break;
+          
+    case ID_EVENT_START:
+      s << "Event ``" << vals.name << "'' with id ";
+      break;
+    case ID_STATE_START:
+      s << "State ``" << vals.name << "'' starts on ";
+      break;
+    case ID_STATE_END:
+      s << "State ``" << vals.name << "'' ends on   ";
+      break;
+    case ID_EVENT_ID:
+      s << "Eventy Id: " << vals.event_id;
+      break;
+    case ID_NOP:
+      s << "NOP";
+      break;
+
+    default:
+      s << "Unknown evt " << id;
+      break;
 
   }
 
@@ -227,9 +250,68 @@ void event_types_to_paje(ostream &out)
 }
 
 
+Paje::Event * get_event_or_warn(char * evt_name) {
+  if (! event_names->count(evt_name) ) {
+    cerr << "Warning: Event " << evt_name << "has id but no definition, ignoring" << endl;
+    return NULL;
+  }
+
+  Paje::Event * evt = (*event_names)[evt_name];
+  return evt;
+}
 
 
 
+void parse_late_tree()
+{
+  Paje::event_id_t evt_id = 0;
+
+  //ids are on the leaves; their parents are always the event/state name
+  //do a deep search, whenever you get an event_start, state_start or
+  //state_end then there is already an evt_id set up :)
+  walk_tree_depth_first(late_parse_tree, [&](attribs_t *n, int level)
+      {
+        SemanticAttribute * attr = n->getVal();
+        Paje::Event *evt;
+
+        switch (attr->id) {
+          case ID_EVENT_START:
+            if (!(evt = get_event_or_warn(attr->vals.name))) {
+              return false; // ignore this one
+            }
+            evt->set_trigger_id(EVENT_TRIGGER, evt_id);
+            break;
+
+          case ID_STATE_START:
+            if (!(evt = get_event_or_warn(attr->vals.name))) {
+              return false; // ignore this one
+            }
+            evt->set_trigger_id(EVENT_START, evt_id);
+            break;
+
+          case ID_STATE_END:
+            if (!(evt = get_event_or_warn(attr->vals.name))) {
+              return false; // ignore this one
+            }
+            evt->set_trigger_id(EVENT_END, evt_id);
+            break;
+
+          case ID_EVENT_ID:
+            evt_id = attr->vals.event_id;
+            break;
+          case ID_NOP:
+            break;
+          default:
+            // ignore
+            cerr << "ignored evt:" << attr->vals.event_id << endl;
+            break;
+         }
+
+        return false; // not found -- aka go all over the tree
+
+
+      } );
+}
 
 
 
@@ -253,6 +335,10 @@ void init_desc_parser()
   eventtype_names = new event_type_name_map_t();
   event_names     = new event_name_map_t();
   event_ids       = new event_id_map_t();
+
+  SemanticAttribute * attr = new SemanticAttribute();
+  attr->id = ID_NOP;
+  late_parse_tree = new attribs_t(attr);
 }
 
 
