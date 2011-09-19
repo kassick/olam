@@ -39,7 +39,7 @@ attribs_t *n;
 
 %union {
   char* string;
-  long int_lit;
+  long long int_lit;
   void * ptr;
   Paje::Container   * container;
   attribs_t * attr_node;
@@ -71,6 +71,10 @@ attribs_t *n;
 %token<ptr> TOK_INCLUDE  ;
 %token<ptr> TOK_VALUE    ;
 %token<ptr> TOK_TYPE     ;
+%token<ptr> TOK_ID       ;
+%token<ptr> TOK_START    ;
+%token<ptr> TOK_END      ;
+
 
 %type<ptr> code
 %type<ptr> header
@@ -97,6 +101,7 @@ attribs_t *n;
 %type<attr_node> state_param;
 %type<attr_node> state_params;
 %type<ptr>       state_statement;
+%type<attr_node> event_id_statement;
 
 
 
@@ -130,6 +135,9 @@ definition:
            toplevel_container_definition {} 
           |include_statement {}
           |state_statement {}
+          |event_id_statement { 
+              late_parse_tree->addChild ($1);
+            }
           ;
 
 toplevel_container_definition:
@@ -354,13 +362,14 @@ include_statement: TOK_INCLUDE STRING_LIT {
 state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
             // create a new state instance
             // call fill_from_attr
-
-            Paje::State *state = (Paje::State * )(*event_names)[$2];
-            if (!state)
+            Paje::State *state ;
+            if (!(event_names->count($2)))
             {
               string name($2);
               state = new Paje::State(name,0,0);
               (*event_names)[$2] = state;
+            } else {
+              state = (Paje::State * )(*event_names)[$2];
             }
             state->fill_from_attr($4);
 
@@ -419,8 +428,114 @@ state_param: TOK_TYPE IDENTIFIER {
                   attr = new_semantic_attribute();
                   attr->id = ID_FORMAT_NAME;
                   attr->vals.name = str;
+                  
+                  n = new attribs_t(attr);
+                  $$ = n;
             }
           ;
 
 
+
+event_id_statement:
+              TOK_ID IDENTIFIER NUMBER {
+                // simple event
+                attr = new_semantic_attribute();
+                attr->id = ID_EVENT_START;
+                attr->vals.name = $2;
+
+                n = new attribs_t(attr);
+                
+                attr = new_semantic_attribute();
+                attr->id = ID_EVENT_ID;
+                attr->vals.event_id = $3;
+
+                attribs_t * n1 = new attribs_t(attr);
+                n->addChild(n1);
+                $$ = n;
+              } 
+            | TOK_ID IDENTIFIER TOK_START NUMBER {
+                // Start of state 
+                attr = new_semantic_attribute();
+                attr->id = ID_STATE_START;
+                attr->vals.name = $2;
+
+                n = new attribs_t(attr);
+                
+                attr = new_semantic_attribute();
+                attr->id = ID_EVENT_ID;
+                attr->vals.event_id = $4;
+
+                attribs_t * n1 = new attribs_t(attr);
+                n->addChild(n1);
+                $$ = n;
+              }
+            | TOK_ID IDENTIFIER TOK_END NUMBER {
+                // Start of state 
+                attr = new_semantic_attribute();
+                attr->id = ID_STATE_END;
+                attr->vals.name = $2;
+
+                n = new attribs_t(attr);
+
+                attr = new_semantic_attribute();
+                attr->id = ID_EVENT_ID;
+                attr->vals.event_id = $4;
+
+                attribs_t * n1 = new attribs_t(attr);
+                n->addChild(n1);
+                $$ = n;
+              }
+            | TOK_ID IDENTIFIER NUMBER one_comma NUMBER {
+                // Create nop with two childs:
+                //  nop-+ 
+                //      |
+                //      +----START-+
+                //      |          |
+                //      |          +-ID
+                //      +-END-+
+                //            |
+                //            +-ID
+
+
+                //      toplevel: nop
+                attr = new_semantic_attribute();
+                attr->id = ID_NOP;
+
+                n = new attribs_t(attr);
+                
+                // create the start event
+                attr = new_semantic_attribute();
+                attr->id = ID_STATE_START;
+                attr->vals.name = $2;
+
+                attribs_t *n1 = new attribs_t(attr);
+
+                attr = new_semantic_attribute();
+                attr->id = ID_EVENT_ID;
+                attr->vals.event_id = $3;
+
+                attribs_t * n2 = new attribs_t(attr);
+
+                n1->addChild(n2);
+                n->addChild(n1);
+                
+                // create the end event
+                attr = new_semantic_attribute();
+                attr->id = ID_STATE_END;
+                attr->vals.name = strdup($2); // otherwise we'll have double free
+
+                n1 = new attribs_t(attr);
+
+                attr = new_semantic_attribute();
+                attr->id = ID_EVENT_ID;
+                attr->vals.event_id = $5;
+
+                n2 = new attribs_t(attr);
+
+                n1->addChild(n2);
+                n->addChild(n1);
+
+                $$ = n;
+              }
+            ;
 

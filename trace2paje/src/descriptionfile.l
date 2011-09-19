@@ -20,11 +20,9 @@ extern "C"
 %}
 %%
 
-RASTRO                  {
-                          return TOK_RASTRO_HEADER;
-                        }
-CONTAINER               return TOK_CONTAINER;
-EVENTTYPE               return TOK_EVENT_TYPE;
+RASTRO                  return TOK_RASTRO_HEADER;
+CONTAINER               return TOK_CONTAINER    ;
+EVENTTYPE               return TOK_EVENT_TYPE   ;
 LINKTYPE                return TOK_LINKTYPE ;
 NAME                    return TOK_NAME     ;
 CREATE                  return TOK_CREATE   ;
@@ -38,13 +36,17 @@ IGNORE                  return TOK_IGNORE   ;
 INCLUDE                 return TOK_INCLUDE  ;
 VALUE                   return TOK_VALUE    ;
 TYPE                    return TOK_TYPE     ;
+ID                      return TOK_ID       ;
+START                   return TOK_START    ;
+END                     return TOK_END      ;
+
 [icwlfds]               { // rastro type tokens, kind of symplistic but functional
                           yylval.string = strdup(yytext);
                           return RST_TYPE;
                         }
 
 [0-9]+                  {
-                          yylval.int_lit = atol(yytext);
+                          yylval.int_lit = atoll(yytext);
                           return NUMBER;
                         }
 [\@a-zA-Z][a-zA-Z_0-9]*   {
