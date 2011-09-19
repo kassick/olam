@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Sex, 16 Set 2011 21:03:08 -0300 (kassick)"
+// Updated: "Seg, 19 Set 2011 19:29:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -41,6 +41,14 @@
 
 namespace Paje {
 
+  typedef enum _trigger_id_t {
+    EVENT_TRIGGER,   // one time event
+    EVENT_START,     // do a start action
+    EVENT_END,       // do an end action
+    EVENT_NOP,       // warn of bad implementation
+  } trigger_id_t;
+
+
   typedef unsigned int event_id_t;
 
   typedef struct _identifier_entry_t {
@@ -63,12 +71,25 @@ namespace Paje {
       string formatValue;
       string name;
 
+      event_id_t  start_id, end_id, trigger_id;
+
       identifier_list_t identifier_names;
 
       virtual bool trigger(event_id_t evt_id, double timestamp,
           symbols_table_t * symbols, ostream &out);
 
       virtual void fill_from_attr(attribs_t * attrs);
+
+      virtual void set_trigger_id(trigger_id_t trigger_id, event_id_t id);
+
+      virtual bool do_start(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+
+      virtual bool do_end(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+
+      virtual bool do_trigger(double timestamp,
+          symbols_table_t * symbols, ostream &out);
 
   
      bool load_symbols(rst_event_t *event, symbols_table_t * symbols);
@@ -86,7 +107,10 @@ namespace Paje {
         this->name = name;
       };
 
-      bool trigger(event_id_t evt_id, double timestamp,
+      virtual bool do_start(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+
+      virtual bool do_end(double timestamp,
           symbols_table_t * symbols, ostream &out);
       
       void fill_from_attr(attribs_t * attrs);
