@@ -1,0 +1,61 @@
+RASTRO(var1,var2)
+
+CONTAINER ANAME {
+  EVENTTYPE ANEVENT {
+    umevent
+  }
+
+  ACCEPT {
+  }
+  NAME "Container%(varname:.8d)"
+  CREATE PARENT
+  DESTROY ANOTHERNAME1
+
+
+  CONTAINER ACHILD1 {
+    NAME "OtherName"
+    CREATE PARENT
+  }
+  CONTAINER OTHERCHILD1 {
+    NAME "OtherChild"
+    CONTAINER SUBSUB3 {
+      NAME "OOOO"
+    }
+    ACCEPT {
+      Event1
+      Event2
+    }
+  }
+}
+
+CONTAINER BNAME {
+  NAME "Container%(varname:.8d)"
+  CREATE PARENT
+  DESTROY ANOTHERNAME
+  CONTAINER ACHILD2 {
+    CONTAINER SUBSUB1 {
+      NAME "OOOO"
+    }
+    NAME "OtherName"
+    CREATE PARENT
+  }
+  CONTAINER OTHERCHILD2 {
+    NAME "OtherChild"
+  }
+}
+
+STATE ASTATE {
+  TYPE ATYPE
+  VALUE "%(VAR1)"
+  i svar
+  i VAR1
+  s VAR2
+  f { VAR3, VAR4 VAR5}
+  s { VARVAR }
+}
+
+ID ASTATE 4 5
+ID ANEVENT 1
+ID OSTATE 5 , 223989823
+ID OSTATE START 5
+ID OSTATE END 6
