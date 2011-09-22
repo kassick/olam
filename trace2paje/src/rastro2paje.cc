@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Seg, 19 Set 2011 18:45:38 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 21:37:35 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -215,12 +215,14 @@ int main(int argc, char** argv)
     }
 
 
-      //cerr << "Container hierarchy at the end:" <<endl;
-      //print_tree(toplevel_hierarchy);
 
   }
 
-  print_tree(late_parse_tree);
+
+//#if 0
+  
+  print_tree(early_parse_tree);
+  /*
   walk_tree_depth_first(late_parse_tree,[&](attribs_t * n, int level) {
       while (level--)
         cout << " ";
@@ -228,14 +230,39 @@ int main(int argc, char** argv)
       cout << endl;
       return false;
     });
+    */
+//#endif
+ 
+  // Converts the early tree to the internal structures
+  attr_to_container_hierarchy(early_parse_tree,toplevel_hierarchy);
+  for_each(container_type_names->begin(), container_type_names->end(),[&](pair<string,hierarchy_t * > p) {
+      cerr << "container " << p.first << " defined" << endl;
+    });
+  attr_to_event_types(early_parse_tree);
+  attr_to_link_types(early_parse_tree);
+  for_each(eventtype_names->begin(), eventtype_names->end(),[&](pair<string,Paje::EventType * > p) {
+      cerr << "event " << p.first << " defined" << endl;
+    });
 
-  check_unique_types();
+#if 0
+  cerr << "Container hierarchy at the end:" <<endl;
+  print_tree(toplevel_hierarchy);
+#endif
+
+  // Checks if container and event types have a unique name
+  // Also puts all names into the maps
+  //check_unique_types();
 
   //cerr << "(idf1,idf2) = (" << Paje::idf1_name << "," << Paje::idf2_name << ")" << endl;
 
 
 
+
   parse_late_tree();
+
+  map_accept_attrs(early_parse_tree);
+
+  check_events_have_type();
 
 
 

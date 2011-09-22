@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.hh"
 // Created: "Qua, 27 Jul 2011 11:08:49 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 14:22:32 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 17:21:19 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -27,6 +27,7 @@
 #ifndef CONTAINER_H_
 #define CONTAINER_H_
 
+#include "paje.hh"
 #include <iostream>
 #include <map>
 #include <string>
@@ -52,12 +53,14 @@ namespace Paje {
 
   using namespace std;
 
-  class Container {
+  class Container: public PajeElement {
     private:
       void fill_fields_from_cb(SemanticAttribute * attr);
       void init(string _typeName);
 
+
     public:
+      Container * parent;
 
       Container(string);
       Container(string,attribs_t * attr_head);
@@ -70,9 +73,8 @@ namespace Paje {
       bool triggerParent,destroyChildren;
       string triggerEvent;
 
-      string toPaje();
-
       const string toString()const;
+      virtual void do_header(ostream &out);
 
   }   ;
 

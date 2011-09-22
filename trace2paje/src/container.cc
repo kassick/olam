@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 14:35:17 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 16:47:50 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -30,6 +30,7 @@
 #include <string.h>
 #include "container.hh"
 #include "semantics.hh"
+#include "paje.hh"
 
 
 
@@ -38,10 +39,10 @@
 
 namespace Paje {
 
-  string Container::toPaje() {
-    return "PAjeCreateContainer " + this->typeName;
-
-  } 
+  void Container::do_header(ostream &out)
+  {
+    pajeDefineContainerType(typeName, parent->typeName, typeName,out);
+  }
   
   const string Container::toString() const{
     stringstream s;

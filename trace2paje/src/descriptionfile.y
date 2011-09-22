@@ -74,6 +74,8 @@ attribs_t *n;
 %token<ptr> TOK_ID       ;
 %token<ptr> TOK_START    ;
 %token<ptr> TOK_END      ;
+%token<ptr> TOK_SOURCE   ;
+%token<ptr> TOK_DEST     ;
 
 
 %type<ptr> code
@@ -81,7 +83,6 @@ attribs_t *n;
 %type<ptr> definition
 %type<ptr> definitions
 %type<attr_node> container_definition
-%type<container> toplevel_container_definition
 %type<attr_node> container_param
 %type<attr_node> container_params
 %type<attr_node> name_param
@@ -90,6 +91,7 @@ attribs_t *n;
 %type<string> idf
 %type<attr_node> accept_item;
 %type<attr_node> accept_list;
+%type<attr_node> opt_accept_list;
 %type<attr_node> accept_param;
 %type<attr_node> eventtype_param;
 %type<ptr> include_statement;
@@ -102,6 +104,7 @@ attribs_t *n;
 %type<attr_node> state_params;
 %type<ptr>       state_statement;
 %type<attr_node> event_id_statement;
+%type<attr_node> linktype_param;
 
 
 
@@ -132,33 +135,19 @@ definitions: definition
            ;
 
 definition:
-           toplevel_container_definition {} 
+           container_definition {
+              early_parse_tree->addChild($1);
+           }
           |include_statement {}
-          |state_statement {}
+          |state_statement {
+            // early_parse_tree->addChild($1); // needs to move the code
+                                              // later...
+          }
           |event_id_statement { 
               late_parse_tree->addChild ($1);
             }
           ;
 
-toplevel_container_definition:
-                             container_definition {
-                                hierarchy_t * top = attr_to_container_hierarchy($1,toplevel_hierarchy);
-                                
-                                //cout << "toplevel hierarchy:" <<endl;
-
-                                //print_tree(top);
-
-                                //cout <<"----?" <<endl;
-
-                                //toplevel_hierarchy->addChild(top);
-                              
-                                //cout << "Defined a toplevel container:" << $1->getVal()->vals.container_type <<endl;
-
-
-                                //free_subtree($1,true);
-                                $$ = NULL;
-                              }
-                             ;
 
 container_definition:
           TOK_CONTAINER IDENTIFIER '{' container_params '}' {
@@ -192,6 +181,7 @@ container_param: name_param
                 | destroy_param
                 | accept_param
                 | eventtype_param
+                | linktype_param
                 | container_definition
                 ;
 
@@ -272,6 +262,41 @@ eventtype_param: TOK_EVENT_TYPE IDENTIFIER '{' accept_list '}' {
                   $$ = n;
                   
                }
+
+linktype_param: TOK_LINKTYPE IDENTIFIER TOK_SOURCE IDENTIFIER TOK_DEST
+                            IDENTIFIER opt_accept_list  {
+                  // link type node with type name
+                  attr = new_semantic_attribute();
+                  attr->id = ID_LINK_TYPE;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+
+                  // source node
+                  attr = new_semantic_attribute();
+                  attr->id = ID_LINK_SOURCE;
+                  attr->vals.name = $4;
+                  n->addChild(new attribs_t(attr));
+                  
+                  // dest node
+                  attr = new_semantic_attribute();
+                  attr->id = ID_LINK_DEST;
+                  attr->vals.name = $6;
+                  n->addChild(new attribs_t(attr));
+                  
+                  if ($7) {
+                    // add the accept list
+                    n->addChild($7);
+                  }
+
+                  $$ = n;
+                }
+
+opt_accept_list: '{' accept_list '}' {
+               $$ = $2;
+               }
+               | {$$ = NULL};
+
 
 accept_param: TOK_ACCEPT '{' accept_list '}' {
 

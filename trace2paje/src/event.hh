@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Seg, 19 Set 2011 19:29:08 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 21:51:53 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -58,13 +58,37 @@ namespace Paje {
 
   typedef list<identifier_entry_t> identifier_list_t;
 
-  class EventType {
+  //************************************************
+  //Class: Paje::EventType
+  class EventType: public PajeElement {
     public:
       string typeName;
       Container * container;
+
+      EventType(string &typeName);
+      EventType(string &typeName,Paje::Container * c);
+      //EventType(string &typeName, attribs_t * attribs);
+
+      virtual void do_header(ostream &out);
+
+  };
+  
+  //************************************************
+  //Class: Paje::LinkType
+  class LinkType: public EventType {
+    public:
+      Container *source, *dest;
+
+      LinkType(string& typeName, Paje::Container * c, attribs_t * t);
+
+      virtual void do_header(ostream &out);
   };
 
-  class Event {
+
+
+  //************************************************
+  //Class: Paje::Event
+  class Event: public PajeElement {
     public:
       EventType *eventType;
 
@@ -74,6 +98,8 @@ namespace Paje {
       event_id_t  start_id, end_id, trigger_id;
 
       identifier_list_t identifier_names;
+
+      Event();
 
       virtual bool trigger(event_id_t evt_id, double timestamp,
           symbols_table_t * symbols, ostream &out);

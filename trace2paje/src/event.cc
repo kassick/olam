@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Seg, 19 Set 2011 19:29:57 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 21:52:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -32,13 +32,111 @@
 #include <map>
 #include <iostream>
 #include <rastro.h>
+#include "semantics.hh"
 
 using namespace std;
+
+
+/*******************************************************************************
+ Paje::EventType functions
+*******************************************************************************/
+
+void Paje::EventType::do_header(ostream &out)
+{
+  pajeDefineStateType(typeName, container->typeName, typeName, out);
+}
+
+
+Paje::EventType::EventType(string & typeName) {
+  this->typeName = typeName;
+}
+
+Paje::EventType::EventType(string & typeName,Paje::Container * c) {
+  this->typeName = typeName;
+  this->container = c;
+
+}
+
+#if 0
+// this is unused for now
+Paje::EventType::EventType(string & typeName, attribs_t * attribs)
+{
+  this->typeName = typeName;
+
+  // walks the parent node (a Container, we hope...)
+  walk_tree_up_to_root(attribs,[&](attrib_t * n, int level) {
+      SemanticAttribute * attr = n->getVal();
+      if (attr->id == ID_CONTAINER) {
+        if (! container_type_names->count(attr->vals.name))
+        {
+          cerr << "Error: EventType " << typeName << "can not find it's parent container " << attr->vals.name << endl;
+          exit(1);
+        }
+
+        this->container = (*container_type_names)[attr->vals.name];
+        return true; // stop now, otherwise it will get to the first containers!
+      }
+    });
+}
+#endif
+
+/*******************************************************************************
+ Paje::LinkType functions
+*******************************************************************************/
+
+Paje::LinkType::LinkType(string& tn, Paje::Container * c, attribs_t * t) : 
+  Paje::EventType(tn,c)
+{
+  this->source = NULL;
+  this->dest  = NULL;
+  
+  attribs_t::iterator it;
+  for (it = t->begin(); it != t->end(); ++it)
+  {
+    SemanticAttribute * attr = (*it)->getVal();
+    switch(attr->id) {
+      case ID_LINK_SOURCE:
+        if (!container_type_names->count(attr->vals.name)) {
+          cerr << "Error: Can not find source container for link type " << typeName << endl;
+          exit(1);
+        }
+        this->source = (*container_type_names)[attr->vals.name]->getVal();
+        break;
+      case ID_LINK_DEST:
+        if (!container_type_names->count(attr->vals.name)) {
+          cerr << "Error: Can not find source container for link type " << typeName << endl;
+          exit(1);
+        }
+        this->dest = (*container_type_names)[attr->vals.name]->getVal();
+        break;
+      default:
+        break;
+    }
+  }
+
+  if ((this->source == NULL) || (this->dest == NULL) || (this->container == NULL)) {
+    cerr << "Null fields, verify!" << endl;
+    exit(1);
+  }
+}
+
+void Paje::LinkType::do_header(ostream &out)
+{
+  pajeDefineLinkType(typeName, container->typeName,
+                        source->typeName,
+                        dest->typeName,
+                        typeName,
+                        out);
+}
 
 /*******************************************************************************
  Paje::Event functions
 
 *******************************************************************************/
+
+Paje::Event::Event() {
+  this->eventType = NULL;
+}
 
 /////
 // Trigger functions
@@ -186,3 +284,6 @@ void Paje::State::fill_from_attr(attribs_t * attrs)
 {
   return;
 }
+
+
+

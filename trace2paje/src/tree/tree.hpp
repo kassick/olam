@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Seg, 19 Set 2011 18:47:02 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 20:07:33 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -217,6 +217,23 @@ bool walk_tree_depth_first(TreeNode<T> * t, callable cb, int level=0)
 }
 
 
+
+// walks from a node up to the root; stops when cb is true; or reached the
+// top
+template <typename T, typename callable>
+bool walk_tree_up_to_root(TreeNode<T> * t, callable cb, int level=0)
+{
+  
+  if (! t->getParent() )
+    return false;
+
+  if (! (cb (t,level))) {
+    return walk_tree_up_to_root(t->getParent(), level-1);
+  } else {
+    return true;
+  }
+
+}
 
 template <typename T>
 struct print_tree_cb {

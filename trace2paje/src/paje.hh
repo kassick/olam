@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje.hh"
 // Created: "Seg, 01 Ago 2011 15:34:40 -0300 (kassick)"
-// Updated: "Sex, 02 Set 2011 17:51:58 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 16:22:38 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,6 +26,7 @@
 #define _PAJE_HH_H
 
 #include <string>
+#include <iostream>
 #include <sstream>
 
 using namespace std;
@@ -34,7 +35,8 @@ namespace Paje {
 
   class PajeElement {
     public:
-      void toPaje(stringstream &definitions, stringstream &header, stringstream &finalization);
+      virtual void do_header(ostream &header);
+      virtual void toPaje(stringstream &definitions, stringstream &header, stringstream &finalization);
   };
 }
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Seg, 19 Set 2011 18:22:20 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 21:34:16 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -49,7 +49,7 @@ typedef map<string,hierarchy_t *> container_type_names_t;
 
 typedef std::map<std::string      , Paje::Event * >      event_name_map_t;
 typedef std::multimap<Paje::event_id_t , Paje::Event * > event_id_map_t;
-typedef std::map<std::string      , Paje::EventType >  event_type_name_map_t;
+typedef std::map<std::string      , Paje::EventType * >  event_type_name_map_t;
 
 extern attribs_t * attributes;
 
@@ -62,18 +62,21 @@ extern event_id_map_t        * event_ids;
 extern queue<string>         files_to_parse;
 
 
-extern attribs_t * late_parse_tree;
+extern attribs_t * late_parse_tree, *early_parse_tree;
 
 SemanticAttribute * new_semantic_attribute();
-hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top);
 
 
 void init_desc_parser();
-void check_unique_types();
+void attr_to_event_types(attribs_t * attribs);
+void attr_to_link_types(attribs_t * attribs);
+hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top);
 void parse_late_tree();
 
 void hierarchy_to_paje(ostream &out);
 void event_types_to_paje(ostream &out);
+void map_accept_attrs(attribs_t * attribs);
+void check_events_have_type();
 
 
 template <typename CharT, typename Traits>

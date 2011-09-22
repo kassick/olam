@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Seg, 19 Set 2011 19:31:07 -0300 (kassick)"
+// Updated: "Qua, 21 Set 2011 21:53:32 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -27,6 +27,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <algorithm>
 #include "attributes.hh"
 #include "container.hh"
 #include "semantics.hh"
@@ -42,9 +43,13 @@ event_name_map_t      * event_names;
 event_id_map_t        * event_ids;
 queue<string> files_to_parse;
 
-attribs_t * late_parse_tree; // treee to hold ids, values and types statements that must be parsed AFTER all the rest of the parsing
+attribs_t * late_parse_tree, // tree to hold ids, values and types statements that must be parsed AFTER all the rest of the parsing
+          * early_parse_tree; // three that holds the hierarchy
 
 
+
+///************************************************************************************
+// Class functions
 const string SemanticAttribute::toString() const {
   stringstream s;
   switch (id) {
@@ -106,8 +111,12 @@ const string SemanticAttribute::toString() const {
   return s.str();
 }
 
+
+
+//******************************************************************************
 //Utility functions
 
+// ****************************************
 // Create a new semantic attribute
 SemanticAttribute *new_semantic_attribute()
 {
@@ -115,6 +124,10 @@ SemanticAttribute *new_semantic_attribute()
 }
 
 
+
+
+
+// **********************************************************************
 // Create a tree of Paje::Container* from a tree of SemanticAttribute
 hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
 {
@@ -128,11 +141,20 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
   if (attr->getVal()->id == ID_CONTAINER) {
     Paje::Container * c;
     char * container_type = attr->getVal()->vals.container_type;
+    if (container_type_names->count(container_type))
+    {
+      cerr << "Error: A container with type " << container_type << " has already been defined" <<endl;
+      exit(1);
+    }
+
 
 
     c = new Paje::Container(container_type, attr);
 
+    c->parent = top->getVal(); // the tree takes care of this, but do_header needs to know who is the parent... matter of isolation
+
     top_ = new hierarchy_t(c);
+    (*container_type_names)[container_type] = top_;
     top->addChild(top_);
 
     h = top_;
@@ -153,9 +175,124 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
 }
 
 
+void attr_to_event_types(attribs_t * attribs)
+{
+  string container_name;
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+    SemanticAttribute * attr = n->getVal();
+    if (attr->id == ID_CONTAINER)
+    {
+      container_name = attr->vals.name;
+    } else if (attr->id == ID_EVENT_TYPE) 
+    {
+      if (eventtype_names->count(attr->vals.name))
+      {
+        cerr << "Error: EventType " << attr->vals.name << "has already been defined" << endl;
+        exit(1);
+      }
+
+      if (container_type_names->count(container_name) == 0) {
+        cerr << "Error: Event Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        exit(1);
+      }
+
+      Paje::Container * c = (*container_type_names)[container_name]->getVal();
+      string tn = attr->vals.name;
+
+      Paje::EventType * evttype = new Paje::EventType(tn,c);
+      (*eventtype_names)[attr->vals.name] = evttype;
+
+      return true; // can stop this subtree
+    }
+    return false;
+  });
+}
+
+void attr_to_link_types(attribs_t * attribs)
+{
+  string container_name;
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+    SemanticAttribute * attr = n->getVal();
+    if (attr->id == ID_CONTAINER)
+    {
+      container_name = attr->vals.name;
+    } else if (attr->id == ID_LINK_TYPE) 
+    {
+      if (eventtype_names->count(attr->vals.name))
+      {
+        cerr << "Error: LinkType " << attr->vals.name << "has already been defined" << endl;
+        exit(1);
+      }
+
+
+      if (container_type_names->count(container_name) == 0) {
+        cerr << "Error: Link Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        exit(1);
+      }
+
+      Paje::Container * c = (*container_type_names)[container_name]->getVal();
+      string tn = attr->vals.name;
+
+      Paje::LinkType * evttype = new Paje::LinkType(tn,c,n);
+      (*eventtype_names)[attr->vals.name] = evttype;
+
+      return true; // can stop this subtree
+    }
+    return false;
+  });
+}
+
+void map_accept_attrs(attribs_t * attribs)
+{
+  string container_name;
+  string event_type;
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+    SemanticAttribute * attr = n->getVal();
+    
+    if (attr->id == ID_EVENT_TYPE)
+    {
+      event_type = attr->vals.name;
+      //cerr << "event type " << event_type << endl;
+      attribs_t::iterator it;
+      for(it = n->begin(); it != n->end(); ++it)
+      {
+        SemanticAttribute *list_attr = (*it)->getVal();
+        if (list_attr->id == ID_ACCEPT_LIST) {
+          walk_tree_head_first(*it,[&](attribs_t * n1, int level1) {
+              SemanticAttribute * attr1 = n1->getVal();
+              if (attr1->id == ID_ACCEPT_LIST) {
+                //cerr << "  accepts " << attr1->vals.name << endl;
+                if (!event_names->count(attr1->vals.name)) {
+                  cerr << "Warning: Event type " << event_type << " accepts undefined event " << attr1->vals.name << endl;
+                } else {
+                  Paje::Event * evt = (*event_names)[attr1->vals.name];
+                  evt->eventType = (*eventtype_names)[event_type];
+                }
+              }
+              return false; // visit all the children of event_type
+            });
+        }
+      }
+    }
+    return false;
+  });
+}
+
+void check_events_have_type()
+{
+  for_each(event_names->begin(), event_names->end(), [&](pair<string, Paje::Event *> p) {
+      if (p.second->eventType == NULL)
+      {
+        cerr << "Error: Event " << p.first << " has no defined type" << endl;
+        exit(1);
+      }
+    });
+}
 
 
 
+#if 0
+// ************************************************************
 // Fill in container ids and check for unique types
 void check_unique_container_types()
 {
@@ -174,6 +311,14 @@ void check_unique_container_types()
   }
 }
 
+#endif
+
+
+
+
+
+#if 0
+// ****************************************
 // Fill in container ids and check for unique types
 void check_unique_event_types()
 {
@@ -185,15 +330,16 @@ void check_unique_event_types()
         list<string>::iterator it;
         for (it = c->event_types.begin(); it != c->event_types.end(); ++it)
         {
-          if (eventtype_names->find(*it) != eventtype_names->end())
+          if (eventtype_names->count(*it))
           {
             cerr << "Error: An event type named " << *it << " has already been defined" <<endl;
             return true;
           }
 
-          EventType &t = (*eventtype_names)[*it];
-          t.typeName = *it;
-          t.container = c;
+          EventType *t = new EventType();
+          t->typeName = *it;
+          t->container = c;
+          (*eventtype_names)[*it] = t;
         }
         return false;
       }) )
@@ -201,16 +347,19 @@ void check_unique_event_types()
     exit(1);
   }
 }
+#endif
 
-
+#if 0
 void check_unique_types() 
 {
   check_unique_container_types();
   check_unique_event_types();
 }
+#endif
 
 
 
+//************************************************************
 // walk the hierarchy dump paje formated output
 void hierarchy_to_paje(ostream &out)
 {
@@ -223,7 +372,8 @@ void hierarchy_to_paje(ostream &out)
 
         parent = h->getParent()->getVal();
 
-        pajeDefineContainerType(c->typeName, parent->typeName, c->typeName,out);
+        //pajeDefineContainerType(c->typeName, parent->typeName, c->typeName,out);
+        c->do_header(out);
 
         return false;
       })) {
@@ -234,22 +384,36 @@ void hierarchy_to_paje(ostream &out)
 // Walk the hierarchy and dump event types
 void event_types_to_paje(ostream &out)
 {
+#if 0
   if (walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * h, int level) {
         Paje::Container * c = h->getVal();
 
         list<string>::iterator it;
         for (it = c->event_types.begin(); it != c->event_types.end(); ++it)
         {
-          pajeDefineStateType(*it, c->typeName, *it, out);
+          //pajeDefineStateType(*it, c->typeName, *it, out);
+          if (! eventtype_names->count(*it) ) {
+            cerr << "Internal Error: no event type with name " << *it << endl;
+            exit(1);
+          }
+          Paje::EventType * t = (*eventtype_names)[*it];
+          t->do_header(out);
         }
 
         return false;
       })) {
     cerr << "Error while dumping paje event types. What on earth!? " << endl;
   }
+#endif
+  for_each(eventtype_names->begin(), eventtype_names->end(), 
+      [&](pair<string,Paje::EventType *> p) {
+        p.second->do_header(out);
+      });
 }
 
 
+//****************************
+//Get an event name or wanr that it does not exist
 Paje::Event * get_event_or_warn(char * evt_name) {
   if (! event_names->count(evt_name) ) {
     cerr << "Warning: Event " << evt_name << "has id but no definition, ignoring" << endl;
@@ -261,6 +425,9 @@ Paje::Event * get_event_or_warn(char * evt_name) {
 }
 
 
+//*****************************
+//Parse the ID, VALUE and TYPE tokens after all event types have been
+//already defined
 
 void parse_late_tree()
 {
@@ -317,7 +484,7 @@ void parse_late_tree()
 
 
 
-
+//****************************************
 // Initialization Function -- Parser wide
 
 void init_desc_parser()
@@ -336,9 +503,12 @@ void init_desc_parser()
   event_names     = new event_name_map_t();
   event_ids       = new event_id_map_t();
 
-  SemanticAttribute * attr = new SemanticAttribute();
-  attr->id = ID_NOP;
-  late_parse_tree = new attribs_t(attr);
+  SemanticAttribute * attr1 = new SemanticAttribute();
+  SemanticAttribute * attr2 = new SemanticAttribute();
+  attr1->id = ID_NOP;
+  attr2->id = ID_NOP;
+  late_parse_tree = new attribs_t(attr1);
+  early_parse_tree = new attribs_t(attr2);
 }
 
 
