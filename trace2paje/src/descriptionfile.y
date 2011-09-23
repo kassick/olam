@@ -76,6 +76,8 @@ attribs_t *n;
 %token<ptr> TOK_END      ;
 %token<ptr> TOK_SOURCE   ;
 %token<ptr> TOK_DEST     ;
+%token<ptr> TOK_LINK     ;
+%token<ptr> TOK_KEY      ;
 
 
 %type<ptr> code
@@ -102,7 +104,10 @@ attribs_t *n;
 
 %type<attr_node> state_param;
 %type<attr_node> state_params;
-%type<ptr>       state_statement;
+%type<attr_node> state_statement;
+%type<attr_node> link_param;
+%type<attr_node> link_params;
+%type<attr_node> link_statement;
 %type<attr_node> event_id_statement;
 %type<attr_node> linktype_param;
 
@@ -140,8 +145,10 @@ definition:
            }
           |include_statement {}
           |state_statement {
-            // early_parse_tree->addChild($1); // needs to move the code
-                                              // later...
+            early_parse_tree->addChild($1);
+          }
+          |link_statement {
+            early_parse_tree->addChild($1);
           }
           |event_id_statement { 
               late_parse_tree->addChild ($1);
@@ -245,7 +252,7 @@ destroy_param: TOK_DESTROY IDENTIFIER {
 
 eventtype_param: TOK_EVENT_TYPE IDENTIFIER '{' accept_list '}' {
                   attr = new_semantic_attribute();
-                  attr->id = ID_EVENT_TYPE;
+                  attr->id = ID_EVENT_TYPE_DEF;
                   attr->vals.name = $2;
 
                   n = new attribs_t(attr);
@@ -255,7 +262,7 @@ eventtype_param: TOK_EVENT_TYPE IDENTIFIER '{' accept_list '}' {
                }
                | TOK_EVENT_TYPE IDENTIFIER {
                   attr = new_semantic_attribute();
-                  attr->id = ID_EVENT_TYPE;
+                  attr->id = ID_EVENT_TYPE_DEF;
                   attr->vals.name = $2;
 
                   n = new attribs_t(attr);
@@ -385,20 +392,28 @@ include_statement: TOK_INCLUDE STRING_LIT {
 
 
 state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
+            attr = new_semantic_attribute();
+            attr->id = ID_STATE;
+            attr->vals.name = $2;
+
+            n = new attribs_t(attr);
+            n->addChild($4);
+            $$ = n;
+            /*
             // create a new state instance
             // call fill_from_attr
             Paje::State *state ;
             if (!(event_names->count($2)))
             {
               string name($2);
-              state = new Paje::State(name,0,0);
+              state = new Paje::State(name);
               (*event_names)[$2] = state;
             } else {
               state = (Paje::State * )(*event_names)[$2];
             }
             state->fill_from_attr($4);
 
-            $$ = NULL;
+            $$ = NULL; */
           }
 
 state_params: state_params state_param    {
@@ -410,7 +425,7 @@ state_params: state_params state_param    {
 
 state_param: TOK_TYPE IDENTIFIER {
                   attr = new_semantic_attribute();
-                  attr->id = ID_STATE_TYPE;
+                  attr->id = ID_EVENT_TYPE;
                   attr->vals.name = $2;
 
                   n = new attribs_t(attr);
@@ -459,6 +474,91 @@ state_param: TOK_TYPE IDENTIFIER {
             }
           ;
 
+
+
+link_statement: TOK_LINK IDENTIFIER '{' link_params '}' {
+            // create a new state instance
+            // call fill_from_attr
+
+            attr = new_semantic_attribute();
+            attr->id = ID_LINK;
+            attr->vals.name = $2;
+
+            n = new attribs_t(attr);
+            n->addChild($4);
+            $$ = n;
+          }
+
+link_params: link_params link_param    {
+                    $1->addChild($2);
+                    $$ = $1;
+              }
+            | link_param {$$ = $1;}
+
+
+link_param: TOK_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_EVENT_TYPE;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  $$ = n;
+
+               }
+          | RST_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_RASTRO_TYPE;
+                  attr->vals.name = $1;
+
+                  n = new attribs_t(attr);
+
+                  SemanticAttribute * attr2 = new_semantic_attribute();
+                  attr2->id = ID_IDF;
+                  attr2->vals.name = $2;
+
+                  attribs_t *n2 = new attribs_t(attr2);
+
+                  n->addChild(n2);
+
+                  $$ = n;
+                }
+          | RST_TYPE '{' idf_list '}' {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_RASTRO_TYPE;
+                  attr->vals.name = $1;
+
+                  n = new attribs_t(attr);
+                  n->addChild($3);
+
+                  $$ = n;
+                }
+          | TOK_VALUE STRING_LIT {
+                  // remove ""
+                  char * str = $2;
+                  str[strlen(str)-1] = '\0';
+                  str++;
+
+                  attr = new_semantic_attribute();
+                  attr->id = ID_FORMAT_NAME;
+                  attr->vals.name = str;
+                  
+                  n = new attribs_t(attr);
+                  $$ = n;
+            }
+          | TOK_KEY STRING_LIT {
+                  // remove ""
+                  char * str = $2;
+                  str[strlen(str)-1] = '\0';
+                  str++;
+
+                  attr = new_semantic_attribute();
+                  attr->id = ID_KEY_FORMAT;
+                  attr->vals.name = str;
+                  
+                  n = new attribs_t(attr);
+                  $$ = n;
+            }
+          ;
 
 
 event_id_statement:

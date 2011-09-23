@@ -24,6 +24,7 @@ RASTRO                  return TOK_RASTRO_HEADER;
 CONTAINER               return TOK_CONTAINER    ;
 EVENTTYPE               return TOK_EVENT_TYPE   ;
 LINKTYPE                return TOK_LINKTYPE ;
+LINK                    return TOK_LINK     ;
 NAME                    return TOK_NAME     ;
 CREATE                  return TOK_CREATE   ;
 PARENT                  return TOK_PARENT   ;
@@ -41,6 +42,7 @@ START                   return TOK_START    ;
 END                     return TOK_END      ;
 FROM                    return TOK_SOURCE   ;
 TO                      return TOK_DEST     ;
+KEY                     return TOK_KEY      ;
 
 [icwlfds]               { // rastro type tokens, kind of symplistic but functional
                           yylval.string = strdup(yytext);

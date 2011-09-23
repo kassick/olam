@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qua, 21 Set 2011 21:37:35 -0300 (kassick)"
+// Updated: "Sex, 23 Set 2011 19:22:44 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -222,6 +222,9 @@ int main(int argc, char** argv)
 //#if 0
   
   print_tree(early_parse_tree);
+  cerr << endl;
+  print_tree(late_parse_tree);
+  cerr << endl;
   /*
   walk_tree_depth_first(late_parse_tree,[&](attribs_t * n, int level) {
       while (level--)
@@ -256,6 +259,8 @@ int main(int argc, char** argv)
   //cerr << "(idf1,idf2) = (" << Paje::idf1_name << "," << Paje::idf2_name << ")" << endl;
 
 
+  attr_to_states(early_parse_tree);
+  attr_to_links(early_parse_tree);
 
 
   parse_late_tree();
@@ -264,6 +269,10 @@ int main(int argc, char** argv)
 
   check_events_have_type();
 
+
+  for_each(event_names->begin(), event_names->end(), [&](pair<string,Paje::Event *> p) {
+      cerr << p.second->toString() << endl;
+      });
 
 
   // Here begins the parsing of events and the output

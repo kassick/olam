@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qua, 21 Set 2011 21:53:32 -0300 (kassick)"
+// Updated: "Sex, 23 Set 2011 19:19:03 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -82,6 +82,10 @@ const string SemanticAttribute::toString() const {
       s << "Accept event " << vals.identifier_name;
       break;
 
+    case ID_EVENT_TYPE_DEF:
+      s << "Event type Definition " << vals.name;
+      break;
+    
     case ID_EVENT_TYPE:
       s << "Event type " << vals.name;
       break;
@@ -90,16 +94,53 @@ const string SemanticAttribute::toString() const {
       s << "Event ``" << vals.name << "'' with id ";
       break;
     case ID_STATE_START:
-      s << "State ``" << vals.name << "'' starts on ";
+      s << "Event ``" << vals.name << "'' starts on ";
       break;
     case ID_STATE_END:
-      s << "State ``" << vals.name << "'' ends on   ";
+      s << "Event ``" << vals.name << "'' ends on   ";
       break;
     case ID_EVENT_ID:
       s << "Eventy Id: " << vals.event_id;
       break;
     case ID_NOP:
       s << "NOP";
+      break;
+
+    case ID_LINK:
+      s << "Link ``" << vals.name << "´´";
+      break;
+
+    case ID_STATE:
+      s << "State ``" << vals.name << "´´";
+      break;
+
+    case ID_RASTRO_TYPE:
+      s << "Rastro Type " << vals.name << "´´";
+      break;
+
+    case ID_IDF:
+      s <<" Identifier ``" << vals.name << "´´";
+      break;
+
+    case ID_LINK_TYPE:
+    case ID_STATE_TYPE:
+      s << "Type ``" << vals.name << "´´" ;
+      break;
+    
+    case ID_FORMAT_NAME:
+      s << "Value ``" << vals.name << "´´" ;
+      break;
+    
+    case ID_KEY_FORMAT:
+      s << "Key ``" << vals.name << "´´" ;
+      break;
+
+    case ID_LINK_SOURCE:
+      s << "From ``" << vals.name << "´´";
+      break;
+    
+    case ID_LINK_DEST:
+      s << "To ``" << vals.name << "´´";
       break;
 
     default:
@@ -183,7 +224,7 @@ void attr_to_event_types(attribs_t * attribs)
     if (attr->id == ID_CONTAINER)
     {
       container_name = attr->vals.name;
-    } else if (attr->id == ID_EVENT_TYPE) 
+    } else if (attr->id == ID_EVENT_TYPE_DEF) 
     {
       if (eventtype_names->count(attr->vals.name))
       {
@@ -242,16 +283,64 @@ void attr_to_link_types(attribs_t * attribs)
   });
 }
 
+void attr_to_links(attribs_t * attribs)
+{
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+      SemanticAttribute * attr = n->getVal();
+
+      if (attr->id == ID_LINK) {
+        Paje::Link * link;
+        string name = attr->vals.name;
+
+        // last man standing policy: if the link already exists, then just
+        // decorate if with whatever other information there may be here
+        if (event_names->count(name)) {
+          cerr << "Name clash: " << name << endl;
+          exit(1);
+        } else {
+          link = new Paje::Link(name, n);
+          (*event_names)[name] = link;
+        }
+
+        return true; // prune tree
+      }
+      return false; // keep on visiting
+    });
+}
+
+void attr_to_states(attribs_t * attribs)
+{
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+      SemanticAttribute * attr = n->getVal();
+
+      if (attr->id == ID_STATE) {
+        Paje::State * state;
+        string name = attr->vals.name;
+
+        // last man standing policy: if the link already exists, then just
+        // decorate if with whatever other information there may be here
+        if (event_names->count(name)) {
+          cerr << "Name clash: " << name << endl;
+          exit(1);
+        } else {
+          state = new Paje::State(name, n);
+          (*event_names)[name] = state;
+        }
+
+        return true; // prune tree
+      }
+      return false; // keep on visiting
+    });
+}
+
 void map_accept_attrs(attribs_t * attribs)
 {
-  string container_name;
-  string event_type;
   walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
     SemanticAttribute * attr = n->getVal();
     
-    if (attr->id == ID_EVENT_TYPE)
+    if (attr->id == ID_EVENT_TYPE_DEF)
     {
-      event_type = attr->vals.name;
+      string event_type = attr->vals.name;
       //cerr << "event type " << event_type << endl;
       attribs_t::iterator it;
       for(it = n->begin(); it != n->end(); ++it)
@@ -283,8 +372,20 @@ void check_events_have_type()
   for_each(event_names->begin(), event_names->end(), [&](pair<string, Paje::Event *> p) {
       if (p.second->eventType == NULL)
       {
-        cerr << "Error: Event " << p.first << " has no defined type" << endl;
-        exit(1);
+        cerr << "Warning: Event " << p.first << " has no defined type" << endl;
+        // this event won't be mapped to event ids
+      } else {
+        // adds the trigger id
+        if (p.second->trigger_id)
+          event_ids->insert (pair<event_id_t,Paje::Event*>(p.second->trigger_id, p.second));
+        
+        //adds the start id
+        if (p.second->start_id)
+          event_ids->insert (pair<event_id_t,Paje::Event*>(p.second->start_id, p.second));
+        
+        // adds the end_id
+        if (p.second->end_id)
+          event_ids->insert (pair<event_id_t,Paje::Event*>(p.second->end_id, p.second));
       }
     });
 }
@@ -405,6 +506,7 @@ void event_types_to_paje(ostream &out)
     cerr << "Error while dumping paje event types. What on earth!? " << endl;
   }
 #endif
+  // For earch event type named, dump the 
   for_each(eventtype_names->begin(), eventtype_names->end(), 
       [&](pair<string,Paje::EventType *> p) {
         p.second->do_header(out);

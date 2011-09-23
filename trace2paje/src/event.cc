@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Qua, 21 Set 2011 21:52:48 -0300 (kassick)"
+// Updated: "Sex, 23 Set 2011 19:23:46 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -27,6 +27,7 @@
 #include "paje.hh"
 #include "event.hh"
 #include "symbols.hh"
+#include <assert.h>
 #include <sstream>
 #include <string>
 #include <map>
@@ -135,6 +136,7 @@ void Paje::LinkType::do_header(ostream &out)
 *******************************************************************************/
 
 Paje::Event::Event() {
+  start_id = end_id = trigger_id = 0;
   this->eventType = NULL;
 }
 
@@ -198,10 +200,75 @@ bool Paje::Event::trigger(event_id_t evt_id, double timestamp,
     return do_end(timestamp,symbols,out);
 }
 
+
+void Paje::Event::add_symbol_from_tree(attribs_t * attrs)
+{
+  char type;
+  identifier_entry_t entry;
+
+  assert(attrs->getVal()->id == ID_RASTRO_TYPE);
+
+  // gets the type of the child variables
+  type = attrs->getVal()->vals.name[0];
+  switch (type) {
+    CASE_TYPE1('c',c,entry.type);
+    CASE_TYPE1('w',w,entry.type);
+    CASE_TYPE1('i',i,entry.type);
+    CASE_TYPE1('l',l,entry.type);
+    CASE_TYPE1('f',f,entry.type);
+    CASE_TYPE1('d',d,entry.type);
+    CASE_TYPE1('s',s,entry.type);
+    default:
+      cerr << "Unknown type " << type << endl;
+      exit(1);
+  }
+
+
+  walk_tree_head_first(attrs,[&](attribs_t * n, int level) {
+      SemanticAttribute * attr = n->getVal();
+
+      switch (attr->id) {
+        case ID_RASTRO_TYPE:
+          break; // ignore; code done above
+        case ID_IDF:
+          entry.field_name = attr->vals.name;
+          this->identifier_names.push_back(entry);
+          break;
+        default:
+          cerr << "Unexpected value in tree: " << attr << endl;
+          exit(1);
+      }
+      return false;
+      });
+
+}
+
 ///
 void Paje::Event::fill_from_attr(attribs_t * attrs)
 {
-  cerr << "Abstract class, dumbass!" << endl;
+  walk_tree_head_first(attrs,[&](attribs_t * n, int level) {
+        SemanticAttribute * attr = n->getVal();
+        switch (attr->id) {
+          case ID_FORMAT_NAME:
+            this->formatValue = attr->vals.name;
+            break;
+          case ID_EVENT_TYPE:
+            if (eventtype_names->count(attr->vals.name)) {
+              this->eventType = (*eventtype_names)[attr->vals.name];
+            } else {
+              cerr << "Unknown type: " << attr->vals.name << endl;
+              exit(1);
+            }
+            break;
+          case ID_RASTRO_TYPE:
+            this->add_symbol_from_tree(n);
+            return false; // no need to descend into this branch
+            break;
+          default:
+            break;
+        }
+        return false;
+      });
 }
 
 
@@ -241,11 +308,39 @@ bool Paje::Event::load_symbols(rst_event_t *event, symbols_table_t * symbols)
 
 }
 
+string Paje::Event::toString() {
+  stringstream out;
+
+  out << "Paje::" << this->type_identifier << "``" << this->name << "´´" << endl;
+  out << "   " << "Formated to " << this->formatValue << endl;
+  out << "   " << "Type: " << (this->eventType == NULL? "NULL": this->eventType->typeName) << endl;
+  out << "   " << "With IDs:";
+  if (start_id)   out << " Start: " << start_id;
+  if (end_id)     out << " End: " << end_id;
+  if (trigger_id) out << " Trigger: " << trigger_id;
+  out << endl;
+
+  out << "   " << "Fields:" << endl;
+  identifier_list_t::iterator it;
+  for (it = identifier_names.begin(); it != identifier_names.end(); ++it)
+    out << "      " << (*it).type << " " << (*it).field_name << endl;
+
+  return out.str();
+}
+
+
 
 
 /*******************************************************************************
  * Paje State functions
  ******************************************************************************/
+
+Paje::State::State(string& name, attribs_t * attribs) {
+  this->name = name;
+  this->type_identifier = "State";
+
+  this->fill_from_attr(attribs);
+}
 
 bool Paje::State::do_start(double timestamp,
     symbols_table_t * symbols, ostream &out)
@@ -282,8 +377,72 @@ bool Paje::State::do_end(double timestamp,
 
 void Paje::State::fill_from_attr(attribs_t * attrs)
 {
+  Paje::Event::fill_from_attr(attrs);
   return;
 }
 
 
+
+/*******************************************************************************
+ * Paje::Link class
+ ******************************************************************************/
+
+Paje::Link::Link(string &name, attribs_t * attribs) {
+  this->name = name;
+
+  this->fill_from_attr(attribs);
+}
+
+
+string Paje::Link::toString() {
+  stringstream out;
+
+  out << Paje::Event::toString();
+  out << "   " << "Key format: " << format_key << endl;
+
+  return out.str();
+}
+
+
+
+
+/////
+// Trigger functions
+bool Paje::Link::do_start(double timestamp,
+          symbols_table_t * symbols, ostream &out) {
+  cerr << "Error: Class Link has no start action" << endl;
+  return false;
+}
+
+bool Paje::Link::do_end(double timestamp,
+          symbols_table_t * symbols, ostream &out) {
+  cerr << "Error: Class Link has no end  action" << endl;
+  return false;
+}
+
+bool Paje::Link::do_trigger(double timestamp,
+          symbols_table_t * symbols, ostream &out) {
+  // Actually, Link should call PajeLink....
+  cerr << "Error: Class Link has no trigger action" << endl;
+  return false;
+}
+
+void Paje::Link::fill_from_attr(attribs_t * attrs) {
+  Paje::Event::fill_from_attr(attrs);
+  walk_tree_head_first(attrs,[&](attribs_t * n, int level) {
+        SemanticAttribute * attr = n->getVal();
+        switch (attr->id) {
+          case ID_LINK:
+            break; // name has already been set
+          case ID_KEY_FORMAT:
+            this->format_key = attr->vals.name;
+            break;
+          default:
+            break;
+        }
+
+
+        return false;
+      });
+}
 

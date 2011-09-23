@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Qua, 21 Set 2011 21:51:53 -0300 (kassick)"
+// Updated: "Sex, 23 Set 2011 19:22:31 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -95,6 +95,8 @@ namespace Paje {
       string formatValue;
       string name;
 
+      string type_identifier;
+
       event_id_t  start_id, end_id, trigger_id;
 
       identifier_list_t identifier_names;
@@ -118,20 +120,18 @@ namespace Paje {
           symbols_table_t * symbols, ostream &out);
 
   
-     bool load_symbols(rst_event_t *event, symbols_table_t * symbols);
+      bool load_symbols(rst_event_t *event, symbols_table_t * symbols);
+      void add_symbol_from_tree(attribs_t * attrs);
+
+      virtual string toString();
 
   };
 
 
   class State: public Event {
     public:
-      event_id_t start_id, end_id;
 
-      State(string &_name, event_id_t _start_id, event_id_t _end_id):
-        start_id{_start_id}, end_id{_end_id} 
-      {
-        this->name = name;
-      };
+      State(string &_name, attribs_t * attrs) ;
 
       virtual bool do_start(double timestamp,
           symbols_table_t * symbols, ostream &out);
@@ -139,11 +139,30 @@ namespace Paje {
       virtual bool do_end(double timestamp,
           symbols_table_t * symbols, ostream &out);
       
-      void fill_from_attr(attribs_t * attrs);
+      virtual void fill_from_attr(attribs_t * attrs);
   } ;
-}
+
+  class Link: public Event {
+    public:
+      string format_key;
+      Link(string &name, attribs_t * attribs);
+
+      virtual bool do_start(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+
+      virtual bool do_end(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+      
+      virtual bool do_trigger(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+      
+      virtual void fill_from_attr(attribs_t * attrs);
+      virtual string toString() ;
+  };
 
 
+
+} // Paje namespace
 
 
 #define CASE_TYPE(SHORT_NAME , PAJE_NAME) \
@@ -158,6 +177,14 @@ namespace Paje {
           break; // trick?
 
 
+
+
+// sadly, #SHORT_NAME[0] does not work as the compiler does not recognize
+// str_const[int_const] as a char in compilation time
+#define CASE_TYPE1(CHAR_NAME,SHORT_NAME,VALUE) \
+  case CHAR_NAME : \
+    VALUE = SHORT_NAME;   \
+    break;                \
 
 
 #endif

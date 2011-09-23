@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Qua, 21 Set 2011 20:07:33 -0300 (kassick)"
+// Updated: "Sex, 23 Set 2011 19:29:16 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -181,7 +181,7 @@ bool walk_tree_head_first(TreeNode<T> * t, callable cb, int level=0)
   bool ret = false;
   if (!cb (t,level) ) {
     for (typename TreeNode<T>::iterator it = t->begin(); 
-        (it != t->end()) && (!ret);
+        (it != t->end()); // && (!ret);
         ++it)
     {
       ret = walk_tree_head_first(*it,cb, level+1);
