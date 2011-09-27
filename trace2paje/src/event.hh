@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Sex, 23 Set 2011 19:22:31 -0300 (kassick)"
+// Updated: "Ter, 27 Set 2011 17:10:00 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -36,8 +36,10 @@
 #include <map>
 #include <list>
 #include <iostream>
-#include <rastro.h>
 #include "rastro_helper.hh"
+extern "C" {
+#include <rastro.h>
+}
 
 namespace Paje {
 

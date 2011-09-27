@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Sex, 23 Set 2011 19:22:44 -0300 (kassick)"
+// Updated: "Ter, 27 Set 2011 15:41:27 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -29,6 +29,7 @@
 #include "semantics.hh"
 #include "container.hh"
 #include "paje.hh"
+#include "rastro_loop.hh"
 #include <getopt.h>
 #include <string.h>
 #include <set>
@@ -133,7 +134,7 @@ int main(int argc, char** argv)
   fs::path pathname; // path of the first file
   fs::path dirname; // dirname of the first file
 
-  queue<string> rst_files_to_open;
+  list<string> rst_files_to_open;
 
   oind = parse_opts(argc, argv);
 
@@ -145,7 +146,7 @@ int main(int argc, char** argv)
 
 
   while (oind < argc) {
-    rst_files_to_open.push(string(argv[oind]));
+    rst_files_to_open.push_back(string(argv[oind]));
     cerr << "opening rastro " << argv[oind] <<endl;
     oind ++;
   }
@@ -301,6 +302,8 @@ int main(int argc, char** argv)
   paje_header(*fout);
   hierarchy_to_paje(*fout);
   event_types_to_paje(*fout);
+
+  rastro_loop_events(rst_files_to_open,*fout);
 
 
   // Here loop around the paje events and dumps the events
