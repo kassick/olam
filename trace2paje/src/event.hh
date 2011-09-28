@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Ter, 27 Set 2011 17:10:00 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 17:08:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -122,7 +122,7 @@ namespace Paje {
           symbols_table_t * symbols, ostream &out);
 
   
-      bool load_symbols(rst_event_t *event, symbols_table_t * symbols);
+      bool load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols);
       void add_symbol_from_tree(attribs_t * attrs);
 
       virtual string toString();

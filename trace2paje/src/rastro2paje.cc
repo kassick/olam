@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Ter, 27 Set 2011 15:41:27 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 17:38:39 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -281,6 +281,7 @@ int main(int argc, char** argv)
   if (global_opts.fout_name == "stdout") {
     fout = &cout;
   } else {
+    //@todo open here the file name in the arguments
     fout = new ofstream("out.test");
   }
 

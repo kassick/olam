@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Ter, 27 Set 2011 17:31:22 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 17:10:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,11 +45,16 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 {
 
   // Open files, use a tmp sync file
-  map<string,rst_file_t> file_to_data;
-  char *syncfile;
+  char syncfile[256];
   char * fname;
+  set<string> opened_files;
   
-  strcpy(syncfile,"rastroXXXXXX");
+  rst_event_t event;
+  rst_file_t data;
+  set<Paje::event_id_t> ignored_ids;
+  symbols_table_t symbols;
+  
+  strcpy(syncfile,"/tmp/rastroXXXXXX");
   if (mkstemp(syncfile) == -1)
   {
     cerr << "could not make sync file " << syncfile << endl;
@@ -58,11 +63,12 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
   for_each(files_to_open.begin(), files_to_open.end(),
       [&](string & item)
       {
-        if (! file_to_data.count(item)) {
-          rst_file_t &data = file_to_data[item];
+        if (! opened_files.count(item)) {
           fname = strdup(item.c_str());
           int ret = rst_open_file(fname, &data, syncfile, _RST_BUF_SIZE);
           free(fname);
+
+          opened_files.insert(item);
 
           if (ret == -1) {
             cerr << "Error: trace file " << item << " could not be opened" << endl;
@@ -75,29 +81,42 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
     );
 
 
+  cerr << "Now loops!!" << endl;
   // now loops on the events
-  rst_event_t event;
-  rst_file_t data;
-  set<Paje::event_id_t> ignored_ids;
-  symbols_table_t symbols;
+  //
+  for_each(event_ids->begin(), event_ids->end(),
+      [&](pair<Paje::event_id_t, Paje::Event*> p)
+      {
+        cerr << p.first << " => " << p.second->name << endl;
+      }
+      );
+
+
 
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
+    cerr << "evemt type == " << event.type << " == " << evt_id << endl;
     int nevts = 0;
-    event_id_map_t::iterator it = event_ids->find(evt_id);
 
-    // get every event in list
-    while (it != event_ids->end()) {
+    pair<event_id_map_t::iterator,event_id_map_t::iterator> equal_range;
+    event_id_map_t::iterator it;
+    
+    equal_range = event_ids->equal_range(evt_id);
+
+    for(it = equal_range.first; 
+        it != equal_range.second;
+        ++it) {
       ++nevts;
 
       pair<Paje::event_id_t, Paje::Event*> p = *it;
       
       Paje::Event * evt = p.second;
-      evt->load_symbols(&event,&symbols);
+      evt->load_symbols(evt_id, &event,&symbols);
+      symbols[Paje::idf1_name].set_value(event.id1);
+      symbols[Paje::idf1_name].set_value(event.id1);
       double timestamp = (double) event.timestamp / 1000000 ;
       evt->trigger(evt_id, timestamp, &symbols, out);
 
-      ++it;
 
     }
 
@@ -110,12 +129,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
 
   // close files
-  for_each(file_to_data.begin(), file_to_data.end(),
-      [&](pair<string, rst_file_t> p)
-      {
-        rst_close_file( & (p.second) );
-      }
-    );
+  rst_close_file( &data );
 
   return;
 }

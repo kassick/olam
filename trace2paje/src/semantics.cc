@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 23 Set 2011 19:19:03 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 17:11:40 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -367,6 +367,31 @@ void map_accept_attrs(attribs_t * attribs)
   });
 }
 
+void map_pre_triggers(Paje::Event * evt)
+{
+  // create events for create containers
+  return;
+}
+
+void add_event_do_id_map(Paje::Event * evt)
+{
+  map_pre_triggers(evt);
+  
+  // adds the end_id
+  if (evt->end_id)
+    event_ids->insert (pair<event_id_t,Paje::Event*>(evt->end_id, evt));
+
+
+  if (evt->trigger_id)
+    event_ids->insert (pair<event_id_t,Paje::Event*>(evt->trigger_id, evt));
+  
+  //adds the start id
+  if (evt->start_id)
+    event_ids->insert (pair<event_id_t,Paje::Event*>(evt->start_id, evt));
+  
+  // map_pos_triggers(evt); // do we have any trigger for post-event?
+}
+
 void check_events_have_type()
 {
   for_each(event_names->begin(), event_names->end(), [&](pair<string, Paje::Event *> p) {
@@ -376,16 +401,7 @@ void check_events_have_type()
         // this event won't be mapped to event ids
       } else {
         // adds the trigger id
-        if (p.second->trigger_id)
-          event_ids->insert (pair<event_id_t,Paje::Event*>(p.second->trigger_id, p.second));
-        
-        //adds the start id
-        if (p.second->start_id)
-          event_ids->insert (pair<event_id_t,Paje::Event*>(p.second->start_id, p.second));
-        
-        // adds the end_id
-        if (p.second->end_id)
-          event_ids->insert (pair<event_id_t,Paje::Event*>(p.second->end_id, p.second));
+        add_event_do_id_map(p.second);
       }
     });
 }

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 27 Set 2011 17:09:45 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 17:09:44 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -276,10 +276,13 @@ void Paje::Event::fill_from_attr(attribs_t * attrs)
 
 
 ////
-bool Paje::Event::load_symbols(rst_event_t *event, symbols_table_t * symbols)
+bool Paje::Event::load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols)
 {
   int count_c, count_w, count_i, count_l, count_f, count_d, count_s;
   Paje::Symbol *symbol;
+
+  if (id == end_id)
+    return true; // we don't have to load symbols for the end trigger
 
       count_c= count_w= count_i= count_l= count_f= count_d= count_s = 0 ;
 

@@ -5,9 +5,8 @@ include_directories ("${RASTRO_INCLUDES}" )
 
 
 
-add_library(rastro SHARED IMPORTED)
+#add_library(Rastro SHARED IMPORTED)
 
-set_property(TARGET rastro PROPERTY IMPORTED_LOCATION "${RASTRO_LIBRARY}")
 
 
 
@@ -26,15 +25,17 @@ container.cc
 semantics.cc
 paje.cc
 symbols.cc
+rastro_loop.cc
 tree/tree.hpp # my tree implementation
 ${BISON_DescriptionFileParser_OUTPUTS}
 ${FLEX_DescriptionFileScanner_OUTPUTS}
 )
 set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
+#set_property(TARGET rastro2paje PROPERTY IMPORTED_LOCATION "${RASTRO_PREFIX}/lib")
 set_property(SOURCE 
-  container.cc semantics.cc paje.cc rastri2paje.cc symbols.cc
+  container.cc semantics.cc paje.cc rastro2paje.cc symbols.cc
   PROPERTY COMPILE_FLAGS "-std=c++0x")
-target_link_libraries(rastro2paje fl rastro boost_regex boost_filesystem)
+target_link_libraries(rastro2paje fl boost_regex boost_filesystem ${RASTRO_LIBRARIES})
 
 
 

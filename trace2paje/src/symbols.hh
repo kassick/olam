@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.hh"
 // Created: "Qui, 25 Ago 2011 14:38:26 -0300 (kassick)"
-// Updated: "Sex, 16 Set 2011 18:25:47 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 16:27:25 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -43,7 +43,7 @@ using namespace std;
 
 
 #define SYMBOL_FREE_STR_PRE \
-    if (this->holds == c) \
+    if (this->holds == s) \
       free (this->val.s);
 
 #define SYMBOL_NO_PRE
