@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 17:09:44 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 23:16:05 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -31,6 +31,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <stack>
 #include <iostream>
 #include "semantics.hh"
 
@@ -140,6 +141,7 @@ void Paje::LinkType::do_header(ostream &out)
 
 Paje::Event::Event() {
   start_id = end_id = trigger_id = 0;
+  timestamp_stack.push(-1);
   this->eventType = NULL;
 }
 
@@ -196,11 +198,17 @@ bool Paje::Event::trigger(event_id_t evt_id, double timestamp,
   if (evt_id == trigger_id)
     return do_trigger(timestamp,symbols,out);
 
-  if (evt_id == start_id)
+  if (evt_id == start_id) {
+    timestamp_stack.push(timestamp);
     return do_start(timestamp,symbols,out);
+  }
 
   if (evt_id == end_id)
-    return do_end(timestamp,symbols,out);
+  {
+    bool ret = do_end(timestamp,symbols,out);
+    timestamp_stack.pop();
+    return ret;
+  }
 }
 
 
@@ -314,6 +322,11 @@ bool Paje::Event::load_symbols(event_id_t id, rst_event_t *event, symbols_table_
 
   (*symbols)["EVT_NAME"].set_value(this->name.c_str());
 
+}
+
+bool Paje::Event::operator<(const Paje::Event* other) const
+{
+  return (this->timestamp_stack.top() < other->timestamp_stack.top());
 }
 
 string Paje::Event::toString() {

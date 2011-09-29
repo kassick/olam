@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 17:08:58 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 23:15:36 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -34,6 +34,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <stack>
 #include <list>
 #include <iostream>
 #include "rastro_helper.hh"
@@ -102,6 +103,7 @@ namespace Paje {
       event_id_t  start_id, end_id, trigger_id;
 
       identifier_list_t identifier_names;
+      stack<double> timestamp_stack;
 
       Event();
 
@@ -126,6 +128,8 @@ namespace Paje {
       void add_symbol_from_tree(attribs_t * attrs);
 
       virtual string toString();
+
+      bool operator<(const Event * e) const;
 
   };
 

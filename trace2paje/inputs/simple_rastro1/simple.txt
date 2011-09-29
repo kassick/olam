@@ -55,7 +55,7 @@ STATE str_evt {
 
 
 STATE loop_evt {
-  VALUE "loop(%a) %(b) %(str)"
+  VALUE "loop%(a) %(b) %(str)"
   i a
   f b
   s str

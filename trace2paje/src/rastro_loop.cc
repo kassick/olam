@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 17:10:08 -0300 (kassick)"
+// Updated: "Qua, 28 Set 2011 23:51:46 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -93,6 +93,8 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
 
 
+  vector<Paje::Event *> evt_serve_list;
+  vector<Paje::Event *>::reverse_iterator evt_serve_list_it;
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
     cerr << "evemt type == " << event.type << " == " << evt_id << endl;
@@ -103,28 +105,46 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
     
     equal_range = event_ids->equal_range(evt_id);
 
-    for(it = equal_range.first; 
+    for(it = equal_range.first;
         it != equal_range.second;
-        ++it) {
+        ++it) 
+    {
       ++nevts;
 
-      pair<Paje::event_id_t, Paje::Event*> p = *it;
+      evt_serve_list.push_back(it->second);
+      cerr << "Event " << it->second->name << endl;
+    }
+
+
+    sort(evt_serve_list.begin(), evt_serve_list.end(),
+        [](Paje::Event* evt1, Paje::Event* evt2) {
+          return evt1->timestamp_stack.top() < evt2->timestamp_stack.top();
+        });
+
+    for(evt_serve_list_it = evt_serve_list.rbegin();
+        evt_serve_list_it < evt_serve_list.rend();
+        ++evt_serve_list_it)
+    {
+
+      //pair<Paje::event_id_t, Paje::Event*> p = *it;
       
-      Paje::Event * evt = p.second;
+      Paje::Event * evt = *evt_serve_list_it; //p.second;
+      cerr << "11Event " << evt->name << endl;
       evt->load_symbols(evt_id, &event,&symbols);
       symbols[Paje::idf1_name].set_value(event.id1);
-      symbols[Paje::idf1_name].set_value(event.id1);
+      symbols[Paje::idf2_name].set_value(event.id2);
       double timestamp = (double) event.timestamp / 1000000 ;
       evt->trigger(evt_id, timestamp, &symbols, out);
-
-
     }
+    
 
     // warn once that there's no event for this id
     if ( (!nevts) && (!ignored_ids.count(evt_id)) ) {
       cerr << "Ignoring id " << evt_id  << endl;
       ignored_ids.insert(evt_id);
     }
+
+    evt_serve_list.clear();
   }
 
 
