@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 23:16:05 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 16:56:06 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -141,7 +141,7 @@ void Paje::LinkType::do_header(ostream &out)
 
 Paje::Event::Event() {
   start_id = end_id = trigger_id = 0;
-  timestamp_stack.push(-1);
+  timestamp_stack.push(DEFAULT_EVENT_PRIO);
   this->eventType = NULL;
 }
 
@@ -199,14 +199,14 @@ bool Paje::Event::trigger(event_id_t evt_id, double timestamp,
     return do_trigger(timestamp,symbols,out);
 
   if (evt_id == start_id) {
-    timestamp_stack.push(timestamp);
+    this->push_timestamp(timestamp);
     return do_start(timestamp,symbols,out);
   }
 
   if (evt_id == end_id)
   {
     bool ret = do_end(timestamp,symbols,out);
-    timestamp_stack.pop();
+    this->pop_timestamp(timestamp);
     return ret;
   }
 }
@@ -324,9 +324,55 @@ bool Paje::Event::load_symbols(event_id_t id, rst_event_t *event, symbols_table_
 
 }
 
+
+
+/*************************************
+ * Event Priorities:
+ * the priorities define the order in which the triggers will be invoked
+ * The natural priority order is as follows:
+ *   StatePop == EventTrigger > 
+ *    ContainerCreate >
+ *      ContainerDestroy >
+ *         StatePush
+ *
+ * That means that
+ *    * Containers will be created before new states are pushed
+ *    * Containers will be destroyed before new states are pushed (
+ *      that means you can not have a state in a container if it's id
+ *      is the one that triggers container create, but this makes sense
+ *      cause the only state that would be valid here would be one with
+ *      start_time == end_time)
+ *    * States will be popped before new ones are pushed (avoiding
+ *      imbrication conflicts)
+ *    
+ *  One important thing: the priority of StatePop is proportional to the
+ *  last time that state was pushed. That means that imbrication will
+ *  be mantained consistent
+ *  */
+
+void Paje::Event::push_timestamp(const double timestamp)
+{
+  this->timestamp_stack.push(timestamp);
+}
+
+double Paje::Event::pop_timestamp(const double timestamp)
+{
+  // ignore parameter, we do not need in the default case
+  double ret = this->timestamp_stack.top();
+  this->timestamp_stack.pop();
+  return ret;
+}
+
+
+double Paje::Event::get_priority() const
+{
+  return this->timestamp_stack.top();
+}
+
+
 bool Paje::Event::operator<(const Paje::Event* other) const
 {
-  return (this->timestamp_stack.top() < other->timestamp_stack.top());
+  return (this->get_priority() > other->get_priority());
 }
 
 string Paje::Event::toString() {
@@ -466,4 +512,66 @@ void Paje::Link::fill_from_attr(attribs_t * attrs) {
         return false;
       });
 }
+
+
+
+
+
+
+
+//******************************************************************************
+// Class ContainerTrigger
+// called to execute PajeCreateContainer/PajeDestroyContainer when the
+// correct id is seen in the rastro
+
+
+Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c)
+{
+  this->container = c;
+  push_timestamp(CONTAINER_CREATE_PRIO); // can leave the EVENT_DEFAULT_PRIO on the stack, won't hurt
+}
+
+
+bool Paje::ContainerCreateTrigger::do_start(double timestamp,
+    symbols_table_t * symbols, ostream &out)
+{
+  string containerName, parentName;
+  
+  containerName = format_values(container->formatName, symbols);
+  if (this->container->parent)
+    parentName =  format_values(container->parent->formatName, symbols);
+  else
+    parentName = PAJE_ROOT_CONTAINER;
+
+  pajeCreateContainer(timestamp,
+                         containerName,
+                         container->typeName,
+                         parentName,
+                         containerName,
+                         out);
+
+  return true;
+}
+
+
+bool Paje::ContainerCreateTrigger::do_end(double timestamp,
+    symbols_table_t * symbols, ostream &out)
+{
+  string containerName;
+  containerName = format_values(container->formatName, symbols);
+  
+  pajeDestroyContainer(timestamp,
+                          container->typeName,
+                          containerName,
+                          out);
+
+  return true;
+}
+
+
+void Paje::ContainerCreateTrigger::push_timestamp(double timestamp)
+{
+  timestamp_stack.push(CONTAINER_DESTROY_PRIO);
+}
+
 

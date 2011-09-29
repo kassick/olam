@@ -13,8 +13,8 @@ CONTAINER machine {
   }
 
   NAME "Container_%(id1)"
-  CREATE PARENT
-  DESTROY CHILDREN
+  CREATE int8_evt
+  DESTROY PARENT
 
 }
 

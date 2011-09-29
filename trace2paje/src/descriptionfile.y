@@ -237,10 +237,10 @@ destroy_param: TOK_DESTROY IDENTIFIER {
 
                   //cout << "Destroy on event " << $2 <<endl; 
                 }
-            | TOK_DESTROY TOK_CHILDREN {
+            | TOK_DESTROY TOK_PARENT {
                   attr = new_semantic_attribute();
-                  attr->id = ID_DESTROY_CHILDREN;
-                  attr->vals.destroy_children = true;
+                  attr->id = ID_DESTROY_WITH_PARENT;
+                  attr->vals.destroy_with_parent = true;
 
                   n = new attribs_t(attr);
                   $$ = n;

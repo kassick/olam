@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Sex, 23 Set 2011 18:04:49 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 18:04:40 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -36,7 +36,7 @@ enum _attrib_ids {
   ID_CREATE_EVENT,
   ID_CREATE_PARENT,
   ID_DESTROY_EVENT,
-  ID_DESTROY_CHILDREN,
+  ID_DESTROY_WITH_PARENT,
   ID_CONTAINER,
   ID_ACCEPT_LIST,
   ID_IGNORE_LIST,
@@ -72,7 +72,7 @@ class SemanticAttribute {
       char *container_type;
       char *identifier_name;
       bool create_parent;
-      bool destroy_children;
+      bool destroy_with_parent;
       unsigned long event_id;
       rastro_basic_types_t rastro_type;
       rastro_basic_val_t rastro_val;

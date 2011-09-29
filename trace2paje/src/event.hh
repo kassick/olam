@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 23:15:36 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 16:55:16 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,10 +37,19 @@
 #include <stack>
 #include <list>
 #include <iostream>
+#include <limits>
 #include "rastro_helper.hh"
 extern "C" {
 #include <rastro.h>
 }
+
+
+
+#define DEFAULT_EVENT_PRIO (-(numeric_limits<double>::infinity()) )
+#define CONTAINER_CREATE_PRIO (-10)
+#define CONTAINER_DESTROY_PRIO (-1)
+
+
 
 namespace Paje {
 
@@ -131,6 +140,10 @@ namespace Paje {
 
       bool operator<(const Event * e) const;
 
+      virtual void push_timestamp(const double timestamp);
+      virtual double pop_timestamp(const double timestamp);
+      virtual double get_priority() const;
+
   };
 
 
@@ -148,6 +161,8 @@ namespace Paje {
       virtual void fill_from_attr(attribs_t * attrs);
   } ;
 
+
+
   class Link: public Event {
     public:
       string format_key;
@@ -164,6 +179,26 @@ namespace Paje {
       
       virtual void fill_from_attr(attribs_t * attrs);
       virtual string toString() ;
+  };
+
+
+
+  class ContainerCreateTrigger: public Event {
+    public:
+      ContainerCreateTrigger(Paje::Container * c);
+
+      virtual bool do_start(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+
+      virtual bool do_end(double timestamp,
+          symbols_table_t * symbols, ostream &out);
+      
+
+      virtual void push_timestamp(double timestamp);
+
+    protected:
+      Container * container;
+
   };
 
 

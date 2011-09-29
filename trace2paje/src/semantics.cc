@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 17:11:40 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 18:08:50 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -65,11 +65,11 @@ const string SemanticAttribute::toString() const {
       else
         s << "Do not create on parent -- huh!?";
       break;
-    case ID_DESTROY_CHILDREN:
-      if (vals.destroy_children)
-        s << "Destroy on Children";
+    case ID_DESTROY_WITH_PARENT:
+      if (vals.destroy_with_parent)
+        s << "Destroy with parent";
       else
-        s << "Do not destroy on children -- huh!?";
+        s << "Do not destroy with parent -- huh!?";
       break;
     case ID_DESTROY_EVENT:
       s << "Destroy on Event " << vals.destroy_event;
@@ -367,6 +367,66 @@ void map_accept_attrs(attribs_t * attribs)
   });
 }
 
+
+
+void create_container_create_events()
+{
+
+  walk_tree_head_first(toplevel_hierarchy, [&](hierarchy_t * n, int level)
+      {
+        Paje::ContainerCreateTrigger * ct = NULL;
+        Paje::Container * c = n->getVal();
+        
+        
+        // are we created on a given event?
+        if (! (c->triggerParent) ) {
+
+          // Make sure the event exists
+          if (! event_names->count(c->createEvent) )
+          {
+            cerr << "[Error] Container " << c->typeName << " creates on unexistent event " << c->createEvent << endl;
+            exit(1);
+          }
+
+          // Create the ContainerCreate event; map it's start id to the
+          // start or trigger id if the event
+          ct = new Paje::ContainerCreateTrigger(c);
+          Paje::Event * evt   = (*event_names)[c->createEvent];
+          Paje::event_id_t id = (evt->start_id? evt->start_id : evt->trigger_id);
+          ct->set_trigger_id(EVENT_START,id);
+
+          event_ids->insert(pair<Paje::event_id_t, Paje::Event *>(id,ct));
+        }
+
+        // are we destroyed on a given event?
+        if (! c->destroyWithParent) {
+
+          // make sure the event exists
+          if (! event_names->count(c->destroyEvent) )
+          {
+            cerr << "[Error] Container " << c->typeName << " destroys on unexistent event " << c->destroyEvent << endl;
+            exit(1);
+          }
+          
+          // the event may have already been created
+          if (!ct)
+            ct = new Paje::ContainerCreateTrigger(c);
+
+          Paje::Event * evt = (*event_names)[c->destroyEvent];
+          Paje::event_id_t id = (evt->end_id? evt->end_id : evt->trigger_id);
+          ct->set_trigger_id(EVENT_END, id);
+          
+          event_ids->insert(pair<Paje::event_id_t, Paje::Event *>(id,ct));
+
+        }
+
+        return false; // walk all tree
+      }
+
+    );
+}
+
+
 void map_pre_triggers(Paje::Event * evt)
 {
   // create events for create containers
@@ -394,6 +454,7 @@ void add_event_do_id_map(Paje::Event * evt)
 
 void check_events_have_type()
 {
+  create_container_create_events();
   for_each(event_names->begin(), event_names->end(), [&](pair<string, Paje::Event *> p) {
       if (p.second->eventType == NULL)
       {

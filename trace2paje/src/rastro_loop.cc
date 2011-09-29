@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 23:51:46 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 17:33:23 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -94,7 +94,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
 
   vector<Paje::Event *> evt_serve_list;
-  vector<Paje::Event *>::reverse_iterator evt_serve_list_it;
+  vector<Paje::Event *>::iterator evt_serve_list_it;
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
     cerr << "evemt type == " << event.type << " == " << evt_id << endl;
@@ -116,13 +116,10 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
     }
 
 
-    sort(evt_serve_list.begin(), evt_serve_list.end(),
-        [](Paje::Event* evt1, Paje::Event* evt2) {
-          return evt1->timestamp_stack.top() < evt2->timestamp_stack.top();
-        });
+    sort(evt_serve_list.begin(), evt_serve_list.end());
 
-    for(evt_serve_list_it = evt_serve_list.rbegin();
-        evt_serve_list_it < evt_serve_list.rend();
+    for(evt_serve_list_it = evt_serve_list.begin();
+        evt_serve_list_it < evt_serve_list.end();
         ++evt_serve_list_it)
     {
 

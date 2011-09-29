@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje.hh"
 // Created: "Seg, 01 Ago 2011 15:34:40 -0300 (kassick)"
-// Updated: "Qua, 21 Set 2011 16:22:38 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 16:42:12 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -39,6 +39,8 @@ namespace Paje {
       virtual void toPaje(stringstream &definitions, stringstream &header, stringstream &finalization);
   };
 }
+
+#define PAJE_ROOT_CONTAINER  "0"
 
 void init_paje_events();
 void paje_header(ostream &out);
