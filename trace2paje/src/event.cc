@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 16:56:06 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 17:14:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,13 +33,15 @@
 #include <map>
 #include <stack>
 #include <iostream>
-#include "semantics.hh"
+#include "semantic_types.hh"
 
 extern "C" {
 #include <rastro.h>
 }
 
 using namespace std;
+  
+set<pair<string,string>> Paje::container_unique_names;
 
 
 /*******************************************************************************
@@ -525,9 +527,10 @@ void Paje::Link::fill_from_attr(attribs_t * attrs) {
 // correct id is seen in the rastro
 
 
-Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c)
+Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c,hierarchy_t * n)
 {
   this->container = c;
+  this->hierarchy = n;
   push_timestamp(CONTAINER_CREATE_PRIO); // can leave the EVENT_DEFAULT_PRIO on the stack, won't hurt
 }
 
@@ -537,18 +540,43 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
 {
   string containerName, parentName;
   
-  containerName = format_values(container->formatName, symbols);
   if (this->container->parent)
-    parentName =  format_values(container->parent->formatName, symbols);
+    containerName =  format_values(container->parent->formatName, symbols);
   else
-    parentName = PAJE_ROOT_CONTAINER;
+    containerName = PAJE_ROOT_CONTAINER;
 
-  pajeCreateContainer(timestamp,
-                         containerName,
-                         container->typeName,
-                         parentName,
-                         containerName,
-                         out);
+
+  walk_tree_head_first(hierarchy,[&](hierarchy_t * n, int level)
+      {
+        Paje::Container * c = n->getVal();
+        parentName = containerName;
+
+        if (c->triggerParent || (c == this->container) ) {
+          // do this for the current container and all it's create on parent children
+          containerName = format_values(c->formatName, symbols);
+
+          // do we already have a container with this name, of this type?
+          pair<string,string> p(containerName,c->typeName);
+          if (Paje::container_unique_names.count(p))
+          {
+              return true; // ignore
+              // can happen, if a container is triggered by event1, and
+              // event1 happens several times
+          }
+
+          Paje::container_unique_names.insert(p);
+
+          pajeCreateContainer(timestamp,
+                                 containerName,
+                                 c->typeName,
+                                 parentName,
+                                 containerName,
+                                 out);
+          return false;
+        }
+        return true; // does not create on parent, this one and it's children shall not be created here, there will be an event for it
+
+      });
 
   return true;
 }

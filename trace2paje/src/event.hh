@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 16:55:16 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 17:13:49 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -34,6 +34,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <set>
 #include <stack>
 #include <list>
 #include <iostream>
@@ -69,6 +70,9 @@ namespace Paje {
   } identifier_entry_t;
 
   typedef list<identifier_entry_t> identifier_list_t;
+
+
+  extern set<pair<string,string>> container_unique_names;
 
   //************************************************
   //Class: Paje::EventType
@@ -185,7 +189,7 @@ namespace Paje {
 
   class ContainerCreateTrigger: public Event {
     public:
-      ContainerCreateTrigger(Paje::Container * c);
+      ContainerCreateTrigger(Paje::Container * c, hierarchy_t * n);
 
       virtual bool do_start(double timestamp,
           symbols_table_t * symbols, ostream &out);
@@ -198,6 +202,7 @@ namespace Paje {
 
     protected:
       Container * container;
+      hierarchy_t * hierarchy;
 
   };
 
