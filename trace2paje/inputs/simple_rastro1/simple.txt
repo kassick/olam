@@ -14,7 +14,7 @@ CONTAINER machine {
 
   NAME "Container_%(id1)"
   CREATE int8_evt
-  DESTROY PARENT
+  DESTROY finalize_evt
 
 }
 
@@ -63,7 +63,6 @@ STATE loop_evt {
 
 
 
-
 ID int8_evt 10 11
 ID int16_evt 11 12
 ID int32_evt 12 13
@@ -72,3 +71,4 @@ ID float_evt 14 15
 ID double_evt 15 16
 ID str_evt 16 17
 ID loop_evt 1 2
+ID finalize_evt 3

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 17:35:25 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 18:36:40 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -54,11 +54,12 @@ void Paje::EventType::do_header(ostream &out)
 }
 
 
-Paje::EventType::EventType(string & typeName) {
+Paje::EventType::EventType(const string & typeName) {
   this->typeName = typeName;
+  this->container = NULL;
 }
 
-Paje::EventType::EventType(string & typeName,Paje::Container * c) {
+Paje::EventType::EventType(const string & typeName,Paje::Container * c) {
   this->typeName = typeName;
   this->container = c;
 
@@ -395,6 +396,42 @@ string Paje::Event::toString() {
     out << "      " << (*it).type << " " << (*it).field_name << endl;
 
   return out.str();
+}
+
+
+/*******************************************************************************
+ * Paje Dummy Event
+ * This one is created for referenced events with id but that have no EVENT
+ * or STATE defined. They act as nicknames for some IDs to help sometimes
+ * -- like having a INIT and a FINALIZE id that does nothing but to mark
+ *  where the rastro begins or ends for some given container
+ ******************************************************************************/
+
+
+Paje::DummyEvent::DummyEvent(Paje::EventType * evt_type)
+{
+  Event();
+  this->eventType = evt_type;
+}
+
+bool Paje::DummyEvent::do_start(double timestamp,
+    symbols_table_t * symbols, ostream &out)
+{
+  return true;
+}
+
+
+bool Paje::DummyEvent::do_end(double timestamp,
+    symbols_table_t * symbols, ostream &out)
+{
+  return true;
+}
+
+
+bool Paje::DummyEvent::do_trigger(double timestamp,
+    symbols_table_t * symbols, ostream &out)
+{
+  return true;
 }
 
 

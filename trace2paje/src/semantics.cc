@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 16:09:04 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 18:37:57 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -384,6 +384,7 @@ void create_container_create_events()
           // Make sure the event exists
           if (! event_names->count(c->createEvent) )
           {
+            // Used an event without
             cerr << "[Error] Container " << c->typeName << " creates on unexistent event " << c->createEvent << endl;
             exit(1);
           }
@@ -452,7 +453,11 @@ void add_event_do_id_map(Paje::Event * evt)
   // map_pos_triggers(evt); // do we have any trigger for post-event?
 }
 
-void check_events_have_type()
+
+
+// maps all events to their respective IDs and check if all have an event
+// type
+void events_to_id_map()
 {
   create_container_create_events();
   for_each(event_names->begin(), event_names->end(), [&](pair<string, Paje::Event *> p) {
@@ -586,7 +591,8 @@ void event_types_to_paje(ostream &out)
   // For earch event type named, dump the 
   for_each(eventtype_names->begin(), eventtype_names->end(), 
       [&](pair<string,Paje::EventType *> p) {
-        p.second->do_header(out);
+        if (p.first != DUMMY_EVENT_TYPE_KEY)
+          p.second->do_header(out);
       });
 }
 
@@ -595,8 +601,10 @@ void event_types_to_paje(ostream &out)
 //Get an event name or wanr that it does not exist
 Paje::Event * get_event_or_warn(char * evt_name) {
   if (! event_names->count(evt_name) ) {
-    cerr << "Warning: Event " << evt_name << "has id but no definition, ignoring" << endl;
-    return NULL;
+    cerr << "[Warning] Event " << evt_name << "has id but no definition, "
+      << "treating as Dummy" << endl;
+    (*event_names)[evt_name] = 
+          new DummyEvent((*eventtype_names)[DUMMY_EVENT_TYPE_KEY]);
   }
 
   Paje::Event * evt = (*event_names)[evt_name];
@@ -610,6 +618,11 @@ Paje::Event * get_event_or_warn(char * evt_name) {
 
 void parse_late_tree()
 {
+  // create an event type for the dummy event
+  // this key is invalid in the grammar, so should not be a problem
+  (*eventtype_names)[DUMMY_EVENT_TYPE_KEY] = 
+                  new Paje::EventType(DUMMY_EVENT_TYPE_NAME);
+  
   Paje::event_id_t evt_id = 0;
 
   //ids are on the leaves; their parents are always the event/state name

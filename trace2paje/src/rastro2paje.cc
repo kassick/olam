@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qua, 28 Set 2011 17:38:39 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 18:31:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -220,7 +220,7 @@ int main(int argc, char** argv)
   }
 
 
-//#if 0
+#if 0
   
   print_tree(early_parse_tree);
   cerr << endl;
@@ -235,45 +235,58 @@ int main(int argc, char** argv)
       return false;
     });
     */
-//#endif
+#endif
  
   // Converts the early tree to the internal structures
   attr_to_container_hierarchy(early_parse_tree,toplevel_hierarchy);
+
+  // create the types
+  attr_to_event_types(early_parse_tree);
+  attr_to_link_types(early_parse_tree);
+
+
+
+#if 0
   for_each(container_type_names->begin(), container_type_names->end(),[&](pair<string,hierarchy_t * > p) {
       cerr << "container " << p.first << " defined" << endl;
     });
-  attr_to_event_types(early_parse_tree);
-  attr_to_link_types(early_parse_tree);
+#endif
+
+
+#if 0
   for_each(eventtype_names->begin(), eventtype_names->end(),[&](pair<string,Paje::EventType * > p) {
       cerr << "event " << p.first << " defined" << endl;
     });
+#endif
 
 #if 0
   cerr << "Container hierarchy at the end:" <<endl;
   print_tree(toplevel_hierarchy);
 #endif
 
-  // Checks if container and event types have a unique name
-  // Also puts all names into the maps
-  //check_unique_types();
 
-  //cerr << "(idf1,idf2) = (" << Paje::idf1_name << "," << Paje::idf2_name << ")" << endl;
-
+  // Create the events, links and dummy references
 
   attr_to_states(early_parse_tree);
   attr_to_links(early_parse_tree);
 
 
+  // parse the VALUE, EVENTTYPE and ID tokens that happen AFTER all the
+  // definitions
   parse_late_tree();
 
+  // Map types -> events/states/links
   map_accept_attrs(early_parse_tree);
 
-  check_events_have_type();
+  // add all events with ids to the ids map
+  events_to_id_map();
 
 
+#if 0
   for_each(event_names->begin(), event_names->end(), [&](pair<string,Paje::Event *> p) {
       cerr << p.second->toString() << endl;
       });
+#endif
 
 
   // Here begins the parsing of events and the output

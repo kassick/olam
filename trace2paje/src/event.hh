@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 17:35:34 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 18:36:22 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -81,8 +81,8 @@ namespace Paje {
       string typeName;
       Container * container;
 
-      EventType(string &typeName);
-      EventType(string &typeName,Paje::Container * c);
+      EventType(const string &typeName);
+      EventType(const string &typeName,Paje::Container * c);
       //EventType(string &typeName, attribs_t * attribs);
 
       virtual void do_header(ostream &out);
@@ -149,6 +149,21 @@ namespace Paje {
       virtual double get_priority() const;
 
   };
+
+
+  class DummyEvent: public Event {
+      public: 
+        DummyEvent(EventType * evt_type);
+        virtual bool do_start(double timestamp,
+            symbols_table_t * symbols, ostream &out);
+
+        virtual bool do_end(double timestamp,
+            symbols_table_t * symbols, ostream &out);
+
+        virtual bool do_trigger(double timestamp,
+            symbols_table_t * symbols, ostream &out);
+  };
+
 
 
   class State: public Event {

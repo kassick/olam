@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 16:16:52 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 18:31:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -44,7 +44,8 @@ using namespace std;
 
 
 
-
+#define DUMMY_EVENT_TYPE_KEY "#"
+#define DUMMY_EVENT_TYPE_NAME "___DUMMY___"
 
 
 SemanticAttribute * new_semantic_attribute();
@@ -61,7 +62,7 @@ void parse_late_tree();
 void hierarchy_to_paje(ostream &out);
 void event_types_to_paje(ostream &out);
 void map_accept_attrs(attribs_t * attribs);
-void check_events_have_type();
+void events_to_id_map();
 
 
 template <typename CharT, typename Traits>
