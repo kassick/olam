@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 18:31:56 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:07:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -220,7 +220,6 @@ int main(int argc, char** argv)
   }
 
 
-#if 0
   
   print_tree(early_parse_tree);
   cerr << endl;
@@ -235,7 +234,6 @@ int main(int argc, char** argv)
       return false;
     });
     */
-#endif
  
   // Converts the early tree to the internal structures
   attr_to_container_hierarchy(early_parse_tree,toplevel_hierarchy);
@@ -259,10 +257,8 @@ int main(int argc, char** argv)
     });
 #endif
 
-#if 0
   cerr << "Container hierarchy at the end:" <<endl;
   print_tree(toplevel_hierarchy);
-#endif
 
 
   // Create the events, links and dummy references

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 18:12:51 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:01:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -47,7 +47,17 @@ namespace Paje {
   const string Container::toString() const{
     stringstream s;
 
-    s << "Container " << typeName ;
+    s << "Container " << typeName << endl;
+    s << "   " << "formatName: " << formatName<< endl;
+    if (triggerParent)
+      s << "   " << "Create on Parent"<< endl;
+    else
+      s << "   " << "createEvent: " << createEvent<< endl;
+
+    if (destroyWithParent)
+      s << "   " << "Destroy with Parent"<< endl;
+    else
+      s << "   " << "destroyEvent: " << destroyEvent<< endl;
     /*<< " accepting ";
     if (accept_all)
       s << "ALL EVENTS";
@@ -91,8 +101,11 @@ namespace Paje {
     //returns false -- hence here, stopping at the first non-toplevel
     //container makes sure it just reads the attributes of the current
     //container
-    walk_tree(t, [&](SemanticAttribute* attr, int level)
+    walk_tree_head_first(t, [&](attribs_t * n, int level)
         {
+          SemanticAttribute* attr = n->getVal();
+          cerr << "Creating container " << _typeName << " " << level << endl;
+          cerr << *attr << endl;
           if ((attr-> id == ID_CONTAINER) && (level > 0))
             return true; // we're done
           this->fill_fields_from_cb(attr);

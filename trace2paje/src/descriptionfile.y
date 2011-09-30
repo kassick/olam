@@ -34,6 +34,19 @@ SemanticAttribute * attr;
 attribs_t *n;
 
 
+attribs_t * create_nop_attr(attribs_t * n)
+{
+  SemanticAttribute * attr = new_semantic_attribute();
+  attr->id = ID_NOP;
+
+  attribs_t * t = new attribs_t(attr);
+  if (n)
+    t->addChild(n);
+
+  return t;
+}
+
+
 
 %}
 
@@ -178,6 +191,10 @@ container_definition:
 
 container_params:
                   container_params container_param {
+                    /*$$ = create_nop_attr(NULL);
+                    $$->addChild($1);
+                    $$->addChild($2);*/
+                    //$1->addChild(create_nop_attr($2));
                     $1->addChild($2);
                   }
                 | container_param { $$ = $1}
@@ -189,7 +206,9 @@ container_param: name_param
                 | accept_param
                 | eventtype_param
                 | linktype_param
-                | container_definition
+                | container_definition {
+                  $$ = create_nop_attr($1);
+                  }
                 ;
 
 name_param: TOK_NAME STRING_LIT {

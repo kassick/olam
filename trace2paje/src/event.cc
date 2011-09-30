@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 18:36:40 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 18:48:28 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -588,6 +588,8 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
         Paje::Container * c = n->getVal();
         parentName = containerName;
 
+        cerr << "Creating " << c->typeName << endl;
+
         if (c->triggerParent || (c == this->container) ) {
           // do this for the current container and all it's create on parent children
           containerName = format_values(c->formatName, symbols);
@@ -623,12 +625,19 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
     symbols_table_t * symbols, ostream &out)
 {
   string containerName;
-  containerName = format_values(container->formatName, symbols);
   
-  pajeDestroyContainer(timestamp,
-                          container->typeName,
-                          containerName,
-                          out);
+  // needs to destroy all children
+  walk_tree_depth_first(this->hierarchy,[&](hierarchy_t * n, int level) 
+      {
+        Paje::Container * c = n->getVal();
+        containerName = format_values(c->formatName, symbols);
+        pajeDestroyContainer(timestamp,
+                              c->typeName,
+                              containerName,
+                              out);
+        return false;
+      }
+    );
 
   return true;
 }
