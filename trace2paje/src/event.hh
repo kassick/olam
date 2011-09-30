@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 16:55:16 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 18:24:53 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,7 +45,7 @@ extern "C" {
 
 
 
-#define DEFAULT_EVENT_PRIO (-(numeric_limits<double>::infinity()) )
+#define DEFAULT_EVENT_PRIO (-(numeric_limits<double>::max()) )
 #define CONTAINER_CREATE_PRIO (-10)
 #define CONTAINER_DESTROY_PRIO (-1)
 
