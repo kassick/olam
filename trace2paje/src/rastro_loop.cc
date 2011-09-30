@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 18:23:56 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:24:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -81,15 +81,18 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
     );
 
 
-  cerr << "Now loops!!" << endl;
   // now loops on the events
   //
+
+
+#if 0
   for_each(event_ids->begin(), event_ids->end(),
       [&](pair<Paje::event_id_t, Paje::Event*> p)
       {
         cerr << p.first << " => " << p.second->name << endl;
       }
       );
+#endif
 
 
 
@@ -97,7 +100,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
   vector<Paje::Event *>::iterator evt_serve_list_it;
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
-    cerr << "evemt type == " << event.type << " == " << evt_id << endl;
+    //cerr << "evemt type == " << event.type << " == " << evt_id << endl;
     int nevts = 0;
 
     pair<event_id_map_t::iterator,event_id_map_t::iterator> equal_range;
@@ -112,7 +115,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
       ++nevts;
 
       evt_serve_list.push_back(it->second);
-      cerr << "Event " << it->second->name << endl;
+      //cerr << "Event " << it->second->name << endl;
     }
 
 
@@ -130,7 +133,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
       //pair<Paje::event_id_t, Paje::Event*> p = *it;
       
       Paje::Event * evt = *evt_serve_list_it; //p.second;
-      cerr << "11Event " << evt->name << " prio " << evt->get_priority() << endl;
+      //cerr << "11Event " << evt->name << " prio " << evt->get_priority() << endl;
       evt->load_symbols(evt_id, &event,&symbols);
       symbols[Paje::idf1_name].set_value(event.id1);
       symbols[Paje::idf2_name].set_value(event.id2);

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:01:58 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:22:30 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -104,8 +104,8 @@ namespace Paje {
     walk_tree_head_first(t, [&](attribs_t * n, int level)
         {
           SemanticAttribute* attr = n->getVal();
-          cerr << "Creating container " << _typeName << " " << level << endl;
-          cerr << *attr << endl;
+          //cerr << "Creating container " << _typeName << " " << level << endl;
+          //cerr << *attr << endl;
           if ((attr-> id == ID_CONTAINER) && (level > 0))
             return true; // we're done
           this->fill_fields_from_cb(attr);
