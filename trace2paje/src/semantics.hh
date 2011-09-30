@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Sex, 23 Set 2011 19:21:35 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 16:16:52 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -36,6 +36,7 @@
 #include "container.hh"
 #include "attributes.hh"
 #include "event.hh"
+#include "semantic_types.hh"
 
 
 using namespace Paje;
@@ -43,26 +44,8 @@ using namespace std;
 
 
 
-typedef TreeNode<Paje::Container*> hierarchy_t;
-
-typedef map<string,hierarchy_t *> container_type_names_t;
-
-typedef std::map<std::string      , Paje::Event * >      event_name_map_t;
-typedef std::multimap<Paje::event_id_t , Paje::Event * > event_id_map_t;
-typedef std::map<std::string      , Paje::EventType * >  event_type_name_map_t;
-
-extern attribs_t * attributes;
-
-extern hierarchy_t * toplevel_hierarchy;
-extern container_type_names_t * container_type_names;
-
-extern event_type_name_map_t * eventtype_names;
-extern event_name_map_t      * event_names;
-extern event_id_map_t        * event_ids;
-extern queue<string>         files_to_parse;
 
 
-extern attribs_t * late_parse_tree, *early_parse_tree;
 
 SemanticAttribute * new_semantic_attribute();
 

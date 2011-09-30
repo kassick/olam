@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.hh"
 // Created: "Qua, 27 Jul 2011 11:08:49 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 17:55:01 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 16:17:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -81,6 +81,9 @@ namespace Paje {
 
 
 }
+
+
+typedef TreeNode<Paje::Container*> hierarchy_t;
 
 
 template <typename CharT, typename Traits>

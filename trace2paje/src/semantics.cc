@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 18:08:50 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 16:09:04 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -390,7 +390,7 @@ void create_container_create_events()
 
           // Create the ContainerCreate event; map it's start id to the
           // start or trigger id if the event
-          ct = new Paje::ContainerCreateTrigger(c);
+          ct = new Paje::ContainerCreateTrigger(c,n);
           Paje::Event * evt   = (*event_names)[c->createEvent];
           Paje::event_id_t id = (evt->start_id? evt->start_id : evt->trigger_id);
           ct->set_trigger_id(EVENT_START,id);
@@ -410,7 +410,7 @@ void create_container_create_events()
           
           // the event may have already been created
           if (!ct)
-            ct = new Paje::ContainerCreateTrigger(c);
+            ct = new Paje::ContainerCreateTrigger(c,n);
 
           Paje::Event * evt = (*event_names)[c->destroyEvent];
           Paje::event_id_t id = (evt->end_id? evt->end_id : evt->trigger_id);

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 17:33:23 -0300 (kassick)"
+// Updated: "Qui, 29 Set 2011 18:23:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -116,7 +116,11 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
     }
 
 
-    sort(evt_serve_list.begin(), evt_serve_list.end());
+    sort(evt_serve_list.begin(), evt_serve_list.end(),
+        [](Paje::Event * evt1, Paje::Event * evt2) {
+          return (evt1->get_priority() > evt2->get_priority());
+          }
+        );
 
     for(evt_serve_list_it = evt_serve_list.begin();
         evt_serve_list_it < evt_serve_list.end();
@@ -126,7 +130,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
       //pair<Paje::event_id_t, Paje::Event*> p = *it;
       
       Paje::Event * evt = *evt_serve_list_it; //p.second;
-      cerr << "11Event " << evt->name << endl;
+      cerr << "11Event " << evt->name << " prio " << evt->get_priority() << endl;
       evt->load_symbols(evt_id, &event,&symbols);
       symbols[Paje::idf1_name].set_value(event.id1);
       symbols[Paje::idf2_name].set_value(event.id2);
