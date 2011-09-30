@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:22:15 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:30:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -147,7 +147,6 @@ int main(int argc, char** argv)
 
   while (oind < argc) {
     rst_files_to_open.push_back(string(argv[oind]));
-    cerr << "opening rastro " << argv[oind] <<endl;
     oind ++;
   }
 
@@ -169,10 +168,6 @@ int main(int argc, char** argv)
     yyin = fin;
     */
   }
-  
-  
-  
-  cerr << "Hello World!" << endl;
 
   init_desc_parser();
   // Here we parse every description file we have in the INCLUDE directives
@@ -293,8 +288,12 @@ int main(int argc, char** argv)
   if (global_opts.fout_name == "stdout") {
     fout = &cout;
   } else {
-    //@todo open here the file name in the arguments
-    fout = new ofstream("out.test");
+    fout = new ofstream(global_opts.fout_name);
+    if (fout->fail())
+    {
+      cerr << "[Error] Can not open file " << global_opts.fout_name << endl;
+      exit(1);
+    }
   }
 
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 18:37:57 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:27:35 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -228,12 +228,12 @@ void attr_to_event_types(attribs_t * attribs)
     {
       if (eventtype_names->count(attr->vals.name))
       {
-        cerr << "Error: EventType " << attr->vals.name << "has already been defined" << endl;
+        cerr << "Error: EventType " << attr->vals.name << " has already been defined" << endl;
         exit(1);
       }
 
       if (container_type_names->count(container_name) == 0) {
-        cerr << "Error: Event Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        cerr << "Error: Event Type " << attr->vals.name << " can not find it's container type " << container_name << endl;
         exit(1);
       }
 
@@ -261,7 +261,7 @@ void attr_to_link_types(attribs_t * attribs)
     {
       if (eventtype_names->count(attr->vals.name))
       {
-        cerr << "Error: LinkType " << attr->vals.name << "has already been defined" << endl;
+        cerr << "Error: LinkType " << attr->vals.name << " has already been defined" << endl;
         exit(1);
       }
 
@@ -601,7 +601,7 @@ void event_types_to_paje(ostream &out)
 //Get an event name or wanr that it does not exist
 Paje::Event * get_event_or_warn(char * evt_name) {
   if (! event_names->count(evt_name) ) {
-    cerr << "[Warning] Event " << evt_name << "has id but no definition, "
+    cerr << "[Warning] Event " << evt_name << " has id but no definition, "
       << "treating as Dummy" << endl;
     (*event_names)[evt_name] = 
           new DummyEvent((*eventtype_names)[DUMMY_EVENT_TYPE_KEY]);

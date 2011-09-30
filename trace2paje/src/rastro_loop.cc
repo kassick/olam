@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:24:48 -0300 (kassick)"
+// Updated: "Sex, 30 Set 2011 19:26:57 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -64,6 +64,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
       [&](string & item)
       {
         if (! opened_files.count(item)) {
+          cerr << "opening rastro " << item <<endl;
           fname = strdup(item.c_str());
           int ret = rst_open_file(fname, &data, syncfile, _RST_BUF_SIZE);
           free(fname);
