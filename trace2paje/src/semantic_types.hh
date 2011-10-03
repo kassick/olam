@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantic_types.hh"
 // Created: "Sex, 30 Set 2011 16:13:42 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 16:17:58 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 16:33:42 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -57,6 +57,8 @@ extern event_type_name_map_t * eventtype_names;
 extern event_name_map_t      * event_names;
 extern event_id_map_t        * event_ids;
 extern queue<string>         files_to_parse;
+
+extern list<pair<string,Paje::Event*>> * ordered_event_names;
 
 
 extern attribs_t * late_parse_tree, *early_parse_tree;

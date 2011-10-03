@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:27:35 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 16:34:10 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -42,6 +42,7 @@ event_type_name_map_t * eventtype_names;
 event_name_map_t      * event_names;
 event_id_map_t        * event_ids;
 queue<string> files_to_parse;
+list<pair<string,Paje::Event*>> * ordered_event_names;
 
 attribs_t * late_parse_tree, // tree to hold ids, values and types statements that must be parsed AFTER all the rest of the parsing
           * early_parse_tree; // three that holds the hierarchy
@@ -300,6 +301,7 @@ void attr_to_links(attribs_t * attribs)
         } else {
           link = new Paje::Link(name, n);
           (*event_names)[name] = link;
+          ordered_event_names->push_back(pair<string,Paje::Event*>(name,link));
         }
 
         return true; // prune tree
@@ -325,6 +327,7 @@ void attr_to_states(attribs_t * attribs)
         } else {
           state = new Paje::State(name, n);
           (*event_names)[name] = state;
+          ordered_event_names->push_back(pair<string,Paje::Event*>(name,state));
         }
 
         return true; // prune tree
@@ -381,18 +384,19 @@ void create_container_create_events()
         // are we created on a given event?
         if (! (c->triggerParent) ) {
 
+          Paje::Event * evt = get_event_or_warn(c->createEvent);
+          /*
           // Make sure the event exists
           if (! event_names->count(c->createEvent) )
           {
             // Used an event without
             cerr << "[Error] Container " << c->typeName << " creates on unexistent event " << c->createEvent << endl;
             exit(1);
-          }
+          }   */
 
           // Create the ContainerCreate event; map it's start id to the
           // start or trigger id if the event
           ct = new Paje::ContainerCreateTrigger(c,n);
-          Paje::Event * evt   = (*event_names)[c->createEvent];
           Paje::event_id_t id = (evt->start_id? evt->start_id : evt->trigger_id);
           ct->set_trigger_id(EVENT_START,id);
 
@@ -402,18 +406,20 @@ void create_container_create_events()
         // are we destroyed on a given event?
         if (! c->destroyWithParent) {
 
+          Paje::Event * evt = get_event_or_warn(c->destroyEvent);
+          /*
           // make sure the event exists
           if (! event_names->count(c->destroyEvent) )
           {
             cerr << "[Error] Container " << c->typeName << " destroys on unexistent event " << c->destroyEvent << endl;
             exit(1);
           }
+          */
           
           // the event may have already been created
           if (!ct)
             ct = new Paje::ContainerCreateTrigger(c,n);
 
-          Paje::Event * evt = (*event_names)[c->destroyEvent];
           Paje::event_id_t id = (evt->end_id? evt->end_id : evt->trigger_id);
           ct->set_trigger_id(EVENT_END, id);
           
@@ -599,12 +605,14 @@ void event_types_to_paje(ostream &out)
 
 //****************************
 //Get an event name or wanr that it does not exist
-Paje::Event * get_event_or_warn(char * evt_name) {
+Paje::Event * get_event_or_warn(const string & evt_name) {
   if (! event_names->count(evt_name) ) {
-    cerr << "[Warning] Event " << evt_name << " has id but no definition, "
-      << "treating as Dummy" << endl;
-    (*event_names)[evt_name] = 
-          new DummyEvent((*eventtype_names)[DUMMY_EVENT_TYPE_KEY]);
+    cerr << "[Warning] Event " << evt_name 
+          << " has id but no definition, "
+          << "treating as Dummy" << endl;
+    Paje::DummyEvent * evt = new DummyEvent(evt_name,(*eventtype_names)[DUMMY_EVENT_TYPE_KEY]);
+    (*event_names)[evt_name] = evt;
+    (*ordered_event_names).push_back(pair<string,Paje::Event*>(evt_name,evt));
   }
 
   Paje::Event * evt = (*event_names)[evt_name];
@@ -694,6 +702,7 @@ void init_desc_parser()
   eventtype_names = new event_type_name_map_t();
   event_names     = new event_name_map_t();
   event_ids       = new event_id_map_t();
+  ordered_event_names = new list<pair<string,Paje::Event*>>();
 
   SemanticAttribute * attr1 = new SemanticAttribute();
   SemanticAttribute * attr2 = new SemanticAttribute();

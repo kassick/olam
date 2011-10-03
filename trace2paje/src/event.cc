@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:25:44 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 17:38:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,6 +33,7 @@
 #include <map>
 #include <stack>
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 #include "semantic_types.hh"
 
 extern "C" {
@@ -247,6 +248,7 @@ void Paje::Event::add_symbol_from_tree(attribs_t * attrs)
         case ID_IDF:
           entry.field_name = attr->vals.name;
           this->identifier_names.push_back(entry);
+          rst_function_signature_buf << entry.type;
           break;
         default:
           cerr << "Unexpected value in tree: " << attr << endl;
@@ -378,6 +380,77 @@ bool Paje::Event::operator<(const Paje::Event* other) const
   return (this->get_priority() > other->get_priority());
 }
 
+
+bool Paje::Event::has_ids() const {
+  return (this->trigger_id != 0);
+}
+
+void Paje::Event::gen_auto_ids(long int * base_id)
+{
+  this->set_trigger_id(EVENT_TRIGGER,*base_id);
+  (*base_id)++;
+}
+
+void Paje::Event::gen_ids_description(ostream & out)
+{
+  if (this->trigger_id)
+    out << "ID " << this->name << " " << this->trigger_id << endl;
+
+  if (this->start_id)
+    out << "ID " << this->name << " START " << this->start_id << endl;
+  
+  if (this->end_id)
+    out << "ID " << this->name << " END " << this->end_id << endl;
+}
+
+
+void Paje::Event::gen_c_header(ostream & out, 
+    const string & start_suffix,
+    const string & end_suffix,
+    const string & evt_suffix  )
+{
+
+  string caps_name = boost::to_upper_copy(this->name);
+
+  if (this->trigger_id)
+    out << "#define " << caps_name << evt_suffix << 
+            " (" << this->trigger_id << ")" << endl;
+
+  if (this->start_id)
+    out << "#define " << caps_name << start_suffix << 
+            " (" << this->start_id << ")" << endl;
+
+  if (this->end_id)
+    out << "#define " << caps_name << end_suffix << 
+            " (" << this->end_id << ")" << endl;
+}
+
+void Paje::Event::gen_fort_header(ostream & out,
+          const string & start_suffix,
+          const string & end_suffix,
+          const string & evt_suffix)
+{
+  string caps_name = boost::to_upper_copy(this->name);
+  if (this->trigger_id)
+    out << "integer :: " <<  caps_name << evt_suffix << 
+            " = " << this->trigger_id << endl;
+
+  if (this->start_id)
+    out << "integer :: " << caps_name << start_suffix << 
+            " = " << this->start_id << endl;
+
+  if (this->end_id)
+    out << "integer :: " << caps_name << end_suffix << 
+            " = " << this->end_id << endl;
+
+}
+
+void Paje::Event::get_rst_function_signature(set<string> & signatures)
+{
+  signatures.insert(this->rst_function_signature_buf.str());
+}
+
+
 string Paje::Event::toString() {
   stringstream out;
 
@@ -408,9 +481,10 @@ string Paje::Event::toString() {
  ******************************************************************************/
 
 
-Paje::DummyEvent::DummyEvent(Paje::EventType * evt_type)
+Paje::DummyEvent::DummyEvent(const string & name, Paje::EventType * evt_type)
 {
   Event();
+  this->name = name;
   this->eventType = evt_type;
 }
 
@@ -434,6 +508,21 @@ bool Paje::DummyEvent::do_trigger(double timestamp,
   return true;
 }
 
+bool Paje::DummyEvent::has_ids() const {
+  return (( this->trigger_id | this->start_id | this->end_id) != 0);
+}
+
+void Paje::DummyEvent::gen_auto_ids(long int * base_id)
+{
+  this->set_trigger_id(EVENT_TRIGGER,*base_id);
+  (*base_id)++;
+  
+  this->set_trigger_id(EVENT_START,*base_id);
+  (*base_id)++;
+
+  this->set_trigger_id(EVENT_END, *base_id);
+  (*base_id)++;
+}
 
 
 
@@ -488,6 +577,18 @@ void Paje::State::fill_from_attr(attribs_t * attrs)
 }
 
 
+bool Paje::State::has_ids() const {
+  return ((this->start_id != 0) && (this->end_id != 0));
+}
+
+void Paje::State::gen_auto_ids(long int * base_id)
+{
+  this->set_trigger_id(EVENT_START,*base_id);
+  (*base_id)++;
+
+  this->set_trigger_id(EVENT_END, *base_id);
+  (*base_id)++;
+}
 
 /*******************************************************************************
  * Paje::Link class
@@ -553,6 +654,18 @@ void Paje::Link::fill_from_attr(attribs_t * attrs) {
 }
 
 
+bool Paje::Link::has_ids() const {
+  return ((this->start_id != 0) && (this->end_id != 0));
+}
+
+void Paje::Link::gen_auto_ids(long int * base_id)
+{
+  this->set_trigger_id(EVENT_START,*base_id);
+  (*base_id)++;
+
+  this->set_trigger_id(EVENT_END, *base_id);
+  (*base_id)++;
+}
 
 
 

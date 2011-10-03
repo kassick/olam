@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 18:36:22 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 16:23:01 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -148,12 +148,31 @@ namespace Paje {
       virtual double pop_timestamp(const double timestamp);
       virtual double get_priority() const;
 
+      virtual bool has_ids() const;
+
+      virtual void gen_auto_ids(long int * base_id);
+
+      virtual void gen_ids_description(ostream & out);
+
+      void get_rst_function_signature(set<string> & signatures);
+      void gen_fort_header(ostream & out,
+          const string & start_suffix,
+          const string & end_suffix,
+          const string & evt_suffix);
+      void gen_c_header(ostream & out, 
+          const string & start_suffix,
+          const string & end_suffix,
+          const string & evt_suffix);
+
+    private:
+      stringstream rst_function_signature_buf;
+
   };
 
 
   class DummyEvent: public Event {
       public: 
-        DummyEvent(EventType * evt_type);
+        DummyEvent(const string &name, EventType * evt_type);
         virtual bool do_start(double timestamp,
             symbols_table_t * symbols, ostream &out);
 
@@ -162,6 +181,10 @@ namespace Paje {
 
         virtual bool do_trigger(double timestamp,
             symbols_table_t * symbols, ostream &out);
+
+        virtual bool has_ids() const;
+
+        virtual void gen_auto_ids(long int * base_id);
   };
 
 
@@ -178,6 +201,10 @@ namespace Paje {
           symbols_table_t * symbols, ostream &out);
       
       virtual void fill_from_attr(attribs_t * attrs);
+
+      virtual bool has_ids() const;
+
+      virtual void gen_auto_ids(long int * base_id);
   } ;
 
 
@@ -198,6 +225,10 @@ namespace Paje {
       
       virtual void fill_from_attr(attribs_t * attrs);
       virtual string toString() ;
+
+      virtual bool has_ids() const;
+
+      virtual void gen_auto_ids(long int * base_id);
   };
 
 
