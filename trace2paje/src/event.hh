@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Seg, 03 Out 2011 16:23:01 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 18:44:32 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -256,17 +256,6 @@ namespace Paje {
 
 } // Paje namespace
 
-
-#define CASE_TYPE(SHORT_NAME , PAJE_NAME) \
-        case SHORT_NAME:                                                             \
-          if (count_ ## SHORT_NAME < event->ct.n_ ## PAJE_NAME) {              \
-            symbol.set_value( event->v_ ## PAJE_NAME [ count_ ## SHORT_NAME ] );\
-            count_ ## SHORT_NAME ++  ;                                      \
-          } else {                                                          \
-            cerr << "Not enought values of type " << #SHORT_NAME  <<endl;   \
-            return false;                                                   \
-          }                                                                 \
-          break; // trick?
 
 
 

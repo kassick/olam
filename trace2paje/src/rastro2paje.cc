@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Seg, 03 Out 2011 18:14:29 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 18:44:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -283,6 +283,7 @@ void generate_rst_signatures(const string & fname)
 
   for_each(signatures.begin(), signatures.end(),
       [&](string s) {
+      if (s.size())
         h_file << s << endl;
       } );
 

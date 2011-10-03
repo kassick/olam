@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Seg, 03 Out 2011 17:38:58 -0300 (kassick)"
+// Updated: "Seg, 03 Out 2011 18:45:10 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -292,12 +292,32 @@ void Paje::Event::fill_from_attr(attribs_t * attrs)
 bool Paje::Event::load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols)
 {
   int count_c, count_w, count_i, count_l, count_f, count_d, count_s;
+  // this is a trick: state needs no symbols in the end; link needs the
+  // ones needed by key. Solution: do not enforce loading ALL symbols if
+  // it's an end symbol. Consistency is left to the user: all symbols in
+  // the end of a link that are needed to form a key MUST BE in the
+  // symbols table, but we are not gonna enforce it
+  bool needs_all_symbols = true;
+
   Paje::Symbol *symbol;
 
   if (id == end_id)
-    return true; // we don't have to load symbols for the end trigger
+    needs_all_symbols = false;
+    //return true; // we don't have to load symbols for the end trigger
 
       count_c= count_w= count_i= count_l= count_f= count_d= count_s = 0 ;
+
+#define CASE_TYPE(SHORT_NAME , PAJE_NAME) \
+        case SHORT_NAME:                                                             \
+          if (count_ ## SHORT_NAME < event->ct.n_ ## PAJE_NAME) {              \
+            symbol.set_value( event->v_ ## PAJE_NAME [ count_ ## SHORT_NAME ] );\
+            count_ ## SHORT_NAME ++  ;                                      \
+          } else if (needs_all_symbols) {                                   \
+            cerr << "Not enought values of type " << #SHORT_NAME  <<endl;   \
+            return false;                                                   \
+          }                                                                 \
+          break; // trick?
+
 
 
   Paje::identifier_list_t::iterator it;
@@ -324,6 +344,8 @@ bool Paje::Event::load_symbols(event_id_t id, rst_event_t *event, symbols_table_
     }
 
   }
+
+#undef CASE_TYPE
 
   (*symbols)["EVT_NAME"].set_value(this->name.c_str());
 
@@ -617,13 +639,42 @@ string Paje::Link::toString() {
 // Trigger functions
 bool Paje::Link::do_start(double timestamp,
           symbols_table_t * symbols, ostream &out) {
-  cerr << "Error: Class Link has no start action" << endl;
+
+  LinkType * lt = (LinkType * ) this->eventType;
+
+  string thisContainer, sourceContainer, thisValue, key;
+
+  thisContainer = format_values(lt->container->formatName, symbols);
+  sourceContainer = format_values(lt->source->formatName, symbols);
+  key  = format_values(this->format_key, symbols);
+
+  pajeStartLink(timestamp,
+                   thisContainer,
+                   lt->typeName,
+                   sourceContainer,
+                   thisValue,
+                   key,
+                   out);
+
   return false;
 }
 
 bool Paje::Link::do_end(double timestamp,
           symbols_table_t * symbols, ostream &out) {
-  cerr << "Error: Class Link has no end  action" << endl;
+  LinkType * lt = (LinkType * ) this->eventType;
+
+  string thisContainer, destContainer, thisValue, key;
+
+  thisContainer = format_values(lt->container->formatName, symbols);
+  destContainer = format_values(lt->source->formatName, symbols);
+  key  = format_values(this->format_key, symbols);
+  pajeEndLink(timestamp,
+                 thisContainer,
+                 lt->typeName,
+                 destContainer,
+                 thisValue,
+                 key,
+                 out);
   return false;
 }
 
