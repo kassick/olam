@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 13:46:10 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 13:57:10 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -48,57 +48,6 @@ set<pair<string,string>> Paje::container_unique_names;
 
 
 
-/*******************************************************************************
- * Paje Dummy Event
- * This one is created for referenced events with id but that have no EVENT
- * or STATE defined. They act as nicknames for some IDs to help sometimes
- * -- like having a INIT and a FINALIZE id that does nothing but to mark
- *  where the rastro begins or ends for some given container
- ******************************************************************************/
-
-
-Paje::DummyEvent::DummyEvent(const string & name, Paje::BaseEventType * evt_type)
-{
-  BaseEvent();
-  this->name = name;
-  this->eventType = evt_type;
-}
-
-bool Paje::DummyEvent::do_start(double timestamp,
-    symbols_table_t * symbols, ostream &out)
-{
-  return true;
-}
-
-
-bool Paje::DummyEvent::do_end(double timestamp,
-    symbols_table_t * symbols, ostream &out)
-{
-  return true;
-}
-
-
-bool Paje::DummyEvent::do_trigger(double timestamp,
-    symbols_table_t * symbols, ostream &out)
-{
-  return true;
-}
-
-bool Paje::DummyEvent::has_ids() const {
-  return (( this->trigger_id | this->start_id | this->end_id) != 0);
-}
-
-void Paje::DummyEvent::gen_auto_ids(long int * base_id)
-{
-  this->set_trigger_id(EVENT_TRIGGER,*base_id);
-  (*base_id)++;
-  
-  this->set_trigger_id(EVENT_START,*base_id);
-  (*base_id)++;
-
-  this->set_trigger_id(EVENT_END, *base_id);
-  (*base_id)++;
-}
 
 
 
