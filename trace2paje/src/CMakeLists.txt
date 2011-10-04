@@ -28,6 +28,7 @@ add_executable(rastro2paje
   baseevent.cc
   baseeventtype.cc
   linktype.cc
+  link.cc
   dummyevent.cc
   state.cc
   event.cc
@@ -74,6 +75,7 @@ add_executable(scanner_test
   baseevent.cc
   baseeventtype.cc
   linktype.cc
+  link.cc
   dummyevent.cc
   state.cc
   symbols.cc

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 13:57:09 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:06:01 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -52,7 +52,8 @@ extern "C" {
 
 #include "baseevent.hh"
 #include "linktype.hh"
-//#include "link.hh"
+#include "link.hh"
+#include "state.hh"
 #include "dummyevent.hh"
 
 
@@ -66,47 +67,8 @@ namespace Paje {
   extern set<pair<string,string>> container_unique_names;
 
 
-  class State: public BaseEvent {
-    public:
-
-      State(string &_name, attribs_t * attrs) ;
-
-      virtual bool do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-
-      virtual bool do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-      
-      virtual void fill_from_attr(attribs_t * attrs);
-
-      virtual bool has_ids() const;
-
-      virtual void gen_auto_ids(long int * base_id);
-  } ;
 
 
-
-  class Link: public BaseEvent {
-    public:
-      string format_key;
-      Link(string &name, attribs_t * attribs);
-
-      virtual bool do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-
-      virtual bool do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-      
-      virtual bool do_trigger(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-      
-      virtual void fill_from_attr(attribs_t * attrs);
-      virtual string toString() ;
-
-      virtual bool has_ids() const;
-
-      virtual void gen_auto_ids(long int * base_id);
-  };
 
 
 
