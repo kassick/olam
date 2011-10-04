@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:25:48 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 20:42:33 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,29 +26,46 @@
 
 #include "containertrigger.hh"
 #include "paje_functions.hh"
+#include "semantic_types.hh"
 #include <set>
 
-set<pair<string,string>> Paje::container_unique_names;
+set<Paje::unique_container_name_t> Paje::container_unique_names;
 
 
 Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c,hierarchy_t * n)
 {
   this->container = c;
   this->hierarchy = n;
-  push_timestamp(CONTAINER_CREATE_PRIO); // can leave the EVENT_DEFAULT_PRIO on the stack, won't hurt
+}
+
+bool Paje::ContainerCreateTrigger::load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols)
+{
+  Paje::BaseEvent * evt = (*event_names)[this->container->createEvent];
+  
+  evt->load_symbols(id, event, symbols);
 }
 
 
+
+
+
+
 bool Paje::ContainerCreateTrigger::do_start(double timestamp,
-    symbols_table_t * symbols, ostream &out)
+    symbols_table_t * symbols,
+    double * priority,
+    ostream &out)
 {
   string containerName, parentName;
+
+  // forcefully load symbols from it's create event
   
+
   if (this->container->parent)
     containerName =  format_values(container->parent->formatName, symbols);
   else
+  { // Should not happen, 0 is not associated with any event and every container needs to be child of 0 (or someone under it)
     containerName = PAJE_ROOT_CONTAINER;
-
+  }
 
   walk_tree_head_first(hierarchy,[&](hierarchy_t * n, int level)
       {
@@ -62,15 +79,27 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
           containerName = format_values(c->formatName, symbols);
 
           // do we already have a container with this name, of this type?
-          pair<string,string> p(containerName,c->typeName);
+          unique_container_name_t p;
+          p.containerName = containerName;
+          p.typeName      = c->typeName;
+          p.parentName    = parentName;
+
           if (Paje::container_unique_names.count(p))
           {
-              return true; // ignore
+              /*cerr << "already contains "
+                    << p.containerName << ","
+                    << p.parentName << ","
+                    << p.typeName << ")"  << endl; */
+              return false; // ignore
               // can happen, if a container is triggered by event1, and
               // event1 happens several times
           }
 
           Paje::container_unique_names.insert(p);
+            /*cerr << "insert! (" 
+                    << p.containerName << ","
+                    << p.parentName << ","
+                    << p.typeName << ")"  << endl;*/
 
           pajeCreateContainer(timestamp,
                                  containerName,
@@ -84,35 +113,62 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
 
       });
 
+  *priority = CONTAINER_CREATE_PRIO;
+
   return true;
 }
 
 
 bool Paje::ContainerCreateTrigger::do_end(double timestamp,
-    symbols_table_t * symbols, ostream &out)
+    symbols_table_t * symbols,
+    double * priority,
+    ostream &out)
 {
   string containerName;
   
   // needs to destroy all children
   walk_tree_depth_first(this->hierarchy,[&](hierarchy_t * n, int level) 
       {
-        Paje::Container * c = n->getVal();
-        containerName = format_values(c->formatName, symbols);
-        pajeDestroyContainer(timestamp,
-                              c->typeName,
-                              containerName,
-                              out);
+        Paje::Container * thatcontainer = n->getVal();
+        string parentName = format_values(thatcontainer->parent->formatName,symbols);
+
+        /*
+        cerr << "Container type " << thatcontainer->typeName << "child of " 
+              << thatcontainer->parent->typeName << "(" << parentName << ")"
+              << endl;*/
+
+        set<Paje::unique_container_name_t>::iterator it;
+
+        it = container_unique_names.begin();
+        while (it != container_unique_names.end())
+        {
+            // pair of containername, typename
+
+            /*
+            cerr << "Kill? (" 
+                    << it->containerName << ","
+                    << it->parentName << ","
+                    << it->typeName << ")"  << endl;*/
+
+            if ( (thatcontainer->typeName == it->typeName) &&
+                 (parentName == it->parentName) )
+            {
+              pajeDestroyContainer(timestamp,
+                                    it->typeName,
+                                    it->containerName,
+                                    out);
+              it = container_unique_names.erase(it);
+            } else 
+              ++it;
+        }
         return false;
       }
     );
 
+  *priority = CONTAINER_DESTROY_PRIO;
   return true;
 }
 
 
-void Paje::ContainerCreateTrigger::push_timestamp(double timestamp)
-{
-  timestamp_stack.push(CONTAINER_DESTROY_PRIO);
-}
 
 

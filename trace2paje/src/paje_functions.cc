@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje_functions.cc"
 // Created: "Ter, 04 Out 2011 14:14:35 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:17:48 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 20:22:57 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -153,9 +153,9 @@ void init_paje_events() {
   }
 };
 
-void pajeDefineContainerType(string &alias,
-                             string &containerType, 
-                             string &name,
+void pajeDefineContainerType(const string &alias,
+                             const string &containerType, 
+                             const string &name,
                              ostream &out)
 {
   out << paje_event_id("PajeDefineContainerType")
@@ -165,9 +165,9 @@ void pajeDefineContainerType(string &alias,
       <<endl;
 }
 
-void pajeDefineStateType(string &alias,
-                         string &containerType, 
-                         string &name,
+void pajeDefineStateType(const string &alias,
+                         const string &containerType, 
+                         const string &name,
                          ostream &out)
       
 {
@@ -178,11 +178,11 @@ void pajeDefineStateType(string &alias,
       << endl;
 }
 
-void pajeDefineLinkType(string &alias,
-                        string &containerType,
-                        string &sourceContainerType,
-                        string &destContainerType, 
-                        string &name,
+void pajeDefineLinkType(const string &alias,
+                        const string &containerType,
+                        const string &sourceContainerType,
+                        const string &destContainerType, 
+                        const string &name,
                         ostream &out)
 {
   out << paje_event_id("PajeDefineLinkType")
@@ -195,9 +195,9 @@ void pajeDefineLinkType(string &alias,
 }
 
 void pajeCreateContainer(double timestamp,
-                         string &alias,
-                         string &type,
-                         string &container, string &name,
+                         const string &alias,
+                         const string &type,
+                         const string &container, const string &name,
                          ostream &out)
 {
   out << paje_event_id("PajeCreateContainer")
@@ -210,7 +210,7 @@ void pajeCreateContainer(double timestamp,
 }
 
 void pajeDestroyContainer(double timestamp,
-                          string &type, string &container,
+                          const string &type, const string &container,
                           ostream &out)
 {
   out << paje_event_id("PajeDestroyContainer")
@@ -221,8 +221,8 @@ void pajeDestroyContainer(double timestamp,
 }
 
 void pajeSetState(double timestamp,
-                  string &container,
-                  string &type, string &value,
+                  const string &container,
+                  const string &type, const string &value,
                   ostream &out)
 {
   out  << paje_event_id("PajeSetState")
@@ -234,8 +234,8 @@ void pajeSetState(double timestamp,
 }
 
 void pajePushState(double timestamp,
-                   string &container,
-                   string &type, string &value,
+                   const string &container,
+                   const string &type, const string &value,
                    ostream &out)
 {
   out << paje_event_id("PajePushState")
@@ -247,7 +247,7 @@ void pajePushState(double timestamp,
 }
 
 void pajePopState(double timestamp,
-                  string &container, string &type,
+                  const string &container, const string &type,
                   ostream &out)
 {
   out << paje_event_id("PajePopState")
@@ -258,10 +258,10 @@ void pajePopState(double timestamp,
 }
 
 void pajeStartLink(double timestamp,
-                   string &container,
-                   string &type,
-                   string &sourceContainer,
-                   string &value, string &key,
+                   const string &container,
+                   const string &type,
+                   const string &sourceContainer,
+                   const string &value, const string &key,
                    ostream &out)
 {
   out << paje_event_id("PajeStartLink")
@@ -275,10 +275,10 @@ void pajeStartLink(double timestamp,
 }
 
 void pajeEndLink(double timestamp,
-                 string &container,
-                 string &type,
-                 string &endContainer,
-                 string &value, string &key,
+                 const string &container,
+                 const string &type,
+                 const string &endContainer,
+                 const string &value, const string &key,
                  ostream &out)
 {
   out << paje_event_id("PajeEndLink")

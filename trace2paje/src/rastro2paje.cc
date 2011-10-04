@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:26:38 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 19:42:07 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -70,6 +70,7 @@ struct _global_opts {
   vector<exe_enum_t> exe_type;
   long int auto_id_base;
   string ids_file, c_header, fort_header, rst_signatures;
+  bool print_tree;
 } global_opts;
 
 static const char *optString = "i:o:hg:";
@@ -83,6 +84,7 @@ static const struct option longOpts[] = {
     { "c-header"              , required_argument, NULL, 0 },
     { "fort-header"           , required_argument, NULL, 0 },
     { "rst-signatures"        , required_argument, NULL, 0 },
+    { "print-tree"            , no_argument      , NULL, 0 },
     { NULL, no_argument, NULL, 0  }
 };
 
@@ -96,6 +98,24 @@ void usage(char ** argv)
            <<endl
        << "-o, --output <file>       : "
            << "Paje output from the rastro files (default: stdout)" 
+           <<endl
+       << "--gen-ids <file>          : "
+           << "Generate ID tokens for all events in the input file that do not have ids yet"
+           <<endl
+       << "--id-base <number>        : "
+           << "Base for new IDs" 
+           << endl
+       << "--c-header <file>         : " 
+           << "Generate a header file with defines for the event ids"
+           <<endl
+       << "--fort-header <file>      : "
+           << "Generate a fortran module for the event ids"
+           << endl
+       << "--rst-signatures <file>   : "
+           << "Generate a file compatible with rastro-generate"
+           << endl
+       << "--print-tree              : "
+           << "Prints the tree after parsing the file"
            <<endl;
 }
 
@@ -109,6 +129,7 @@ int parse_opts(int argc, char ** argv)
   global_opts.fout_name = "stdout";
   global_opts.fin_name  = "stdin";
   global_opts.auto_id_base = AUTO_ID_BASE_DEFAULT;
+  global_opts.print_tree = false;
 
   while (( opt = getopt_long( argc, argv, optString, longOpts, &longIndex ) ) != -1 )
   {
@@ -132,11 +153,11 @@ int parse_opts(int argc, char ** argv)
           global_opts.auto_id_base = atol(optarg);
           break;
       case 0:
-        if (!strcmp(longOpts[longIndex].name,"description"))
+        if (!strcmp(longOpts[longIndex].name,"description")) {
           global_opts.fin_name = optarg;
-        else if (!strcmp(longOpts[longIndex].name,"output"))
+        } else if (!strcmp(longOpts[longIndex].name,"output")) {
           global_opts.fout_name = optarg;
-        else if (!strcmp(longOpts[longIndex].name, "c-header")) {
+        } else if (!strcmp(longOpts[longIndex].name, "c-header")) {
           global_opts.exe_type.push_back(EXE_GEN_C_HEADER);
           global_opts.c_header = optarg;
         } else if (!strcmp(longOpts[longIndex].name, "fort-header")) {
@@ -145,8 +166,9 @@ int parse_opts(int argc, char ** argv)
         } else if (!strcmp(longOpts[longIndex].name, "rst-signatures")) {
           global_opts.exe_type.push_back(EXE_GEN_RST_FUNCTION_SIGNATURES);
           global_opts.rst_signatures = optarg;
-        }
-        else if (!strcmp(longOpts[longIndex].name,"help"))
+        } else if (!strcmp(longOpts[longIndex].name, "print-tree")) {
+          global_opts.print_tree = true;
+        } else if (!strcmp(longOpts[longIndex].name,"help"))
         {
           usage(argv);
           exit(0);
@@ -402,13 +424,13 @@ int main(int argc, char** argv)
   } // while (!files_to_parse.empty())
 
 
-#if 0
-  /// DEBUG!!!!
-  print_tree(early_parse_tree);
-  cerr << endl;
-  print_tree(late_parse_tree);
-  cerr << endl;
-#endif
+  if (global_opts.print_tree) {
+    /// DEBUG!!!!
+    print_tree(early_parse_tree);
+    cerr << endl;
+    print_tree(late_parse_tree);
+    cerr << endl;
+  }
 
 
   { // Do all the parsing of the files
@@ -423,6 +445,7 @@ int main(int argc, char** argv)
     attr_to_link_types(early_parse_tree);
 
     // Create the events, links and dummy references
+    attr_to_events(early_parse_tree);
     attr_to_states(early_parse_tree);
     attr_to_links(early_parse_tree);
 
@@ -437,23 +460,35 @@ int main(int argc, char** argv)
     events_to_id_map();
 
 
-#if 0
-    // DEBUG DEBUG FEBUG DEBUH BUG BUG DE BUG
-    for_each(container_type_names->begin(), container_type_names->end(),[&](pair<string,hierarchy_t * > p) {
-        cerr << "container " << p.first << " defined" << endl;
-      });
+    if (global_opts.print_tree) {
+      // DEBUG DEBUG FEBUG DEBUH BUG BUG DE BUG
 
-    for_each(eventtype_names->begin(), eventtype_names->end(),[&](pair<string,Paje::BaseEventType * > p) {
-        cerr << "event " << p.first << " defined" << endl;
-      });
-
-    cerr << "Container hierarchy at the end:" <<endl;
-    print_tree(toplevel_hierarchy);
-
-    for_each(event_names->begin(), event_names->end(), [&](pair<string,Paje::BaseEvent *> p) {
-        cerr << p.second->toString() << endl;
+      cerr << "====================" << endl;
+      cerr << "== Containers ======" << endl;
+      for_each(container_type_names->begin(), container_type_names->end(),[&](pair<string,hierarchy_t * > p) {
+          cerr << "container " << p.first << " defined" << endl;
         });
-#endif
+
+      cerr << "====================" << endl;
+      cerr << "== Event Types =====" << endl;
+      for_each(eventtype_names->begin(), eventtype_names->end(),[&](pair<string,Paje::BaseEventType * > p) {
+          cerr << "event type " << p.first << " defined";
+          if (p.second->container) 
+            cerr << " on " << p.second->container->typeName;
+          cerr << endl;
+        });
+      
+      cerr << "====================" << endl;
+      cerr << "== Event Names =====" << endl;
+      for_each(event_names->begin(), event_names->end(), [&](pair<string,Paje::BaseEvent *> p) {
+          cerr << p.second->toString() << endl;
+          });
+
+      cerr << "====================" << endl;
+      cerr << "== Hierarchy =======" << endl;
+      print_tree(toplevel_hierarchy);
+
+    }
   } // Parsing
 
 

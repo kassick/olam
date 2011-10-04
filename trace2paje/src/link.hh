@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.hh"
 // Created: "Ter, 04 Out 2011 14:03:20 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:31:10 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 18:18:51 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -41,13 +41,17 @@ namespace Paje {
       Link(string &name, attribs_t * attribs);
 
       virtual bool do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out);
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out);
 
       virtual bool do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out);
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out);
       
       virtual bool do_trigger(double timestamp,
-          symbols_table_t * symbols, ostream &out);
+          symbols_table_t * symbols, double * priority, ostream &out);
       
       virtual void fill_from_attr(attribs_t * attrs);
       virtual string toString() ;

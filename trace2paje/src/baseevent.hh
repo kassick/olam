@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.hh"
 // Created: "Ter, 04 Out 2011 11:50:46 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:33:38 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 19:14:25 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -47,6 +47,7 @@ extern "C" {
 #include "baseeventtype.hh"
 
 #define DEFAULT_EVENT_PRIO (-(numeric_limits<double>::max()) )
+#define DEFAULT_EVENT_PRIO_TRIGG (0)
 
 namespace Paje {
 
@@ -82,37 +83,50 @@ namespace Paje {
       event_id_t  start_id, end_id, trigger_id;
 
       identifier_list_t identifier_names;
-      stack<double> timestamp_stack;
+      map<string, stack<double>> timestamp_map;
 
       BaseEvent();
 
-      virtual bool trigger(event_id_t evt_id, double timestamp,
-          symbols_table_t * symbols, ostream &out);
+      virtual bool trigger(event_id_t evt_id, 
+          double timestamp,
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out);
 
       virtual void fill_from_attr(attribs_t * attrs);
 
       virtual void set_trigger_id(trigger_id_t trigger_id, event_id_t id);
 
       virtual bool do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out);
+          symbols_table_t * symbols, 
+          double * priotity,
+          ostream &out);
+
 
       virtual bool do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out);
+          symbols_table_t * symbols,
+          double * priotity,
+          ostream &out);
 
       virtual bool do_trigger(double timestamp,
-          symbols_table_t * symbols, ostream &out);
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out);
+
+      virtual void set_event_type(BaseEventType * evt_type);
 
   
-      bool load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols);
+      virtual bool load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols);
       void add_symbol_from_tree(attribs_t * attrs);
 
       virtual string toString();
 
-      bool operator<(const BaseEvent * e) const;
+      //bool operator<(const BaseEvent * e) const;
 
-      virtual void push_timestamp(const double timestamp);
-      virtual double pop_timestamp(const double timestamp);
-      virtual double get_priority() const;
+      virtual void push_timestamp(const string & containerName, const double timestamp);
+      virtual double pop_timestamp(const string & containerName, const double timestamp);
+
+      //virtual double get_priority(const string & containerName) const;
 
       virtual bool has_ids() const;
 

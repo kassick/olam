@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:28:05 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 19:10:09 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,29 +37,49 @@ using namespace std;
 
 
 Paje::BaseEvent::BaseEvent() {
+  this->formatValue = "%(EVT_NAME)";
   start_id = end_id = trigger_id = 0;
-  timestamp_stack.push(DEFAULT_EVENT_PRIO);
   this->eventType = NULL;
+}
+
+void Paje::BaseEvent::set_event_type(Paje::BaseEventType * evt_type)
+{
+  this->eventType = evt_type;
+
 }
 
 /////
 // Trigger functions
 bool Paje::BaseEvent::do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out) {
-  cerr << "Error: Class BaseEvent has no start action" << endl;
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out) {
+  string containerName = format_values(this->eventType->container->formatName,symbols);
+  this->push_timestamp(containerName,timestamp);
+  
+  *priority = DEFAULT_EVENT_PRIO;
+  
   return false;
 }
 
 bool Paje::BaseEvent::do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out) {
-  cerr << "Error: Class BaseEvent has no end  action" << endl;
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out) {
+  
+  string containerName = format_values(this->eventType->container->formatName,symbols);
+  
+  *priority = pop_timestamp(containerName,timestamp);
+  
   return false;
 }
 
 bool Paje::BaseEvent::do_trigger(double timestamp,
-          symbols_table_t * symbols, ostream &out) {
-  // Actually, BaseEvent should call PajeEvent....
-  cerr << "Error: Class BaseEvent has no trigger action" << endl;
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out) {
+  *priority = DEFAULT_EVENT_PRIO_TRIGG;
+
   return false;
 }
 
@@ -90,20 +110,20 @@ void Paje::BaseEvent::set_trigger_id(trigger_id_t trigger_field, event_id_t id)
 //Calls the correct function based on the id
 
 bool Paje::BaseEvent::trigger(event_id_t evt_id, double timestamp,
-    symbols_table_t * symbols, ostream &out)
+    symbols_table_t * symbols, 
+    double * priority,
+    ostream &out)
 {
   if (evt_id == trigger_id)
-    return do_trigger(timestamp,symbols,out);
+    return do_trigger(timestamp,symbols,priority,out);
 
   if (evt_id == start_id) {
-    this->push_timestamp(timestamp);
-    return do_start(timestamp,symbols,out);
+    return do_start(timestamp,symbols,priority,out);
   }
 
   if (evt_id == end_id)
   {
-    bool ret = do_end(timestamp,symbols,out);
-    this->pop_timestamp(timestamp);
+    bool ret = do_end(timestamp,symbols,priority,out);
     return ret;
   }
 }
@@ -279,30 +299,43 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
  *  be mantained consistent
  *  */
 
-void Paje::BaseEvent::push_timestamp(const double timestamp)
+void Paje::BaseEvent::push_timestamp(const string & containerName, const double timestamp)
 {
-  this->timestamp_stack.push(timestamp);
+  this->timestamp_map[containerName].push(timestamp);
 }
 
-double Paje::BaseEvent::pop_timestamp(const double timestamp)
+double Paje::BaseEvent::pop_timestamp(const string & containerName, const double timestamp)
 {
-  // ignore parameter, we do not need in the default case
-  double ret = this->timestamp_stack.top();
-  this->timestamp_stack.pop();
-  return ret;
+  if (this->timestamp_map.count(containerName))
+  {
+    double ret = this->timestamp_map[containerName].top();
+    this->timestamp_map[containerName].pop();
+    return ret;
+  } else {
+    return DEFAULT_EVENT_PRIO;
+  }
 }
 
-
-double Paje::BaseEvent::get_priority() const
+#if 0
+double Paje::BaseEvent::get_priority(const string & containerName) const
 {
-  return this->timestamp_stack.top();
+  if (this->timestamp_map.count(containerName)) 
+  {
+    stack<double> &a = (this->timestamp_map)[containerName];
+    return a.top();
+  }
+  else
+    return DEFAULT_EVENT_PRIO;
 }
+#endif
 
 
+#if 0
 bool Paje::BaseEvent::operator<(const Paje::BaseEvent* other) const
 {
   return (this->get_priority() > other->get_priority());
 }
+#endif
 
 
 bool Paje::BaseEvent::has_ids() const {

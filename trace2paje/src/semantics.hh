@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:28:25 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 18:35:47 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -53,6 +53,7 @@ SemanticAttribute * new_semantic_attribute();
 void init_desc_parser();
 void attr_to_event_types(attribs_t * attribs);
 void attr_to_link_types(attribs_t * attribs);
+void attr_to_events(attribs_t * attribs);
 void attr_to_links(attribs_t * attribs);
 void attr_to_states(attribs_t * attribs);
 hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top);

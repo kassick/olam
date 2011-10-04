@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:19:08 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 17:06:05 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -29,6 +29,7 @@
 #include <ostream>
 #include <string>
 #include <string.h>
+#include <sstream>
 #include <algorithm>
 #include <map>
 #include <set>
@@ -40,6 +41,27 @@ extern "C" {
 #include <rastro.h>
 }
 
+
+typedef struct _serve_entry_t {
+  double priority;
+
+  string output;
+
+  Paje::BaseEvent * evt;
+
+  struct _serve_entry_t & operator=(const struct _serve_entry_t &org) 
+  {
+    if (this == &org)
+      return *this;
+
+    this->priority = org.priority;
+    this->evt = org.evt;
+    this->output = org.output;
+
+    return *this;
+  }
+
+} serve_entry_t;
 
 void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 {
@@ -97,49 +119,79 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
 
 
-  vector<Paje::BaseEvent *> evt_serve_list;
-  vector<Paje::BaseEvent *>::iterator evt_serve_list_it;
+  vector<serve_entry_t>           evt_serve_list;
+  vector<serve_entry_t>::iterator evt_serve_list_it;
+
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
+    symbols_table_t tmp_table;
+
     //cerr << "evemt type == " << event.type << " == " << evt_id << endl;
     int nevts = 0;
 
     pair<event_id_map_t::iterator,event_id_map_t::iterator> equal_range;
     event_id_map_t::iterator it;
     
+    // load constant symbols into the tables
+    symbols[Paje::idf1_name].set_value(event.id1);
+    symbols[Paje::idf2_name].set_value(event.id2);
+    double timestamp = (double) event.timestamp / 1000000 ;
+   
+
+    // get all events that must be served with this id
     equal_range = event_ids->equal_range(evt_id);
 
     for(it = equal_range.first;
         it != equal_range.second;
         ++it) 
     {
-      ++nevts;
+      serve_entry_t entry;
+      ostringstream tmp_out;
 
-      evt_serve_list.push_back(it->second);
-      //cerr << "BaseEvent " << it->second->name << endl;
+      ++nevts;
+      entry.evt = it->second;
+      entry.evt->load_symbols(evt_id, &event,&symbols);
+      entry.evt->trigger(evt_id,
+                        timestamp,
+                        &symbols,
+                        &(entry.priority),
+                        tmp_out);
+      
+
+      entry.output = tmp_out.str();
+      evt_serve_list.push_back( entry );
+
+      //entry.output.clear();
     }
 
 
     sort(evt_serve_list.begin(), evt_serve_list.end(),
-        [](Paje::BaseEvent * evt1, Paje::BaseEvent * evt2) {
-          return (evt1->get_priority() > evt2->get_priority());
+        [](serve_entry_t e1, serve_entry_t e2) {
+          return (e1.priority > e2.priority);
+        } );
+    /*
+          
+          
+          pair<string,Paje::BaseEvent*> p1  ,pair<string,Paje::BaseEvent*> p2) {
+          Paje::BaseEvent * evt1 = p1.second;
+          Paje::BaseEvent * evt2 = p2.second;
+          return (evt1->get_priority(p1.first) > evt2->get_priority(p2.firat));
           }
-        );
+        );*/
 
     for(evt_serve_list_it = evt_serve_list.begin();
         evt_serve_list_it < evt_serve_list.end();
         ++evt_serve_list_it)
     {
+      out << evt_serve_list_it->output;
 
-      //pair<Paje::event_id_t, Paje::Event*> p = *it;
+      /*
+      pair<string,Paje::BaseEvent*> p = *it;
       
-      Paje::BaseEvent * evt = *evt_serve_list_it; //p.second;
+      Paje::BaseEvent * evt = p.second;
       //cerr << "11Event " << evt->name << " prio " << evt->get_priority() << endl;
       evt->load_symbols(evt_id, &event,&symbols);
-      symbols[Paje::idf1_name].set_value(event.id1);
-      symbols[Paje::idf2_name].set_value(event.id2);
-      double timestamp = (double) event.timestamp / 1000000 ;
-      evt->trigger(evt_id, timestamp, &symbols, out);
+      evt->trigger(evt_id, timestamp, &symbols, out); */
     }
     
 

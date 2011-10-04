@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:02:36 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 16:39:57 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,9 +33,13 @@ Paje::State::State(string& name, attribs_t * attribs) {
 }
 
 bool Paje::State::do_start(double timestamp,
-    symbols_table_t * symbols, ostream &out)
+    symbols_table_t * symbols,
+    double * priority,
+    ostream &out)
 {
   string containerName, eventValue;
+
+  Paje::BaseEvent::do_start(timestamp, symbols, priority, out);
   
   containerName = format_values(eventType->container->formatName, symbols);
 
@@ -50,10 +54,14 @@ bool Paje::State::do_start(double timestamp,
 }
 
 bool Paje::State::do_end(double timestamp,
-    symbols_table_t * symbols, ostream &out)
+    symbols_table_t * symbols,
+    double * priority,
+    ostream &out)
 {
   string containerName;
 
+  Paje::BaseEvent::do_end(timestamp, symbols, priority, out);
+  
   containerName = format_values(eventType->container->formatName, symbols);
 
     pajePopState(timestamp,

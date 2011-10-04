@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/linktype.hh"
 // Created: "Ter, 04 Out 2011 13:43:22 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 13:44:49 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 19:33:38 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -38,7 +38,7 @@ namespace Paje {
     public:
       Container *source, *dest;
 
-      LinkType(string& typeName, Paje::Container * c, attribs_t * t);
+      LinkType(const string& typeName, Paje::Container * c, attribs_t * t);
 
       virtual void do_header(ostream &out);
   };

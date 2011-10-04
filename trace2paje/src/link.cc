@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:24:58 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 19:18:00 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -49,15 +49,20 @@ string Paje::Link::toString() {
 /////
 // Trigger functions
 bool Paje::Link::do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out) {
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out) {
 
   LinkType * lt = (LinkType * ) this->eventType;
 
+  Paje::BaseEvent::do_start(timestamp, symbols, priority, out);
+
   string thisContainer, sourceContainer, thisValue, key;
 
-  thisContainer = format_values(lt->container->formatName, symbols);
+  thisContainer   = format_values(lt->container->formatName, symbols);
   sourceContainer = format_values(lt->source->formatName, symbols);
-  key  = format_values(this->format_key, symbols);
+  thisValue       = format_values(this->formatValue,symbols);
+  key             = format_values(this->format_key, symbols);
 
   pajeStartLink(timestamp,
                    thisContainer,
@@ -71,14 +76,19 @@ bool Paje::Link::do_start(double timestamp,
 }
 
 bool Paje::Link::do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out) {
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out) {
   LinkType * lt = (LinkType * ) this->eventType;
+  
+  Paje::BaseEvent::do_end(timestamp, symbols, priority, out);
 
   string thisContainer, destContainer, thisValue, key;
 
-  thisContainer = format_values(lt->container->formatName, symbols);
-  destContainer = format_values(lt->source->formatName, symbols);
-  key  = format_values(this->format_key, symbols);
+  thisContainer   = format_values(lt->container->formatName, symbols);
+  destContainer   = format_values(lt->source->formatName, symbols);
+  thisValue       = format_values(this->formatValue,symbols);
+  key             = format_values(this->format_key, symbols);
   pajeEndLink(timestamp,
                  thisContainer,
                  lt->typeName,
@@ -90,9 +100,12 @@ bool Paje::Link::do_end(double timestamp,
 }
 
 bool Paje::Link::do_trigger(double timestamp,
-          symbols_table_t * symbols, ostream &out) {
+          symbols_table_t * symbols,
+          double * priority,
+          ostream &out) {
   // Actually, Link should call PajeLink....
   cerr << "Error: Class Link has no trigger action" << endl;
+  *priority = 0;
   return false;
 }
 

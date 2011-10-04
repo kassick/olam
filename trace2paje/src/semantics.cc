@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:27:30 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 20:37:23 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -215,7 +215,48 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
 
 }
 
+void attr_to_event_types(attribs_t * attribs)
+{
+  string container_name;
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+    SemanticAttribute * attr = n->getVal();
+    if (attr->id == ID_CONTAINER)
+    {
+      container_name = attr->vals.name;
+      
+      if (container_type_names->count(container_name) == 0) {
+        cerr << "Error: Link Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        exit(1);
+      }
+      
+      Paje::Container * c = (*container_type_names)[container_name]->getVal();
 
+      walk_tree_head_first(n,
+        [&c,&eventtype_names](attribs_t * n1, int level1) {
+          SemanticAttribute * attr = n1->getVal();
+          if ((attr->id == ID_CONTAINER) && (level1 > 0))
+          {
+            return true; // not in this function
+          }
+          
+          if (attr->id == ID_EVENT_TYPE_DEF) {
+            if (eventtype_names->count(attr->vals.name))
+            {
+              cerr << "Error: EventType " << attr->vals.name << " has already been defined" << endl;
+              exit(1);
+            } 
+
+            Paje::BaseEventType * evttype = new Paje::BaseEventType(attr->vals.name,c);
+            (*eventtype_names)[attr->vals.name] = evttype;
+          }
+          return false;
+        } );
+    }
+    return false;
+  });
+}
+
+#if 0
 void attr_to_event_types(attribs_t * attribs)
 {
   string container_name;
@@ -248,6 +289,7 @@ void attr_to_event_types(attribs_t * attribs)
     return false;
   });
 }
+#endif
 
 void attr_to_link_types(attribs_t * attribs)
 {
@@ -257,31 +299,65 @@ void attr_to_link_types(attribs_t * attribs)
     if (attr->id == ID_CONTAINER)
     {
       container_name = attr->vals.name;
-    } else if (attr->id == ID_LINK_TYPE) 
-    {
-      if (eventtype_names->count(attr->vals.name))
-      {
-        cerr << "Error: LinkType " << attr->vals.name << " has already been defined" << endl;
-        exit(1);
-      }
-
-
+      
       if (container_type_names->count(container_name) == 0) {
         cerr << "Error: Link Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
         exit(1);
       }
-
+      
       Paje::Container * c = (*container_type_names)[container_name]->getVal();
-      string tn = attr->vals.name;
 
-      Paje::LinkType * evttype = new Paje::LinkType(tn,c,n);
-      (*eventtype_names)[attr->vals.name] = evttype;
+      walk_tree_head_first(n,
+        [&c,&eventtype_names](attribs_t * n1, int level1) {
+          SemanticAttribute * attr = n1->getVal();
+          if ((attr->id == ID_CONTAINER) && (level1 > 0))
+          {
+            return true; // not in this function
+          }
+          
+          if (attr->id == ID_LINK_TYPE) {
+            if (eventtype_names->count(attr->vals.name))
+            {
+              cerr << "Error: LinkType " << attr->vals.name << " has already been defined" << endl;
+              exit(1);
+            } 
 
-      return true; // can stop this subtree
+            Paje::LinkType * evttype = new Paje::LinkType(attr->vals.name,c,n1);
+            (*eventtype_names)[attr->vals.name] = evttype;
+          }
+          return false;
+        } );
     }
     return false;
   });
 }
+
+void attr_to_events(attribs_t * attribs)
+{
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+      SemanticAttribute * attr = n->getVal();
+
+      if (attr->id == ID_EVENT) {
+        Paje::Event * evt;
+        string name = attr->vals.name;
+
+        // last man standing policy: if the link already exists, then just
+        // decorate if with whatever other information there may be here
+        if (event_names->count(name)) {
+          cerr << "Name clash: " << name << endl;
+          exit(1);
+        } else {
+          evt = new Paje::Event(name, n);
+          (*event_names)[name] = evt;
+          ordered_event_names->push_back(pair<string,Paje::BaseEvent*>(name,evt));
+        }
+
+        return true; // prune tree
+      }
+      return false; // keep on visiting
+    });
+}
+
 
 void attr_to_links(attribs_t * attribs)
 {
@@ -337,10 +413,11 @@ void attr_to_states(attribs_t * attribs)
 
 void map_accept_attrs(attribs_t * attribs)
 {
+
   walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
     SemanticAttribute * attr = n->getVal();
     
-    if (attr->id == ID_EVENT_TYPE_DEF)
+    if ( (attr->id == ID_EVENT_TYPE_DEF) || (attr->id == ID_LINK_TYPE) )
     {
       string event_type = attr->vals.name;
       //cerr << "event type " << event_type << endl;
@@ -348,6 +425,7 @@ void map_accept_attrs(attribs_t * attribs)
       for(it = n->begin(); it != n->end(); ++it)
       {
         SemanticAttribute *list_attr = (*it)->getVal();
+        
         if (list_attr->id == ID_ACCEPT_LIST) {
           walk_tree_head_first(*it,[&](attribs_t * n1, int level1) {
               SemanticAttribute * attr1 = n1->getVal();
@@ -357,7 +435,7 @@ void map_accept_attrs(attribs_t * attribs)
                   cerr << "Warning: Event type " << event_type << " accepts undefined event " << attr1->vals.name << endl;
                 } else {
                   Paje::BaseEvent * evt = (*event_names)[attr1->vals.name];
-                  evt->eventType = (*eventtype_names)[event_type];
+                  evt->set_event_type( (*eventtype_names)[event_type] );
                 }
               }
               return false; // visit all the children of event_type
@@ -693,6 +771,7 @@ void init_desc_parser()
   
 
   zero = new Container("0");
+  zero->formatName = "0";
 
   toplevel_hierarchy = new TreeNode < Paje::Container * >(zero);
   attributes = new TreeNode < SemanticAttribute *>(NULL);

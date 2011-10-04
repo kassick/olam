@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/linktype.cc"
 // Created: "Ter, 04 Out 2011 13:44:56 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:24:00 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 19:33:42 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,7 +37,7 @@
  Paje::LinkType functions
 *******************************************************************************/
 
-Paje::LinkType::LinkType(string& tn, Paje::Container * c, attribs_t * t) : 
+Paje::LinkType::LinkType(const string& tn, Paje::Container * c, attribs_t * t) : 
   Paje::BaseEventType(tn,c)
 {
   this->source = NULL;

@@ -1,0 +1,4 @@
+RASTRO(rank,ignore)
+
+INCLUDE "pingpong-link.txt"
+INCLUDE "ids.txt"

@@ -1,0 +1,38 @@
+CONTAINER Machine {
+  NAME "%(hostname)"
+  CREATE init
+  DESTROY finalize
+
+  CONTAINER Rank {
+    NAME "rank_%(rank)"
+    CREATE PARENT
+    DESTROY PARENT
+
+    EVENTTYPE Whatever {
+      init
+      finalize
+    }
+
+  }
+
+  LINKTYPE PingLink FROM Rank TO Rank {
+    ping
+  }
+}
+
+LINK ping {
+  VALUE "msg_%(tag)"
+  KEY "%(tag)##%(dst)"
+  i tag
+  i dst
+}
+
+EVENT init {
+  VALUE "%(EVT_NAME)"
+  s hostname
+}
+
+EVENT finalize {
+  VALUE "%(EVT_NAME)"
+  s hostname
+}

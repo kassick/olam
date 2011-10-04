@@ -115,6 +115,9 @@ attribs_t * create_nop_attr(attribs_t * n)
 %type<attr_node> idf_idlist;
 %type<attr_node> idf_list_item;
 
+%type<attr_node> event_statement;
+%type<attr_node> event_params;
+%type<attr_node> event_param;
 %type<attr_node> state_param;
 %type<attr_node> state_params;
 %type<attr_node> state_statement;
@@ -157,6 +160,9 @@ definition:
               early_parse_tree->addChild($1);
            }
           |include_statement {}
+          |event_statement {
+            early_parse_tree->addChild($1);
+          }
           |state_statement {
             early_parse_tree->addChild($1);
           }
@@ -212,9 +218,15 @@ container_param: name_param
                 ;
 
 name_param: TOK_NAME STRING_LIT {
+                    char *str = $2;
+
+                    // it's a strlit so we have "something" (or "")
+                    str[strlen(str)-1] = '\0';
+                    str++;
+
                     attr = new_semantic_attribute();
                     attr->id = ID_NAME;
-                    attr->vals.name = $2;
+                    attr->vals.name = str;
 
                     n = new attribs_t(attr);
 
@@ -408,7 +420,72 @@ include_statement: TOK_INCLUDE STRING_LIT {
                   files_to_parse.push(str);
                 }
                 
+event_statement: TOK_EVENT IDENTIFIER '{' event_params '}' {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_EVENT;
+                  attr->vals.name = $2;
 
+                  n = new attribs_t(attr);
+                  n->addChild($4);
+                  $$ = n;
+               }
+
+event_params: event_params event_param {
+                    $1->addChild($2);
+                    $$ = $1;
+              }
+            | event_param {$$ = $1;}
+
+event_param: TOK_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_EVENT_TYPE;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  $$ = n;
+
+               }
+          | RST_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_RASTRO_TYPE;
+                  attr->vals.name = $1;
+
+                  n = new attribs_t(attr);
+
+                  SemanticAttribute * attr2 = new_semantic_attribute();
+                  attr2->id = ID_IDF;
+                  attr2->vals.name = $2;
+
+                  attribs_t *n2 = new attribs_t(attr2);
+
+                  n->addChild(n2);
+
+                  $$ = n;
+                }
+          | RST_TYPE '{' idf_list '}' {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_RASTRO_TYPE;
+                  attr->vals.name = $1;
+
+                  n = new attribs_t(attr);
+                  n->addChild($3);
+
+                  $$ = n;
+                }
+          | TOK_VALUE STRING_LIT {
+                  // remove ""
+                  char * str = $2;
+                  str[strlen(str)-1] = '\0';
+                  str++;
+
+                  attr = new_semantic_attribute();
+                  attr->id = ID_FORMAT_NAME;
+                  attr->vals.name = str;
+                  
+                  n = new attribs_t(attr);
+                  $$ = n;
+            }
+          ;
 
 state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
             attr = new_semantic_attribute();
