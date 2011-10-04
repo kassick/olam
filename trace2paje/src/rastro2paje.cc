@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Seg, 03 Out 2011 18:44:48 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 12:21:47 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -181,8 +181,8 @@ void generate_ids_to_file(const string & fname)
   }
 
   for_each(ordered_event_names->begin(), ordered_event_names->end(),
-      [&](pair<string, Paje::Event*> p) {
-        Paje::Event *evt = p.second;
+      [&](pair<string, Paje::BaseEvent*> p) {
+        Paje::BaseEvent *evt = p.second;
 
         if (!evt->has_ids()) {
           evt->gen_auto_ids(&(global_opts.auto_id_base));
@@ -220,8 +220,8 @@ void generate_c_header(const string & fname)
 
 
   for_each(ordered_event_names->begin(), ordered_event_names->end(),
-      [&](pair<string, Paje::Event*> p) {
-        Paje::Event *evt = p.second;
+      [&](pair<string, Paje::BaseEvent*> p) {
+        Paje::BaseEvent *evt = p.second;
           evt->gen_c_header(h_file,"_IN","_OUT","_N");
       });
   
@@ -253,8 +253,8 @@ void generate_fort_header(const string & fname)
 
 
   for_each(ordered_event_names->begin(), ordered_event_names->end(),
-      [&](pair<string, Paje::Event*> p) {
-        Paje::Event *evt = p.second;
+      [&](pair<string, Paje::BaseEvent*> p) {
+        Paje::BaseEvent *evt = p.second;
           evt->gen_fort_header(h_file,"_IN","_OUT","_N");
       });
   
@@ -277,7 +277,7 @@ void generate_rst_signatures(const string & fname)
   }
   
   for_each(ordered_event_names->begin(), ordered_event_names->end(),
-      [&](pair<string, Paje::Event*> p) {
+      [&](pair<string, Paje::BaseEvent*> p) {
         p.second->get_rst_function_signature(signatures);
       });
 
@@ -444,14 +444,14 @@ int main(int argc, char** argv)
         cerr << "container " << p.first << " defined" << endl;
       });
 
-    for_each(eventtype_names->begin(), eventtype_names->end(),[&](pair<string,Paje::EventType * > p) {
+    for_each(eventtype_names->begin(), eventtype_names->end(),[&](pair<string,Paje::BaseEventType * > p) {
         cerr << "event " << p.first << " defined" << endl;
       });
 
     cerr << "Container hierarchy at the end:" <<endl;
     print_tree(toplevel_hierarchy);
 
-    for_each(event_names->begin(), event_names->end(), [&](pair<string,Paje::Event *> p) {
+    for_each(event_names->begin(), event_names->end(), [&](pair<string,Paje::BaseEvent *> p) {
         cerr << p.second->toString() << endl;
         });
 #endif

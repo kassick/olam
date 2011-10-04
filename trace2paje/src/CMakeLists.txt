@@ -18,29 +18,58 @@ ADD_FLEX_BISON_DEPENDENCY(DescriptionFileScanner DescriptionFileParser)
 
 include_directories(tree)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+
+
+############################
+## Main exe
+
 add_executable(rastro2paje
-rastro2paje.cc
-event.cc
-container.cc
-semantics.cc
-paje.cc
-symbols.cc
-rastro_loop.cc
-tree/tree.hpp # my tree implementation
-${BISON_DescriptionFileParser_OUTPUTS}
-${FLEX_DescriptionFileScanner_OUTPUTS}
+  baseevent.cc
+  baseeventtype.cc
+  event.cc
+  container.cc
+  semantics.cc
+  paje.cc
+  symbols.cc
+  rastro_loop.cc
+  tree/tree.hpp # my tree implementation
+  rastro2paje.cc
+  ${BISON_DescriptionFileParser_OUTPUTS}
+  ${FLEX_DescriptionFileScanner_OUTPUTS}
 )
 set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
 #set_property(TARGET rastro2paje PROPERTY IMPORTED_LOCATION "${RASTRO_PREFIX}/lib")
+
 set_property(SOURCE 
   container.cc semantics.cc paje.cc rastro2paje.cc symbols.cc
   PROPERTY COMPILE_FLAGS "-std=c++0x")
+
 target_link_libraries(rastro2paje fl boost_regex boost_filesystem ${RASTRO_LIBRARIES})
 
 
 
 
+
+
+
+#####################################
+## Symbol test
+add_executable(symbols_test
+  symbols.cc
+  symbols.hh
+  )
+
+target_link_libraries(symbols_test boost_regex)
+set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS SYMBOL_UNIT_TEST=1)
+
+
+
+###############################
+## Scanner Test
 add_executable(scanner_test 
+  baseevent.cc
+  baseeventtype.cc
   symbols.cc
   event.cc
   container.cc
@@ -49,27 +78,20 @@ add_executable(scanner_test
   tree/tree.hpp # my tree implementation
   ${FLEX_DescriptionFileScanner_OUTPUTS} 
   ${BISON_DescriptionFileParser_OUTPUTS}
-  )
+)
 
 set_property(TARGET scanner_test PROPERTY COMPILE_FLAGS "-std=c++0x")
-
-
-add_executable(symbols_test
-  symbols.cc
-  symbols.hh
-  )
-target_link_libraries(symbols_test boost_regex)
-set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS SYMBOL_UNIT_TEST=1)
-
 set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS SCANNER_UNIT_TEST=1)
 target_link_libraries(scanner_test fl)
 
+
+
+############################
+### Tree test
 add_executable(tree/tree_test
   tree/tree.cpp
   tree/tree.hpp
-  )
-
-
+)
 set_property(TARGET tree/tree_test PROPERTY COMPILE_FLAGS "-std=c++0x")
 
 #FLEX_TARGET(test_tokens descriptionfile.l descriptionfile.yy.c) #[COMPILE_FLAGS <string>])

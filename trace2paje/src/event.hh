@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Seg, 03 Out 2011 18:44:32 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 12:13:44 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -40,13 +40,19 @@
 #include <iostream>
 #include <limits>
 #include "rastro_helper.hh"
+
+
+#include "baseeventtype.hh"
+#include "baseevent.hh"
+
 extern "C" {
 #include <rastro.h>
 }
 
 
+#include "baseevent.hh"
 
-#define DEFAULT_EVENT_PRIO (-(numeric_limits<double>::max()) )
+
 #define CONTAINER_CREATE_PRIO (-10)
 #define CONTAINER_DESTROY_PRIO (-1)
 
@@ -54,44 +60,12 @@ extern "C" {
 
 namespace Paje {
 
-  typedef enum _trigger_id_t {
-    EVENT_TRIGGER,   // one time event
-    EVENT_START,     // do a start action
-    EVENT_END,       // do an end action
-    EVENT_NOP,       // warn of bad implementation
-  } trigger_id_t;
-
-
-  typedef unsigned int event_id_t;
-
-  typedef struct _identifier_entry_t {
-    string field_name;
-    rastro_basic_types_t type;
-  } identifier_entry_t;
-
-  typedef list<identifier_entry_t> identifier_list_t;
-
-
   extern set<pair<string,string>> container_unique_names;
 
-  //************************************************
-  //Class: Paje::EventType
-  class EventType: public PajeElement {
-    public:
-      string typeName;
-      Container * container;
-
-      EventType(const string &typeName);
-      EventType(const string &typeName,Paje::Container * c);
-      //EventType(string &typeName, attribs_t * attribs);
-
-      virtual void do_header(ostream &out);
-
-  };
   
   //************************************************
   //Class: Paje::LinkType
-  class LinkType: public EventType {
+  class LinkType: public BaseEventType {
     public:
       Container *source, *dest;
 
@@ -101,78 +75,9 @@ namespace Paje {
   };
 
 
-
-  //************************************************
-  //Class: Paje::Event
-  class Event: public PajeElement {
-    public:
-      EventType *eventType;
-
-      string formatValue;
-      string name;
-
-      string type_identifier;
-
-      event_id_t  start_id, end_id, trigger_id;
-
-      identifier_list_t identifier_names;
-      stack<double> timestamp_stack;
-
-      Event();
-
-      virtual bool trigger(event_id_t evt_id, double timestamp,
-          symbols_table_t * symbols, ostream &out);
-
-      virtual void fill_from_attr(attribs_t * attrs);
-
-      virtual void set_trigger_id(trigger_id_t trigger_id, event_id_t id);
-
-      virtual bool do_start(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-
-      virtual bool do_end(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-
-      virtual bool do_trigger(double timestamp,
-          symbols_table_t * symbols, ostream &out);
-
-  
-      bool load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols);
-      void add_symbol_from_tree(attribs_t * attrs);
-
-      virtual string toString();
-
-      bool operator<(const Event * e) const;
-
-      virtual void push_timestamp(const double timestamp);
-      virtual double pop_timestamp(const double timestamp);
-      virtual double get_priority() const;
-
-      virtual bool has_ids() const;
-
-      virtual void gen_auto_ids(long int * base_id);
-
-      virtual void gen_ids_description(ostream & out);
-
-      void get_rst_function_signature(set<string> & signatures);
-      void gen_fort_header(ostream & out,
-          const string & start_suffix,
-          const string & end_suffix,
-          const string & evt_suffix);
-      void gen_c_header(ostream & out, 
-          const string & start_suffix,
-          const string & end_suffix,
-          const string & evt_suffix);
-
-    private:
-      stringstream rst_function_signature_buf;
-
-  };
-
-
-  class DummyEvent: public Event {
+  class DummyEvent: public BaseEvent {
       public: 
-        DummyEvent(const string &name, EventType * evt_type);
+        DummyEvent(const string &name, BaseEventType * evt_type);
         virtual bool do_start(double timestamp,
             symbols_table_t * symbols, ostream &out);
 
@@ -189,7 +94,7 @@ namespace Paje {
 
 
 
-  class State: public Event {
+  class State: public BaseEvent {
     public:
 
       State(string &_name, attribs_t * attrs) ;
@@ -209,7 +114,7 @@ namespace Paje {
 
 
 
-  class Link: public Event {
+  class Link: public BaseEvent {
     public:
       string format_key;
       Link(string &name, attribs_t * attribs);
@@ -233,7 +138,7 @@ namespace Paje {
 
 
 
-  class ContainerCreateTrigger: public Event {
+  class ContainerCreateTrigger: public BaseEvent {
     public:
       ContainerCreateTrigger(Paje::Container * c, hierarchy_t * n);
 

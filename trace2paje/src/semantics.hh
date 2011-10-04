@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Seg, 03 Out 2011 15:52:40 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 12:15:27 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -63,7 +63,7 @@ void hierarchy_to_paje(ostream &out);
 void event_types_to_paje(ostream &out);
 void map_accept_attrs(attribs_t * attribs);
 void events_to_id_map();
-Paje::Event * get_event_or_warn(const string& evt_name);
+Paje::BaseEvent * get_event_or_warn(const string& evt_name);
 
 
 template <typename CharT, typename Traits>

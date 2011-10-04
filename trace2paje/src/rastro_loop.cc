@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:26:57 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 12:19:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -88,7 +88,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
 #if 0
   for_each(event_ids->begin(), event_ids->end(),
-      [&](pair<Paje::event_id_t, Paje::Event*> p)
+      [&](pair<Paje::event_id_t, Paje::BaseEvent*> p)
       {
         cerr << p.first << " => " << p.second->name << endl;
       }
@@ -97,8 +97,8 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
 
 
-  vector<Paje::Event *> evt_serve_list;
-  vector<Paje::Event *>::iterator evt_serve_list_it;
+  vector<Paje::BaseEvent *> evt_serve_list;
+  vector<Paje::BaseEvent *>::iterator evt_serve_list_it;
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
     //cerr << "evemt type == " << event.type << " == " << evt_id << endl;
@@ -116,12 +116,12 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
       ++nevts;
 
       evt_serve_list.push_back(it->second);
-      //cerr << "Event " << it->second->name << endl;
+      //cerr << "BaseEvent " << it->second->name << endl;
     }
 
 
     sort(evt_serve_list.begin(), evt_serve_list.end(),
-        [](Paje::Event * evt1, Paje::Event * evt2) {
+        [](Paje::BaseEvent * evt1, Paje::BaseEvent * evt2) {
           return (evt1->get_priority() > evt2->get_priority());
           }
         );
@@ -133,7 +133,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
       //pair<Paje::event_id_t, Paje::Event*> p = *it;
       
-      Paje::Event * evt = *evt_serve_list_it; //p.second;
+      Paje::BaseEvent * evt = *evt_serve_list_it; //p.second;
       //cerr << "11Event " << evt->name << " prio " << evt->get_priority() << endl;
       evt->load_symbols(evt_id, &event,&symbols);
       symbols[Paje::idf1_name].set_value(event.id1);
