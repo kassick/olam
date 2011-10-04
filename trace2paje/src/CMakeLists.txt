@@ -32,6 +32,7 @@ add_executable(rastro2paje
   dummyevent.cc
   state.cc
   event.cc
+  containertrigger.cc
   container.cc
   semantics.cc
   paje.cc
@@ -78,6 +79,7 @@ add_executable(scanner_test
   link.cc
   dummyevent.cc
   state.cc
+  containertrigger.cc
   symbols.cc
   event.cc
   container.cc
