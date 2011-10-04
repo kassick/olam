@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:12:18 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:25:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,6 +25,7 @@
  */
 
 #include "containertrigger.hh"
+#include "paje_functions.hh"
 #include <set>
 
 set<pair<string,string>> Paje::container_unique_names;

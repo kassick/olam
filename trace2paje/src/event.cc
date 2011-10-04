@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:10:42 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:26:08 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -23,18 +23,6 @@
  */
 
 
-#include "attributes.hh"
-#include "paje.hh"
-#include "event.hh"
-#include "symbols.hh"
-#include <assert.h>
-#include <sstream>
-#include <string>
-#include <map>
-#include <stack>
-#include <iostream>
-#include <boost/algorithm/string.hpp>
-#include "semantic_types.hh"
 
 extern "C" {
 #include <rastro.h>

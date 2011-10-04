@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:06:01 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:24:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -24,6 +24,7 @@
 
 
 #include "link.hh"
+#include "paje_functions.hh"
 
 
 Paje::Link::Link(string &name, attribs_t * attribs) {

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseeventtype.hh"
 // Created: "Ter, 04 Out 2011 12:03:12 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:26:03 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:22:06 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,7 +26,7 @@
 #define __BASEEVENTTYPE_H__
 
 
-#include "paje.hh"
+#include "pajeelement.hh"
 #include "container.hh"
 
 #include <string>

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Sex, 30 Set 2011 19:22:30 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:21:44 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -30,7 +30,8 @@
 #include <string.h>
 #include "container.hh"
 #include "semantics.hh"
-#include "paje.hh"
+#include "pajeelement.hh"
+#include "paje_functions.hh"
 
 
 

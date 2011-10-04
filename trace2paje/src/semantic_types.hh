@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantic_types.hh"
 // Created: "Sex, 30 Set 2011 16:13:42 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:21:38 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:28:48 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -32,9 +32,8 @@
 #include <iostream>
 #include <map>
 #include "tree.hpp"
-#include "container.hh"
+#include "paje.hh"
 #include "attributes.hh"
-#include "event.hh"
 
 
 using namespace Paje;

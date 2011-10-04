@@ -1,18 +1,18 @@
 // C++ source code
-// File: "/home/kassick/Work/olam/trace2paje/src/paje.cc"
-// Created: "Seg, 01 Ago 2011 15:39:46 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:20:34 -0300 (kassick)"
+// File: "/home/kassick/Work/olam/trace2paje/src/pajeelement.cc"
+// Created: "Ter, 04 Out 2011 14:18:07 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:37:42 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
  * ===========================================================================
  *
- *       Filename:  paje.cc
+ *       Filename:  pajeelement.cc
  *
- *    Description:  Pajé utilities; some taken from Akypueira
+ *    Description:  
  *
  *        Version:  1.0
- *        Created:  01-08-2011 15:39:46 BRT
+ *        Created:  04-10-2011 14:18:07 BRT
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -23,3 +23,10 @@
  */
 
 
+#include "pajeelement.hh"
+
+namespace Paje {
+  void PajeElement::do_header(ostream &out) {
+    return;
+  }
+}

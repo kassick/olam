@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje.hh"
 // Created: "Seg, 01 Ago 2011 15:34:40 -0300 (kassick)"
-// Updated: "Qui, 29 Set 2011 16:42:12 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:20:17 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,77 +25,36 @@
 #ifndef _PAJE_HH_H
 #define _PAJE_HH_H
 
-#include <string>
-#include <iostream>
 #include <sstream>
+#include <string>
+#include <map>
+#include <set>
+#include <stack>
+#include <list>
+#include <iostream>
+#include <limits>
 
-using namespace std;
-
-namespace Paje {
-
-  class PajeElement {
-    public:
-      virtual void do_header(ostream &header);
-      virtual void toPaje(stringstream &definitions, stringstream &header, stringstream &finalization);
-  };
+extern "C" {
+#include <rastro.h>
 }
 
-#define PAJE_ROOT_CONTAINER  "0"
+#include "rastro_helper.hh"
+#include "paje_functions.hh"
 
-void init_paje_events();
-void paje_header(ostream &out);
-void pajeDefineContainerType(string &alias,
-                             string &containerType, 
-                             string &name,
-                             ostream &out);
 
-void pajeDefineStateType(string &alias,
-                         string &containerType, 
-                         string &name,
-                         ostream &out);
+#include "attributes.hh"
+#include "symbols.hh"
 
-void pajeDefineLinkType(string &alias,
-                        string &containerType,
-                        string &sourceContainerType,
-                        string &destContainerType, string &name,
-                        ostream &out);
+#include "container.hh"
+#include "baseeventtype.hh"
+#include "linktype.hh"
+#include "baseevent.hh"
+#include "event.hh"
+#include "link.hh"
+#include "state.hh"
+#include "dummyevent.hh"
+#include "containertrigger.hh"
 
-void pajeCreateContainer(double timestamp,
-                         string &alias,
-                         string &type,
-                         string &container, string &name,
-                         ostream &out);
 
-void pajeDestroyContainer(double timestamp,
-                          string &type, string &container,
-                          ostream &out);
-
-void pajeSetState(double timestamp,
-                  string &container,
-                  string &type, string &value,
-                  ostream &out);
-
-void pajePushState(double timestamp,
-                   string &container,
-                   string &type, string &value,
-                   ostream &out);
-
-void pajePopState(double timestamp,
-                  string &container, string &type,
-                  ostream &out);
-
-void pajeStartLink(double timestamp,
-                   string &container,
-                   string &type,
-                   string &sourceContainer,
-                   string &value, string &key,
-                   ostream &out);
-
-void pajeEndLink(double timestamp,
-                 string &container,
-                 string &type,
-                 string &endContainer,
-                 string &value, string &key,
-                 ostream &out);
 
 #endif

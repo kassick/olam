@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.hh"
 // Created: "Ter, 04 Out 2011 14:03:20 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:06:38 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:31:10 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*

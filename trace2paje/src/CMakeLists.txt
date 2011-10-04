@@ -36,6 +36,8 @@ add_executable(rastro2paje
   container.cc
   semantics.cc
   paje.cc
+  paje_functions.cc
+  pajeelement.cc
   symbols.cc
   rastro_loop.cc
   tree/tree.hpp # my tree implementation
@@ -85,6 +87,8 @@ add_executable(scanner_test
   container.cc
   semantics.cc
   paje.cc
+  paje_functions.cc
+  pajeelement.cc
   tree/tree.hpp # my tree implementation
   ${FLEX_DescriptionFileScanner_OUTPUTS} 
   ${BISON_DescriptionFileParser_OUTPUTS}

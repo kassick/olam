@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.hh"
 // Created: "Ter, 04 Out 2011 13:59:55 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:01:35 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:25:23 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -27,6 +27,7 @@
 
 #include "baseevent.hh"
 #include "attributes.hh"
+#include "paje_functions.hh"
 #include <string>
 #include <iostream>
 

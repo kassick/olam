@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:21:47 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 14:26:38 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <queue>
 #include "semantics.hh"
-#include "container.hh"
 #include "paje.hh"
 #include "rastro_loop.hh"
 #include <getopt.h>
