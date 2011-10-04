@@ -27,6 +27,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(rastro2paje
   baseevent.cc
   baseeventtype.cc
+  linktype.cc
   event.cc
   container.cc
   semantics.cc
@@ -70,6 +71,7 @@ set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS SYMBOL_UNIT_TEST=1
 add_executable(scanner_test 
   baseevent.cc
   baseeventtype.cc
+  linktype.cc
   symbols.cc
   event.cc
   container.cc

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:18:34 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 13:46:10 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,55 +45,6 @@ using namespace std;
 set<pair<string,string>> Paje::container_unique_names;
 
 
-
-/*******************************************************************************
- Paje::LinkType functions
-*******************************************************************************/
-
-Paje::LinkType::LinkType(string& tn, Paje::Container * c, attribs_t * t) : 
-  Paje::BaseEventType(tn,c)
-{
-  this->source = NULL;
-  this->dest  = NULL;
-  
-  attribs_t::iterator it;
-  for (it = t->begin(); it != t->end(); ++it)
-  {
-    SemanticAttribute * attr = (*it)->getVal();
-    switch(attr->id) {
-      case ID_LINK_SOURCE:
-        if (!container_type_names->count(attr->vals.name)) {
-          cerr << "Error: Can not find source container for link type " << typeName << endl;
-          exit(1);
-        }
-        this->source = (*container_type_names)[attr->vals.name]->getVal();
-        break;
-      case ID_LINK_DEST:
-        if (!container_type_names->count(attr->vals.name)) {
-          cerr << "Error: Can not find source container for link type " << typeName << endl;
-          exit(1);
-        }
-        this->dest = (*container_type_names)[attr->vals.name]->getVal();
-        break;
-      default:
-        break;
-    }
-  }
-
-  if ((this->source == NULL) || (this->dest == NULL) || (this->container == NULL)) {
-    cerr << "Null fields, verify!" << endl;
-    exit(1);
-  }
-}
-
-void Paje::LinkType::do_header(ostream &out)
-{
-  pajeDefineLinkType(typeName, container->typeName,
-                        source->typeName,
-                        dest->typeName,
-                        typeName,
-                        out);
-}
 
 
 

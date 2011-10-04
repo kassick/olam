@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 12:13:44 -0300 (kassick)"
+// Updated: "Ter, 04 Out 2011 13:46:10 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -51,6 +51,7 @@ extern "C" {
 
 
 #include "baseevent.hh"
+#include "linktype.hh"
 
 
 #define CONTAINER_CREATE_PRIO (-10)
@@ -63,16 +64,6 @@ namespace Paje {
   extern set<pair<string,string>> container_unique_names;
 
   
-  //************************************************
-  //Class: Paje::LinkType
-  class LinkType: public BaseEventType {
-    public:
-      Container *source, *dest;
-
-      LinkType(string& typeName, Paje::Container * c, attribs_t * t);
-
-      virtual void do_header(ostream &out);
-  };
 
 
   class DummyEvent: public BaseEvent {
