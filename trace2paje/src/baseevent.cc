@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 19:10:09 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 15:18:34 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -235,7 +235,10 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
             symbol.set_value( event->v_ ## PAJE_NAME [ count_ ## SHORT_NAME ] );\
             count_ ## SHORT_NAME ++  ;                                      \
           } else if (needs_all_symbols) {                                   \
-            cerr << "Not enought values of type " << #SHORT_NAME  <<endl;   \
+            cerr << "[Warning] Not enought values of type " << #SHORT_NAME  \
+                 << " for id " << id                                        \
+                 << " in event " << this->name                              \
+                 << endl;                                                   \
             return false;                                                   \
           }                                                                 \
           break; // trick?

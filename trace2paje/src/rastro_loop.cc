@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 17:06:05 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 15:49:03 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -140,6 +140,21 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
     // get all events that must be served with this id
     equal_range = event_ids->equal_range(evt_id);
+
+    /*
+    cerr << "for id " << evt_id << " got the following limits: ";
+    if (equal_range.first != event_ids->end())
+       cerr << (equal_range.first)->second->name;
+    else
+      cerr << "(end)";
+    cerr << " to ";
+
+    if (equal_range.second != event_ids->end())
+      cerr << (equal_range.second)->second->name;
+    else
+      cerr << "(end)";
+    cerr << endl;
+    */
 
     for(it = equal_range.first;
         it != equal_range.second;

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 20:42:33 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 15:50:05 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -40,9 +40,15 @@ Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c,hierarc
 
 bool Paje::ContainerCreateTrigger::load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols)
 {
-  Paje::BaseEvent * evt = (*event_names)[this->container->createEvent];
+  Paje::BaseEvent * create_evt  = (*event_names)[this->container->createEvent];
+  Paje::BaseEvent * destroy_evt = (*event_names)[this->container->destroyEvent];
   
-  evt->load_symbols(id, event, symbols);
+  // load symbols from the event that created the container, but let it
+  // load only partially the symbols
+  //create_evt->load_symbols(create_evt->end_id, event, symbols);
+
+  // load the ones from the destroy as well
+  destroy_evt->load_symbols(create_evt->start_id, event, symbols);
 }
 
 

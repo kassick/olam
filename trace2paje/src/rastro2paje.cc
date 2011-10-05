@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 19:42:07 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 15:02:43 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -350,6 +350,9 @@ void generate_paje_output(const string & fname,int oind, int argc, char ** argv)
   rastro_loop_events(rst_files_to_open,*fout); // loop every rst file and map events
 
   ((ofstream *)fout)->close();
+
+
+  check_missing_links();
 
 }
 

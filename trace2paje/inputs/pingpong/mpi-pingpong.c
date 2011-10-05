@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Ter, 04 Out 2011 19:04:50 -0300 (kassick)"
+ * Updated: "Qua, 05 Out 2011 14:29:02 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -25,7 +25,7 @@
 
 #include <mpi.h>
 #include <stdio.h>
-#include "rst_evts.h"
+#include "evt_defs.h"
 #include <rastro.h>
 #include "rst_functions.h"
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.hh"
 // Created: "Ter, 04 Out 2011 14:03:20 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 18:18:51 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 15:02:17 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -64,5 +64,6 @@ namespace Paje {
 
 }
 
+void check_missing_links();
 
 #endif
