@@ -4,14 +4,16 @@ CONTAINER Machine {
   DESTROY finalize
 
   CONTAINER Rank {
+    EVENTTYPE Whatever {
+      init
+      finalize
+      another
+      else
+    }
     NAME "rank_%(rank)"
     CREATE PARENT
     DESTROY PARENT
 
-    EVENTTYPE Whatever {
-      init
-      finalize
-    }
 
   }
 

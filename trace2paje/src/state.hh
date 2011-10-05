@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.hh"
 // Created: "Ter, 04 Out 2011 13:59:55 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 16:06:51 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 19:47:19 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -57,5 +57,8 @@ namespace Paje {
 
 
 }// namespace
+
+void check_opened_states(ostream & out);
+
 #endif
 

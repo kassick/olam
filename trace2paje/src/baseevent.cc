@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 15:18:34 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 20:17:38 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -28,6 +28,7 @@
 
 #include <cassert>
 #include <boost/algorithm/string.hpp>
+#include <algorithm>
 
 
 
@@ -166,6 +167,7 @@ void Paje::BaseEvent::add_symbol_from_tree(attribs_t * attrs)
 
       switch (attr->id) {
         case ID_RASTRO_TYPE:
+          return (level > 0);
           break; // ignore; code done above
         case ID_IDF:
           entry.field_name = attr->vals.name;
@@ -173,7 +175,8 @@ void Paje::BaseEvent::add_symbol_from_tree(attribs_t * attrs)
           rst_function_signature_buf << entry.type;
           break;
         default:
-          cerr << "Unexpected value in tree: " << attr << endl;
+          cerr << "Unexpected value in tree: " << attr->toString()
+              <<  " while creating " << this->name << endl;
           exit(1);
       }
       return false;

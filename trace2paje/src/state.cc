@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 15:12:44 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 20:02:37 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -24,6 +24,8 @@
 
 
 #include "state.hh"
+#include "semantic_types.hh"
+#include <algorithm>
 
 Paje::State::State(string& name, attribs_t * attribs) {
   this->name = name;
@@ -101,3 +103,56 @@ void Paje::State::gen_auto_ids(long int * base_id)
   (*base_id)++;
 }
 
+
+
+
+struct pending_state {
+  string container;
+  Paje::BaseEvent* evt;
+  double priority;
+};
+
+void check_opened_states(ostream & out)
+{
+  vector<struct pending_state> pending;
+  for_each(event_names->begin(), event_names->end(), 
+      [&](pair<string,Paje::BaseEvent*> p)
+      {
+        Paje::BaseEvent * evt = p.second;
+        if (!evt->eventType)
+          return;
+
+        for (auto it = evt->timestamp_map.begin(); it != evt->timestamp_map.end(); ++it)
+        {
+          const string &container = it->first;
+          stack<double> &ts_stack = it->second;
+
+            while (ts_stack.size())
+            {
+              struct pending_state s;
+              s.container = container;
+              s.evt = evt;
+              s.priority = ts_stack.top();
+              pending.push_back(s);
+              ts_stack.pop();
+            }
+          }
+      });
+
+  sort(pending.begin(),pending.end(),
+      [](const struct pending_state e1, const struct pending_state e2)
+      {
+        return (e1.priority > e2.priority);
+      }
+    );
+
+  for_each(pending.begin(),pending.end(),
+      [&out](struct pending_state s) {
+        cerr << "[Warning] Popping missed state " << s.evt->name << " on " << s.container << endl;
+        pajePopState(s.priority,
+                  s.container,
+                  s.evt->eventType->typeName,
+                  out);
+      }
+    );
+}

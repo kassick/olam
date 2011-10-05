@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 15:49:03 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 18:45:30 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -63,13 +63,14 @@ typedef struct _serve_entry_t {
 
 } serve_entry_t;
 
-void  rastro_loop_events(list<string> &files_to_open, ostream &out)
+double  rastro_loop_events(list<string> &files_to_open, ostream &out)
 {
 
   // Open files, use a tmp sync file
   char syncfile[256];
   char * fname;
   set<string> opened_files;
+  double timestamp;
   
   rst_event_t event;
   rst_file_t data;
@@ -135,7 +136,7 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
     // load constant symbols into the tables
     symbols[Paje::idf1_name].set_value(event.id1);
     symbols[Paje::idf2_name].set_value(event.id2);
-    double timestamp = (double) event.timestamp / 1000000 ;
+    timestamp = (double) event.timestamp / 1000000 ;
    
 
     // get all events that must be served with this id
@@ -223,5 +224,5 @@ void  rastro_loop_events(list<string> &files_to_open, ostream &out)
   // close files
   rst_close_file( &data );
 
-  return;
+  return timestamp;
 }

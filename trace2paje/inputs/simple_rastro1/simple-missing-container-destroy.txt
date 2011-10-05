@@ -14,7 +14,7 @@ CONTAINER machine {
 
   NAME "Container_%(id1)"
   CREATE int8_evt
-  DESTROY finalize_evt
+  #DESTROY finalize_evt
 
 }
 
@@ -63,8 +63,10 @@ STATE loop_evt {
 
 
 
-ID int8_evt 10 11
-ID int16_evt 11 12
+#ID int8_evt 10 11
+ID int8_evt START 10
+#ID int16_evt 11 12
+ID int16_evt START 11
 ID int32_evt 12 13
 ID int64_evt 13 14
 ID float_evt 14 15

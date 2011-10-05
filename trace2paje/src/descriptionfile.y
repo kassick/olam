@@ -203,7 +203,7 @@ container_params:
                     //$1->addChild(create_nop_attr($2));
                     $1->addChild($2);
                   }
-                | container_param { $$ = $1}
+                | container_param { $$ = create_nop_attr($1);}
                 ;
 
 container_param: name_param
@@ -434,7 +434,11 @@ event_params: event_params event_param {
                     $1->addChild($2);
                     $$ = $1;
               }
-            | event_param {$$ = $1;}
+            | event_param {
+              $$ = create_nop_attr($1);
+            }
+            ;
+
 
 event_param: TOK_TYPE IDENTIFIER {
                   attr = new_semantic_attribute();
@@ -516,7 +520,7 @@ state_params: state_params state_param    {
                     $1->addChild($2);
                     $$ = $1;
               }
-            | state_param {$$ = $1;}
+            | state_param {$$ = create_nop_attr($1);}
 
 
 state_param: TOK_TYPE IDENTIFIER {
@@ -589,7 +593,7 @@ link_params: link_params link_param    {
                     $1->addChild($2);
                     $$ = $1;
               }
-            | link_param {$$ = $1;}
+            | link_param {$$ = create_nop_attr($1);}
 
 
 link_param: TOK_TYPE IDENTIFIER {

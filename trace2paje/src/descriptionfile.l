@@ -67,6 +67,10 @@ KEY                     return TOK_KEY      ;
                         }
 
 \n                      { yyline++ ;}
+^[ \t]*#[^\n]*            { // a comment
+                        fprintf(stderr,"Comment: %s\n",yytext);
+                          }
+
 [ \t]+                  /* ignore whitespace */;
 .                       {
                           printf("Unexpected token `` %c ''\n",yytext[0]) ;

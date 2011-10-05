@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 15:02:43 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 19:59:11 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -347,12 +347,18 @@ void generate_paje_output(const string & fname,int oind, int argc, char ** argv)
   event_types_to_paje(*fout); // Define event types
 
   // Here loop around the paje events and dumps the events
-  rastro_loop_events(rst_files_to_open,*fout); // loop every rst file and map events
+  double timestamp = rastro_loop_events(rst_files_to_open,*fout); // loop every rst file and map events
 
-  ((ofstream *)fout)->close();
 
 
   check_missing_links();
+
+  //check_opened_states();
+
+  check_opened_states(*fout);
+  destroy_missing_containers(timestamp,*fout);
+  
+  ((ofstream *)fout)->close();
 
 }
 

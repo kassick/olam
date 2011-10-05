@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 15:50:05 -0300 (kassick)"
+// Updated: "Qua, 05 Out 2011 20:08:49 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -40,15 +40,22 @@ Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c,hierarc
 
 bool Paje::ContainerCreateTrigger::load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols)
 {
-  Paje::BaseEvent * create_evt  = (*event_names)[this->container->createEvent];
-  Paje::BaseEvent * destroy_evt = (*event_names)[this->container->destroyEvent];
-  
-  // load symbols from the event that created the container, but let it
-  // load only partially the symbols
-  //create_evt->load_symbols(create_evt->end_id, event, symbols);
+  if ( (id == this->end_id) && (event_names->count(this->container->destroyEvent)) )
+  {
+    // When destroying an event, load the symbols from it's associated
+    // event
+    Paje::BaseEvent * destroy_evt = (*event_names)[this->container->destroyEvent];
+    destroy_evt->load_symbols(destroy_evt->end_id, event, symbols);
 
-  // load the ones from the destroy as well
-  destroy_evt->load_symbols(create_evt->start_id, event, symbols);
+    //Paje::BaseEvent * create_evt  = (*event_names)[this->container->createEvent];
+  }
+  
+  if ( (id == this->start_id) && (event_names->count(this->container->createEvent)) )
+  {
+    Paje::BaseEvent * create_evt = (*event_names)[this->container->createEvent];
+    create_evt->load_symbols(create_evt->start_id, event, symbols);
+  }
+
 }
 
 
@@ -178,3 +185,40 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
 
 
 
+void destroy_missing_containers(double timestamp, ostream & out)
+{
+  walk_tree_depth_first(toplevel_hierarchy,
+      [&timestamp,&container_unique_names,&out](hierarchy_t * n, int level) 
+      {
+        Paje::Container * thisContainer = n->getVal();
+
+        if (thisContainer->parent == NULL)
+          return true;  // got to the parent
+
+        /*
+        cerr << "Container type " << thatcontainer->typeName << "child of " 
+              << thatcontainer->parent->typeName << "(" << parentName << ")"
+              << endl;*/
+
+        set<Paje::unique_container_name_t>::iterator it;
+
+        it = container_unique_names.begin();
+        while (it != container_unique_names.end())
+        {
+            // pair of containername, typename
+
+            if ( (thisContainer->typeName == it->typeName))
+            {
+              cerr << "[Warning] Destroying missing container " << it->containerName << endl;
+              pajeDestroyContainer(timestamp,
+                                    it->typeName,
+                                    it->containerName,
+                                    out);
+              it = container_unique_names.erase(it);
+            } else 
+              ++it;
+        }
+        return false;
+      }
+    );
+}
