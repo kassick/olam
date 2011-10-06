@@ -70,6 +70,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %token<ptr> TOK_CONTAINER;
 %token<ptr> TOK_RASTRO_HEADER ;
 %token<ptr> TOK_EVENT_TYPE;
+%token<ptr> TOK_STATE_TYPE;
 %token<ptr> TOK_LINKTYPE ;
 %token<ptr> TOK_NAME     ;
 %token<ptr> TOK_CREATE   ;
@@ -109,6 +110,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %type<attr_node> opt_accept_list;
 %type<attr_node> accept_param;
 %type<attr_node> eventtype_param;
+%type<attr_node> statetype_param;
 %type<ptr> include_statement;
 
 %type<attr_node> idf_list;
@@ -212,21 +214,17 @@ container_param: name_param
                 | accept_param
                 | eventtype_param
                 | linktype_param
+                | statetype_param
                 | container_definition {
                   $$ = create_nop_attr($1);
                   }
                 ;
 
 name_param: TOK_NAME STRING_LIT {
-                    char *str = $2;
-
-                    // it's a strlit so we have "something" (or "")
-                    str[strlen(str)-1] = '\0';
-                    str++;
 
                     attr = new_semantic_attribute();
                     attr->id = ID_NAME;
-                    attr->vals.name = str;
+                    attr->vals.name = $2;
 
                     n = new attribs_t(attr);
 
@@ -279,6 +277,28 @@ destroy_param: TOK_DESTROY IDENTIFIER {
                   //cout << "Destroy on children" <<endl;
                 }
             ;
+
+
+
+statetype_param: TOK_STATE_TYPE IDENTIFIER '{' accept_list '}' {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_STATE_TYPE_DEF;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  n->addChild($4);
+                  $$ = n;
+                  
+               }
+               | TOK_STATE_TYPE IDENTIFIER {
+                  attr = new_semantic_attribute();
+                  attr->id = ID_STATE_TYPE_DEF;
+                  attr->vals.name = $2;
+
+                  n = new attribs_t(attr);
+                  $$ = n;
+                  
+               }
 
 
 eventtype_param: TOK_EVENT_TYPE IDENTIFIER '{' accept_list '}' {
@@ -410,14 +430,8 @@ idf: IDENTIFIER { $$ = $1} ;
 
 include_statement: TOK_INCLUDE STRING_LIT {
                   $$ = NULL;
-                  char *str = $2;
 
-                  // it's a strlit so we have "something" (or "")
-                  str[strlen(str)-1] = '\0';
-                  str++;
-
-                  
-                  files_to_parse.push(str);
+                  files_to_parse.push($2);
                 }
                 
 event_statement: TOK_EVENT IDENTIFIER '{' event_params '}' {
@@ -477,14 +491,10 @@ event_param: TOK_TYPE IDENTIFIER {
                   $$ = n;
                 }
           | TOK_VALUE STRING_LIT {
-                  // remove ""
-                  char * str = $2;
-                  str[strlen(str)-1] = '\0';
-                  str++;
 
                   attr = new_semantic_attribute();
                   attr->id = ID_FORMAT_NAME;
-                  attr->vals.name = str;
+                  attr->vals.name = $2;
                   
                   n = new attribs_t(attr);
                   $$ = n;
@@ -561,13 +571,10 @@ state_param: TOK_TYPE IDENTIFIER {
                 }
           | TOK_VALUE STRING_LIT {
                   // remove ""
-                  char * str = $2;
-                  str[strlen(str)-1] = '\0';
-                  str++;
 
                   attr = new_semantic_attribute();
                   attr->id = ID_FORMAT_NAME;
-                  attr->vals.name = str;
+                  attr->vals.name = $2;
                   
                   n = new attribs_t(attr);
                   $$ = n;
@@ -633,27 +640,19 @@ link_param: TOK_TYPE IDENTIFIER {
                   $$ = n;
                 }
           | TOK_VALUE STRING_LIT {
-                  // remove ""
-                  char * str = $2;
-                  str[strlen(str)-1] = '\0';
-                  str++;
 
                   attr = new_semantic_attribute();
                   attr->id = ID_FORMAT_NAME;
-                  attr->vals.name = str;
+                  attr->vals.name = $2;
                   
                   n = new attribs_t(attr);
                   $$ = n;
             }
           | TOK_KEY STRING_LIT {
-                  // remove ""
-                  char * str = $2;
-                  str[strlen(str)-1] = '\0';
-                  str++;
 
                   attr = new_semantic_attribute();
                   attr->id = ID_KEY_FORMAT;
-                  attr->vals.name = str;
+                  attr->vals.name = $2;
                   
                   n = new attribs_t(attr);
                   $$ = n;

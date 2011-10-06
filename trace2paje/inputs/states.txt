@@ -5,6 +5,10 @@ CONTAINER ANAME {
     umevent
   }
 
+  STATETYPE ST1 {
+    ASTATE
+  }
+
   ACCEPT {
   }
   NAME "Container%(varname:.8d)"
@@ -45,7 +49,6 @@ CONTAINER BNAME {
 }
 
 STATE ASTATE {
-  TYPE ATYPE
   VALUE "%(VAR1)"
   i svar
   i VAR1

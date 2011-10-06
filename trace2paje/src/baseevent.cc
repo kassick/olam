@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 20:17:38 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:26:28 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -223,6 +223,7 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
   // the end of a link that are needed to form a key MUST BE in the
   // symbols table, but we are not gonna enforce it
   bool needs_all_symbols = true;
+  bool ret = true;
 
   Paje::Symbol *symbol;
 
@@ -242,7 +243,7 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
                  << " for id " << id                                        \
                  << " in event " << this->name                              \
                  << endl;                                                   \
-            return false;                                                   \
+            ret = false;                                                    \
           }                                                                 \
           break; // trick?
 
@@ -267,7 +268,7 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
 
       default:
         cerr << "Unknown type !?!?!? " <<endl;
-        return false;
+        ret = false;
         break;
     }
 
@@ -276,6 +277,8 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
 #undef CASE_TYPE
 
   (*symbols)["EVT_NAME"].set_value(this->name.c_str());
+
+  return ret;
 
 }
 
@@ -432,4 +435,13 @@ string Paje::BaseEvent::toString() {
     out << "      " << (*it).type << " " << (*it).field_name << endl;
 
   return out.str();
+}
+
+
+
+bool Paje::BaseEvent::fits_in_event_type(
+    const Paje::BaseEventType * evt_type) const
+{
+  // non-specialized event type should fit anywhere
+  return true;
 }

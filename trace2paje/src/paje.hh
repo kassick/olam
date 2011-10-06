@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje.hh"
 // Created: "Seg, 01 Ago 2011 15:34:40 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:20:17 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 15:53:46 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -48,6 +48,7 @@ extern "C" {
 #include "container.hh"
 #include "baseeventtype.hh"
 #include "linktype.hh"
+#include "statetype.hh"
 #include "baseevent.hh"
 #include "event.hh"
 #include "link.hh"

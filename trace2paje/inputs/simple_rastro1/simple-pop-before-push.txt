@@ -64,7 +64,7 @@ STATE loop_evt {
 
 
 ID int8_evt 10 11
-ID int16_evt 11 12
+ID int16_evt 12 11
 ID int32_evt 12 13
 ID int64_evt 13 14
 ID float_evt 14 15

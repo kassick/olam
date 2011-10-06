@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseeventtype.cc"
 // Created: "Ter, 04 Out 2011 12:03:25 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:22:24 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 15:19:33 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -32,7 +32,9 @@
 
 void Paje::BaseEventType::do_header(ostream &out)
 {
-  pajeDefineStateType(typeName, container->typeName, typeName, out);
+  //pajeDefineStateType(typeName, container->typeName, typeName, out);
+  // Here it should call a pajeDefineEventType that is currently not
+  // implemented
 }
 
 

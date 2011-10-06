@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 19:59:11 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:00:23 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -452,6 +452,7 @@ int main(int argc, char** argv)
     // create the types
     attr_to_event_types(early_parse_tree);
     attr_to_link_types(early_parse_tree);
+    attr_to_state_types(early_parse_tree);
 
     // Create the events, links and dummy references
     attr_to_events(early_parse_tree);

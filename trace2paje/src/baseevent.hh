@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.hh"
 // Created: "Ter, 04 Out 2011 11:50:46 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 19:14:25 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 15:49:53 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -143,6 +143,8 @@ namespace Paje {
           const string & start_suffix,
           const string & end_suffix,
           const string & evt_suffix);
+
+      virtual bool fits_in_event_type(const BaseEventType* evt_type) const;
 
     private:
       stringstream rst_function_signature_buf;

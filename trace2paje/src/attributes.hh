@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 18:28:56 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 15:23:42 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -43,6 +43,7 @@ enum _attrib_ids {
   ID_EVENT_TYPE,
   ID_EVENT,
   ID_EVENT_TYPE_DEF,
+  ID_STATE_TYPE_DEF,
   ID_STATE,
   ID_STATE_TYPE,
   ID_PAJE_TYPENAME,

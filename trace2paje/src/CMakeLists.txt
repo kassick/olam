@@ -27,6 +27,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(rastro2paje
   baseevent.cc
   baseeventtype.cc
+  statetype.cc
   linktype.cc
   link.cc
   dummyevent.cc
@@ -78,6 +79,7 @@ add_executable(scanner_test
   baseevent.cc
   baseeventtype.cc
   linktype.cc
+  statetype.cc
   link.cc
   dummyevent.cc
   state.cc

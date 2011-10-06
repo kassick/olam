@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 20:02:37 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:47:06 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -24,8 +24,10 @@
 
 
 #include "state.hh"
+#include "statetype.hh"
 #include "semantic_types.hh"
 #include <algorithm>
+#include <typeinfo>
 
 Paje::State::State(string& name, attribs_t * attribs) {
   this->name = name;
@@ -105,6 +107,21 @@ void Paje::State::gen_auto_ids(long int * base_id)
 
 
 
+bool Paje::State::fits_in_event_type(
+    const Paje::BaseEventType * evt_type) const
+{
+  const Paje::StateType * s = dynamic_cast<const Paje::StateType *>(evt_type);
+  //cerr << "Check if is state type" << endl;
+  return (s != NULL);
+}
+
+
+
+
+
+
+
+//-----------------------------------------------
 
 struct pending_state {
   string container;
@@ -156,3 +173,60 @@ void check_opened_states(ostream & out)
       }
     );
 }
+
+
+
+
+int close_pending_states(string containerName, Paje::Container * c, ostream & out)
+{
+  
+
+  vector<struct pending_state> pending;
+  for_each(event_names->begin(), event_names->end(), 
+      [&](pair<string,Paje::BaseEvent*> p)
+      {
+        Paje::BaseEvent * evt = p.second;
+
+        // filter out events that are not of the type we are using
+        if (( !evt->eventType) ||
+            ( evt->eventType->container != c) )
+          return;
+
+        // no event pushed in this container
+        if (!(evt->timestamp_map.count(containerName)))
+          return;
+
+        stack<double> &ts_stack = evt->timestamp_map[containerName];
+
+        while (ts_stack.size())
+        {
+          struct pending_state s;
+          s.container = containerName;
+          s.evt = evt;
+          s.priority = ts_stack.top();
+          pending.push_back(s);
+          ts_stack.pop();
+        }
+      });
+
+  sort(pending.begin(),pending.end(),
+      [](const struct pending_state e1, const struct pending_state e2)
+      {
+        return (e1.priority > e2.priority);
+      }
+    );
+
+  for_each(pending.begin(),pending.end(),
+      [&out](struct pending_state s) {
+        cerr << "[Warning] Popping missed state " << s.evt->name << " on " << s.container << endl;
+        pajePopState(s.priority,
+                  s.container,
+                  s.evt->eventType->typeName,
+                  out);
+      }
+    );
+
+  return pending.size();
+}
+
+

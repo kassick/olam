@@ -1,18 +1,18 @@
 // C++ source code
-// File: "/home/kassick/Work/olam/trace2paje/src/baseeventtype.hh"
-// Created: "Ter, 04 Out 2011 12:03:12 -0300 (kassick)"
-// Updated: "Qui, 06 Out 2011 15:33:54 -0300 (kassick)"
+// File: "/home/kassick/Work/olam/trace2paje/src/statetype.hh"
+// Created: "Qui, 06 Out 2011 15:16:13 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:14:46 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
  * ===========================================================================
  * 
- *       Filename:  baseeventtype.hh
+ *       Filename:  statetype.hh
  * 
  *    Description:  
  * 
  *        Version:  1.0
- *        Created:  04-10-2011 12:03:12 BRT
+ *        Created:  06-10-2011 15:16:13 BRT
  *       Revision:  none
  *       Compiler:  gcc
  * 
@@ -22,11 +22,13 @@
  * ===========================================================================
  */
 
-#ifndef __BASEEVENTTYPE_H__
-#define __BASEEVENTTYPE_H__
+
+#ifndef __STATETYPE_H__
+#define __STATETYPE_H__
 
 
-#include "pajeelement.hh"
+
+#include "baseeventtype.hh"
 #include "container.hh"
 
 #include <string>
@@ -34,13 +36,11 @@
 
 namespace Paje {
 
-  class BaseEventType: public PajeElement {
+  class StateType: public BaseEventType {
     public:
-      string typeName;
-      Container * container;
 
-      BaseEventType(const string &typeName);
-      BaseEventType(const string &typeName,Paje::Container * c);
+      StateType(const string &typeName);
+      StateType(const string &typeName,Paje::Container * c);
       //EventType(string &typeName, attribs_t * attribs);
 
       virtual void do_header(ostream &out);

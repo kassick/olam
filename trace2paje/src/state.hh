@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.hh"
 // Created: "Ter, 04 Out 2011 13:59:55 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 19:47:19 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:47:15 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -53,12 +53,14 @@ namespace Paje {
       virtual bool has_ids() const;
 
       virtual void gen_auto_ids(long int * base_id);
+      virtual bool fits_in_event_type(const BaseEventType* evt_type) const;
   } ;
 
 
 }// namespace
 
 void check_opened_states(ostream & out);
+int close_pending_states(string containerName, Paje::Container * c, ostream & out);
 
 #endif
 

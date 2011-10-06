@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 20:08:49 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:49:24 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -27,6 +27,7 @@
 #include "containertrigger.hh"
 #include "paje_functions.hh"
 #include "semantic_types.hh"
+#include "state.hh"
 #include <set>
 
 set<Paje::unique_container_name_t> Paje::container_unique_names;
@@ -166,6 +167,7 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
             if ( (thatcontainer->typeName == it->typeName) &&
                  (parentName == it->parentName) )
             {
+              close_pending_states(it->containerName, thatcontainer, out);
               pajeDestroyContainer(timestamp,
                                     it->typeName,
                                     it->containerName,
@@ -177,6 +179,10 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
         return false;
       }
     );
+
+
+
+
 
   *priority = CONTAINER_DESTROY_PRIO;
   return true;

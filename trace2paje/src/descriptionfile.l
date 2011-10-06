@@ -23,6 +23,7 @@ extern "C"
 RASTRO                  return TOK_RASTRO_HEADER;
 CONTAINER               return TOK_CONTAINER    ;
 EVENTTYPE               return TOK_EVENT_TYPE   ;
+STATETYPE               return TOK_STATE_TYPE   ;
 LINKTYPE                return TOK_LINKTYPE ;
 LINK                    return TOK_LINK     ;
 NAME                    return TOK_NAME     ;
@@ -59,7 +60,9 @@ KEY                     return TOK_KEY      ;
                         }
 
 "\""([^\n\"\\]*(\\[.\n])*)*"\""  {
-                          yylval.string=strdup(yytext);
+                          // drop the quotes
+                          yytext[strlen(yytext)-1] = '\0';
+                          yylval.string=strdup(yytext+1);
                           return ( STRING_LIT );
                         }
 [(),{}]                 {
@@ -67,9 +70,9 @@ KEY                     return TOK_KEY      ;
                         }
 
 \n                      { yyline++ ;}
-^[ \t]*#[^\n]*            { // a comment
-                        fprintf(stderr,"Comment: %s\n",yytext);
-                          }
+^[ \t]*#[^\n]*          { // a comment
+                            //fprintf(stderr,"Comment: %s\n",yytext);
+                        }
 
 [ \t]+                  /* ignore whitespace */;
 .                       {

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 20:27:40 -0300 (kassick)"
+// Updated: "Qui, 06 Out 2011 16:15:52 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -229,7 +229,7 @@ void attr_to_event_types(attribs_t * attribs)
       container_name = attr->vals.name;
       
       if (container_type_names->count(container_name) == 0) {
-        cerr << "Error: Link Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        cerr << "Error: Event Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
         exit(1);
       }
       
@@ -259,6 +259,49 @@ void attr_to_event_types(attribs_t * attribs)
     return false;
   });
 }
+
+void attr_to_state_types(attribs_t * attribs)
+{
+  string container_name;
+  walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
+    SemanticAttribute * attr = n->getVal();
+    if (attr->id == ID_CONTAINER)
+    {
+      container_name = attr->vals.name;
+      
+      if (container_type_names->count(container_name) == 0) {
+        cerr << "Error: State Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        exit(1);
+      }
+      
+      Paje::Container * c = (*container_type_names)[container_name]->getVal();
+
+      walk_tree_head_first(n,
+        [&c,&eventtype_names](attribs_t * n1, int level1) {
+          SemanticAttribute * attr = n1->getVal();
+          if ((attr->id == ID_CONTAINER) && (level1 > 0))
+          {
+            return true; // Descend only on the event types of the current container
+          }
+          
+          if (attr->id == ID_STATE_TYPE_DEF) {
+            if (eventtype_names->count(attr->vals.name))
+            {
+              cerr << "Error: StateType " << attr->vals.name << " has already been defined" << endl;
+              exit(1);
+            } 
+
+            Paje::BaseEventType * evttype = new Paje::StateType(attr->vals.name,c);
+            (*eventtype_names)[attr->vals.name] = evttype;
+          }
+          return false;
+        } );
+    }
+    return false;
+  });
+}
+
+
 
 #if 0
 void attr_to_event_types(attribs_t * attribs)
@@ -421,9 +464,11 @@ void map_accept_attrs(attribs_t * attribs)
   walk_tree_head_first(attribs,[&](attribs_t * n, int level) {
     SemanticAttribute * attr = n->getVal();
     
-    if ( (attr->id == ID_EVENT_TYPE_DEF) || (attr->id == ID_LINK_TYPE) )
+    if ( (attr->id == ID_EVENT_TYPE_DEF) || (attr->id == ID_LINK_TYPE) || (attr->id == ID_STATE_TYPE_DEF) )
     {
-      string event_type = attr->vals.name;
+      string event_type_name = attr->vals.name;
+      Paje::BaseEventType * evt_type = (*eventtype_names)[event_type_name];
+
       //cerr << "event type " << event_type << endl;
       attribs_t::iterator it;
       for(it = n->begin(); it != n->end(); ++it)
@@ -436,10 +481,17 @@ void map_accept_attrs(attribs_t * attribs)
               if (attr1->id == ID_ACCEPT_LIST) {
                 //cerr << "  accepts " << attr1->vals.name << endl;
                 if (!event_names->count(attr1->vals.name)) {
-                  cerr << "Warning: Event type " << event_type << " accepts undefined event " << attr1->vals.name << endl;
+                  cerr << "Warning: Event type " << event_type_name << " accepts undefined event " << attr1->vals.name << endl;
                 } else {
                   Paje::BaseEvent * evt = (*event_names)[attr1->vals.name];
-                  evt->set_event_type( (*eventtype_names)[event_type] );
+                  if (evt->fits_in_event_type(evt_type))
+                    evt->set_event_type(evt_type);
+                  else {
+                    cerr << "[Error] Event type " << event_type_name 
+                          << " can not accept ``" << attr1->vals.name << "´´"
+                          << endl;
+                    exit(1);
+                  }
                 }
               }
               return false; // visit all the children of event_type
@@ -679,7 +731,10 @@ void event_types_to_paje(ostream &out)
   for_each(eventtype_names->begin(), eventtype_names->end(), 
       [&](pair<string,Paje::BaseEventType *> p) {
         if (p.first != DUMMY_EVENT_TYPE_KEY)
-          p.second->do_header(out);
+        {
+            p.second->do_header(out);
+        }
+
       });
 }
 
@@ -689,7 +744,7 @@ void event_types_to_paje(ostream &out)
 Paje::BaseEvent * get_event_or_warn(const string & evt_name) {
   if (! event_names->count(evt_name) ) {
     cerr << "[Warning] Event " << evt_name 
-          << " has id but no definition, "
+          << " is referred but has no definition, "
           << "treating as Dummy" << endl;
     Paje::DummyEvent * evt = new DummyEvent(evt_name,(*eventtype_names)[DUMMY_EVENT_TYPE_KEY]);
     (*event_names)[evt_name] = evt;
