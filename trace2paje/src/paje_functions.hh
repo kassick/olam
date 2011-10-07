@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje_functions.hh"
 // Created: "Ter, 04 Out 2011 14:17:16 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 20:23:17 -0300 (kassick)"
+// Updated: "Sex, 07 Out 2011 15:14:54 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -35,6 +35,7 @@ using namespace std;
 
 
 #define PAJE_ROOT_CONTAINER  "0"
+#define PAJE_TS_PRECISION 6
 
 void init_paje_events();
 void paje_header(ostream &out);

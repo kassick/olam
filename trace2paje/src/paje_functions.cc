@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/paje_functions.cc"
 // Created: "Ter, 04 Out 2011 14:14:35 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 20:22:57 -0300 (kassick)"
+// Updated: "Sex, 07 Out 2011 16:27:17 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -24,6 +24,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <string>
 #include "paje_functions.hh"
@@ -201,7 +202,8 @@ void pajeCreateContainer(double timestamp,
                          ostream &out)
 {
   out << paje_event_id("PajeCreateContainer")
-      << " " << paje_event_timestamp(timestamp)
+      << " " << scientific 
+             << paje_event_timestamp(timestamp)
       << " " << alias
       << " " << type
       << " " << container
@@ -214,7 +216,8 @@ void pajeDestroyContainer(double timestamp,
                           ostream &out)
 {
   out << paje_event_id("PajeDestroyContainer")
-      << " " << paje_event_timestamp(timestamp)
+      << " " << scientific 
+             << paje_event_timestamp(timestamp)
       << " " << type
       << " " << container
       << endl;
@@ -226,7 +229,8 @@ void pajeSetState(double timestamp,
                   ostream &out)
 {
   out  << paje_event_id("PajeSetState")
-       << " " << paje_event_timestamp(timestamp)
+       << " " << scientific 
+             << paje_event_timestamp(timestamp)
        << " " << container
        << " " << type
        << " " << value
@@ -239,7 +243,8 @@ void pajePushState(double timestamp,
                    ostream &out)
 {
   out << paje_event_id("PajePushState")
-      << " " << paje_event_timestamp(timestamp)
+      << " " << scientific 
+             << paje_event_timestamp(timestamp)
       << " " << container
       << " " << type
       << " " << value
@@ -251,7 +256,8 @@ void pajePopState(double timestamp,
                   ostream &out)
 {
   out << paje_event_id("PajePopState")
-      << " " << paje_event_timestamp(timestamp)
+      << " " << scientific 
+             << paje_event_timestamp(timestamp)
       << " " << container
       << " " << type
       << endl;
@@ -265,7 +271,8 @@ void pajeStartLink(double timestamp,
                    ostream &out)
 {
   out << paje_event_id("PajeStartLink")
-      << " " << paje_event_timestamp(timestamp)
+      << " " << scientific 
+             << paje_event_timestamp(timestamp)
       << " " << container
       << " " << type
       << " " << sourceContainer
@@ -282,7 +289,8 @@ void pajeEndLink(double timestamp,
                  ostream &out)
 {
   out << paje_event_id("PajeEndLink")
-      << " " << paje_event_timestamp(timestamp)
+      << " " << scientific 
+             << paje_event_timestamp(timestamp)
       << " " << container
       << " " << type
       << " " << endContainer

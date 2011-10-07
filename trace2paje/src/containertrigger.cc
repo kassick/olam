@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Qui, 06 Out 2011 16:49:24 -0300 (kassick)"
+// Updated: "Sex, 07 Out 2011 15:21:36 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -167,7 +167,7 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
             if ( (thatcontainer->typeName == it->typeName) &&
                  (parentName == it->parentName) )
             {
-              close_pending_states(it->containerName, thatcontainer, out);
+              close_pending_states(timestamp,it->containerName, thatcontainer, out);
               pajeDestroyContainer(timestamp,
                                     it->typeName,
                                     it->containerName,

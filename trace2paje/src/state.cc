@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Qui, 06 Out 2011 16:47:06 -0300 (kassick)"
+// Updated: "Sex, 07 Out 2011 15:21:58 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -177,7 +177,7 @@ void check_opened_states(ostream & out)
 
 
 
-int close_pending_states(string containerName, Paje::Container * c, ostream & out)
+int close_pending_states(double timestamp,string containerName, Paje::Container * c, ostream & out)
 {
   
 
@@ -217,9 +217,9 @@ int close_pending_states(string containerName, Paje::Container * c, ostream & ou
     );
 
   for_each(pending.begin(),pending.end(),
-      [&out](struct pending_state s) {
+      [&out,&timestamp](struct pending_state s) {
         cerr << "[Warning] Popping missed state " << s.evt->name << " on " << s.container << endl;
-        pajePopState(s.priority,
+        pajePopState(timestamp,
                   s.container,
                   s.evt->eventType->typeName,
                   out);
