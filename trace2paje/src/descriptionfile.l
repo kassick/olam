@@ -39,6 +39,7 @@ INCLUDE                 return TOK_INCLUDE  ;
 VALUE                   return TOK_VALUE    ;
 TYPE                    return TOK_TYPE     ;
 ID                      return TOK_ID       ;
+PIN_IDS                 return TOK_PIN_IDS  ;
 START                   return TOK_START    ;
 END                     return TOK_END      ;
 FROM                    return TOK_SOURCE   ;

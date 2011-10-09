@@ -34,16 +34,23 @@ SemanticAttribute * attr;
 attribs_t *n;
 
 
-attribs_t * create_nop_attr(attribs_t * n)
+
+
+attribs_t * create_attr(int id, attribs_t * child)
 {
   SemanticAttribute * attr = new_semantic_attribute();
-  attr->id = ID_NOP;
+  attr->id = id;
 
   attribs_t * t = new attribs_t(attr);
-  if (n)
-    t->addChild(n);
+  if (child)
+    t->addChild(child);
 
   return t;
+}
+
+attribs_t * create_nop_attr(attribs_t * n)
+{
+  return create_attr(ID_NOP,n);
 }
 
 
@@ -91,6 +98,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %token<ptr> TOK_SOURCE   ;
 %token<ptr> TOK_DEST     ;
 %token<ptr> TOK_LINK     ;
+%token<ptr> TOK_PIN_IDS  ;
 %token<ptr> TOK_KEY      ;
 
 
@@ -127,6 +135,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %type<attr_node> link_params;
 %type<attr_node> link_statement;
 %type<attr_node> event_id_statement;
+%type<attr_node> pin_ids_statement;
 %type<attr_node> linktype_param;
 
 
@@ -172,6 +181,10 @@ definition:
             early_parse_tree->addChild($1);
           }
           |event_id_statement { 
+              late_parse_tree->addChild ($1);
+            }
+          |pin_ids_statement {
+              // is it on late? really?
               late_parse_tree->addChild ($1);
             }
           ;
@@ -659,6 +672,14 @@ link_param: TOK_TYPE IDENTIFIER {
             }
           ;
 
+
+pin_ids_statement:
+                TOK_PIN_IDS '{' idf_list '}' 
+                {
+                  n = create_attr(ID_PIN_IDS,$3);
+                  $$ = n;
+                }
+                ;
 
 event_id_statement:
               TOK_ID IDENTIFIER NUMBER {

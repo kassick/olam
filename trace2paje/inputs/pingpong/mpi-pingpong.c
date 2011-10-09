@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Qua, 05 Out 2011 14:29:02 -0300 (kassick)"
+ * Updated: "Dom, 09 Out 2011 13:57:15 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -63,6 +63,9 @@ int main(int argc, char ** argv)
       rst_event_ii(PING_IN,tag,DST);
 
       MPI_Send(&data,1,MPI_INT, DST, tag, MPI_COMM_WORLD);
+
+      rst_event(PING_S_OUT);
+
       printf("Rank %d sent %d, tag %d\n",rank,data,tag);
       tag++;
       data+=10;

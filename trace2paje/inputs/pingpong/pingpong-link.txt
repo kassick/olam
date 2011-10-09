@@ -7,6 +7,10 @@ CONTAINER Machine {
     NAME "rank_%(rank)"
     CREATE PARENT
     DESTROY PARENT
+  
+    STATETYPE PingState {
+      ping_s
+    }
 
 
   }
@@ -14,11 +18,17 @@ CONTAINER Machine {
   LINKTYPE PingLink FROM Rank TO Rank {
     ping
   }
+
 }
 
 LINK ping {
   VALUE "msg_%(tag)"
   KEY "%(tag)##%(dst)"
+  i tag
+  i dst
+}
+
+STATE ping_s {
   i tag
   i dst
 }
@@ -32,3 +42,6 @@ EVENT finalize {
   VALUE "%(EVT_NAME)"
   s hostname
 }
+
+ID ping_s 4001 101
+ID ping   4001 4002

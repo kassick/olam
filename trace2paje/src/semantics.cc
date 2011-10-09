@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qui, 06 Out 2011 16:15:52 -0300 (kassick)"
+// Updated: "Dom, 09 Out 2011 18:13:50 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -40,6 +40,7 @@ container_type_names_t * container_type_names;
 event_type_name_map_t * eventtype_names;
 event_name_map_t      * event_names;
 event_id_map_t        * event_ids;
+set<Paje::event_id_t>  unique_ids;
 queue<string> files_to_parse;
 list<pair<string,Paje::BaseEvent*>> * ordered_event_names;
 
@@ -579,15 +580,24 @@ void add_event_do_id_map(Paje::BaseEvent * evt)
   
   // adds the end_id
   if (evt->end_id)
+  {
     event_ids->insert (pair<event_id_t,Paje::BaseEvent*>(evt->end_id, evt));
+    unique_ids.insert(evt->end_id);
+  }
 
 
   if (evt->trigger_id)
+  {
     event_ids->insert (pair<event_id_t,Paje::BaseEvent*>(evt->trigger_id, evt));
+    unique_ids.insert(evt->trigger_id);
+  }
   
   //adds the start id
   if (evt->start_id)
+  {
     event_ids->insert (pair<event_id_t,Paje::BaseEvent*>(evt->start_id, evt));
+    unique_ids.insert(evt->start_id);
+  }
   
   // map_pos_triggers(evt); // do we have any trigger for post-event?
 }

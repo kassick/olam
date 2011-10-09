@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qui, 06 Out 2011 16:00:23 -0300 (kassick)"
+// Updated: "Dom, 09 Out 2011 19:56:24 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -206,7 +206,7 @@ void generate_ids_to_file(const string & fname)
         Paje::BaseEvent *evt = p.second;
 
         if (!evt->has_ids()) {
-          evt->gen_auto_ids(&(global_opts.auto_id_base));
+          evt->gen_auto_ids(&(global_opts.auto_id_base), unique_ids);
           evt->gen_ids_description(ids_file);
         }
 

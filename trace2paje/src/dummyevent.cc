@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/dummyevent.cc"
 // Created: "Ter, 04 Out 2011 13:48:25 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 16:13:32 -0300 (kassick)"
+// Updated: "Dom, 09 Out 2011 18:08:34 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -70,15 +70,27 @@ bool Paje::DummyEvent::has_ids() const {
   return (( this->trigger_id | this->start_id | this->end_id) != 0);
 }
 
-void Paje::DummyEvent::gen_auto_ids(long int * base_id)
+void Paje::DummyEvent::gen_auto_ids(long int * base_id, set<event_id_t> & unique_ids)
 {
+  while (unique_ids.count(*base_id))
+  {
+    (*base_id)++;
+  }
+  unique_ids.insert(*base_id);
   this->set_trigger_id(EVENT_TRIGGER,*base_id);
-  (*base_id)++;
   
+  while (unique_ids.count(*base_id))
+  {
+    (*base_id)++;
+  }
+  unique_ids.insert(*base_id);
   this->set_trigger_id(EVENT_START,*base_id);
-  (*base_id)++;
 
+  while (unique_ids.count(*base_id))
+  {
+    (*base_id)++;
+  }
+  unique_ids.insert(*base_id);
   this->set_trigger_id(EVENT_END, *base_id);
-  (*base_id)++;
 }
 

@@ -1,0 +1,79 @@
+RASTRO(id1,id2)
+
+CONTAINER machine {
+  NAME "machine_%(id1)"
+  CONTAINER rank {
+    EVENTTYPE typevent {
+      int8_evt
+      int16_evt
+      int32_evt
+      int64_evt
+      float_evt
+      double_evt
+      str_evt
+      loop_evt
+    }
+
+    NAME "rank_%(id2)"
+    CREATE PARENT
+  }
+
+  CREATE int8_evt
+  DESTROY finalize_evt
+
+}
+
+STATE int8_evt {
+  VALUE "int8 %(thisval)"
+  c thisval
+}
+
+STATE int16_evt {
+  VALUE "int16 %(thisval)"
+  w thisval
+}
+
+STATE int32_evt {
+  VALUE "int32 %(thisval)"
+  i thisval
+}
+
+STATE int64_evt {
+  VALUE "int64 %(thisval)"
+  l thisval
+}
+
+STATE float_evt {
+  VALUE "float %(thisval)"
+  f thisval
+}
+
+STATE double_evt {
+  VALUE "double %(thisval)"
+  d thisval
+}
+
+STATE str_evt {
+  VALUE "str %(thisval)"
+  s thisval
+}
+
+
+STATE loop_evt {
+  VALUE "loop%(a) %(b) %(str)"
+  i a
+  f b
+  s str
+}
+
+
+
+ID int8_evt 10 11
+ID int16_evt 11 12
+ID int32_evt 12 13
+ID int64_evt 13 14
+ID float_evt 14 15
+ID double_evt 15 16
+ID str_evt 16 17
+ID loop_evt 1 2
+ID finalize_evt 3

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 18:35:35 -0300 (kassick)"
+// Updated: "Dom, 09 Out 2011 18:10:25 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -75,10 +75,10 @@ bool Paje::Event::has_ids() const {
   return ((this->trigger_id != 0));
 }
 
-void Paje::Event::gen_auto_ids(long int * base_id)
+void Paje::Event::gen_auto_ids(long int * base_id, set<event_id_t> & unique_ids)
 {
+  Paje::BaseEvent::gen_auto_ids(base_id,unique_ids);
+  unique_ids.insert(*base_id);
   this->set_trigger_id(EVENT_TRIGGER,*base_id);
-  (*base_id)++;
-
 }
 

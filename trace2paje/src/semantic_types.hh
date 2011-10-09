@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantic_types.hh"
 // Created: "Sex, 30 Set 2011 16:13:42 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:28:48 -0300 (kassick)"
+// Updated: "Dom, 09 Out 2011 18:14:12 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -47,6 +47,7 @@ typedef std::map<std::string      , Paje::BaseEvent * >      event_name_map_t;
 typedef std::multimap<Paje::event_id_t , Paje::BaseEvent * > event_id_map_t;
 typedef std::map<std::string      , Paje::BaseEventType * >  event_type_name_map_t;
 
+
 extern attribs_t * attributes;
 
 extern hierarchy_t * toplevel_hierarchy;
@@ -55,10 +56,10 @@ extern container_type_names_t * container_type_names;
 extern event_type_name_map_t * eventtype_names;
 extern event_name_map_t      * event_names;
 extern event_id_map_t        * event_ids;
+extern set<Paje::event_id_t>  unique_ids;
 extern queue<string>         files_to_parse;
 
 extern list<pair<string,Paje::BaseEvent*>> * ordered_event_names;
-
 
 extern attribs_t * late_parse_tree, *early_parse_tree;
 
