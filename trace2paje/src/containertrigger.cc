@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Sex, 07 Out 2011 15:21:36 -0300 (kassick)"
+// Updated: "Seg, 10 Out 2011 17:20:31 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -28,9 +28,9 @@
 #include "paje_functions.hh"
 #include "semantic_types.hh"
 #include "state.hh"
-#include <set>
+#include <map>
 
-set<Paje::unique_container_name_t> Paje::container_unique_names;
+map<string,Paje::unique_container_name_t> Paje::container_unique_names;
 
 
 Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c,hierarchy_t * n)
@@ -93,12 +93,8 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
           containerName = format_values(c->formatName, symbols);
 
           // do we already have a container with this name, of this type?
-          unique_container_name_t p;
-          p.containerName = containerName;
-          p.typeName      = c->typeName;
-          p.parentName    = parentName;
 
-          if (Paje::container_unique_names.count(p))
+          if (Paje::container_unique_names.count(containerName))
           {
               /*cerr << "already contains "
                     << p.containerName << ","
@@ -108,12 +104,24 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
               // can happen, if a container is triggered by event1, and
               // event1 happens several times
           }
+          
+          //Add the name to the map
+          unique_container_name_t *p = &(Paje::container_unique_names[containerName]);
 
-          Paje::container_unique_names.insert(p);
-            /*cerr << "insert! (" 
-                    << p.containerName << ","
-                    << p.parentName << ","
-                    << p.typeName << ")"  << endl;*/
+          p->containerName = containerName;
+          p->typeName      = c->typeName;
+          p->parentName    = parentName;
+          p->nchild = 0;
+            
+          /*
+          cerr << "Inserted? " << containerName << "("
+                    << p->containerName << ","
+                    << p->parentName << ","
+                    << p->typeName << ","
+                    << p->nchild << ")"  
+                    << endl;
+                    */
+
 
           pajeCreateContainer(timestamp,
                                  containerName,
@@ -121,6 +129,20 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
                                  parentName,
                                  containerName,
                                  out);
+
+          // increase the number of children of the parent
+          p = &(Paje::container_unique_names[parentName]);
+          p->nchild++;
+          /*
+          cerr << "incremented? " << parentName << "("
+                    << p->containerName << ","
+                    << p->parentName << ","
+                    << p->typeName << ","
+                    << p->nchild << ")"  
+                    << endl;
+                    */
+
+
           return false;
         }
         return true; // does not create on parent, this one and it's children shall not be created here, there will be an event for it
@@ -141,37 +163,53 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
   string containerName;
   
   // needs to destroy all children
-  walk_tree_depth_first(this->hierarchy,[&](hierarchy_t * n, int level) 
+  walk_tree_depth_first(this->hierarchy,[&](hierarchy_t * n, int level)
       {
         Paje::Container * thatcontainer = n->getVal();
         string parentName = format_values(thatcontainer->parent->formatName,symbols);
 
+       
         /*
         cerr << "Container type " << thatcontainer->typeName << "child of " 
               << thatcontainer->parent->typeName << "(" << parentName << ")"
-              << endl;*/
+              << endl;
+              */
 
-        set<Paje::unique_container_name_t>::iterator it;
+        map<string,Paje::unique_container_name_t>::iterator it;
 
         it = container_unique_names.begin();
         while (it != container_unique_names.end())
         {
-            // pair of containername, typename
 
-            /*
-            cerr << "Kill? (" 
-                    << it->containerName << ","
-                    << it->parentName << ","
-                    << it->typeName << ")"  << endl;*/
+        /*
+            cerr << "Kill? ("
+                    << it->second.containerName << ","
+                    << it->second.parentName << ","
+                    << it->second.typeName << ","
+                    << it->second.nchild << ")"  
+                    << endl;
+                    */
 
-            if ( (thatcontainer->typeName == it->typeName) &&
-                 (parentName == it->parentName) )
+            if ( (thatcontainer->typeName == it->second.typeName) &&
+                 (parentName == it->second.parentName) &&
+                 (it->second.nchild == 0 ) )
             {
-              close_pending_states(timestamp,it->containerName, thatcontainer, out);
+              close_pending_states(timestamp,it->second.containerName, thatcontainer, out);
               pajeDestroyContainer(timestamp,
-                                    it->typeName,
-                                    it->containerName,
+                                    it->second.typeName,
+                                    it->second.containerName,
                                     out);
+
+              // tell parent it has less one child
+              Paje::unique_container_name_t &p = container_unique_names[parentName];
+              if (!p.nchild)
+                cerr << "[Warning] Internal Error: Container " 
+                     << parentName 
+                     << " already has 0 children; how come are we destroying it yet?" 
+                     << endl;
+              else
+                p.nchild--;
+              
               it = container_unique_names.erase(it);
             } else 
               ++it;
@@ -206,20 +244,31 @@ void destroy_missing_containers(double timestamp, ostream & out)
               << thatcontainer->parent->typeName << "(" << parentName << ")"
               << endl;*/
 
-        set<Paje::unique_container_name_t>::iterator it;
+        map<string,Paje::unique_container_name_t>::iterator it;
 
         it = container_unique_names.begin();
         while (it != container_unique_names.end())
         {
             // pair of containername, typename
 
-            if ( (thisContainer->typeName == it->typeName))
+            if ( (thisContainer->typeName == it->second.typeName))
             {
-              cerr << "[Warning] Destroying missing container " << it->containerName << endl;
+              cerr << "[Warning] Destroying missing container " << it->second.containerName << endl;
               pajeDestroyContainer(timestamp,
-                                    it->typeName,
-                                    it->containerName,
+                                    it->second.typeName,
+                                    it->second.containerName,
                                     out);
+              
+              
+              Paje::unique_container_name_t &p = container_unique_names[it->second.parentName];
+              if (!p.nchild)
+                cerr << "[Warning] Internal Error: Container " 
+                     << it->second.parentName 
+                     << " already has 0 children; how come are we destroying it yet?" 
+                     << endl;
+              else
+                p.nchild--;
+              
               it = container_unique_names.erase(it);
             } else 
               ++it;

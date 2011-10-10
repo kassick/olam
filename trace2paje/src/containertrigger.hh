@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.hh"
 // Created: "Ter, 04 Out 2011 14:07:16 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 18:44:52 -0300 (kassick)"
+// Updated: "Seg, 10 Out 2011 17:06:13 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,7 +33,7 @@
 #include "container.hh"
 #include <iostream>
 #include <string>
-#include <set>
+#include <map>
 
 
 
@@ -43,15 +43,39 @@ namespace Paje {
     string containerName;
     string typeName;
     string parentName;
+    unsigned long nchild;
 
+    _unique_container_name_t() {
+      nchild = 0;
+    }
+
+    /*
     bool operator<(const struct _unique_container_name_t &other) const
     {
       return ( (this->containerName < other.containerName) );
-    }
+    } */
+
+    /*
+    bool operator==(const struct _unique_container_name_t &other) const
+    {
+      return (( this->containerName == other.containerName) );
+    }*/
+
+    /*
+
+    struct _unique_container_name_t & operator=(const struct _unique_container_name_t &other)
+    {
+      this->containerName = other.containerName;
+      this->typeName = other.typeName;
+      this->parentName = other.parentName;
+      this->nchild = other.nchild;
+      return *this;
+
+    }*/
 
   } unique_container_name_t;
 
-  extern set<unique_container_name_t> container_unique_names;
+  extern map<string,unique_container_name_t> container_unique_names;
 
 
 
