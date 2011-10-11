@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Sex, 16 Set 2011 17:04:54 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 17:30:34 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -129,16 +129,20 @@ namespace Paje {
 //#define FMT_REGEX "[#0-9]+"
 
 
-string format_values(string & tpl, symbols_table_t *symbols) {
+string format_values(string & tpl,
+    symbols_table_t **symbols,
+    bool warn) {
   stringstream out;
 
-  format_values(tpl,symbols,out);
+  format_values(tpl,symbols,out,warn);
 
   return out.str();
 }
 
 
-void format_values(string & tpl, symbols_table_t *symbols, ostream &out)
+void format_values(string & tpl, 
+    symbols_table_t **symbols,
+    ostream &out, bool warn)
 {
   string tmp = tpl;
   smatch res;
@@ -179,17 +183,26 @@ void format_values(string & tpl, symbols_table_t *symbols, ostream &out)
 
 
       symbols_table_t::iterator it;
-      it = symbols->find(id);
-      if (it != symbols->end()) {
-        Paje::Symbol &s = (*it).second;
-        s.format(fmt,out);
-      } else {
+      int i;
+      for (i = 0;symbols[i] != NULL;i++)
+      {
+        if ((it = symbols[i]->find(id)) != symbols[i]->end())
+        {
+          Paje::Symbol &s = (*it).second;
+          s.format(fmt,out);
+          break;
+        }
+      }
+
+      if (symbols[i] == NULL)
+      {
         // unknown symbol; just dump the fmt string 
         out << "(" << id;
         if (had_fmt)
           out << ":" << fmt;
         out << ")";
-        cerr << "No symbol ``" << id << "´´, ignoring" << endl;
+        if (warn)
+          cerr << "No symbol ``" << id << "´´, ignoring" << endl;
       }
     
       tmp = res.suffix().str();
@@ -242,18 +255,22 @@ int main(int argc, char ** argv)
 
   string tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:10.2G)";
 
+  symbols_table_t* v[2];
+  v[0] = symbol_table;
+  v[1] = NULL;
+
   cout << "template: " << tpl << endl;
-  cout << format_values(tpl,symbol_table) << endl;
+  cout << format_values(tpl,v) << endl;
   cout << "---" << endl;
   
   tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:10.2G) and a trailiing";
   cout << "template: " << tpl << endl;
-  cout << format_values(tpl,symbol_table) << endl;
+  cout << format_values(tpl,v) << endl;
   cout << "---" << endl;
  
   tpl = "nothing to see here";
   cout << "template: " << tpl << endl;
-  cout << format_values(tpl,symbol_table) << endl;
+  cout << format_values(tpl,v) << endl;
   cout << "---" << endl;
 
 
@@ -272,7 +289,7 @@ int main(int argc, char ** argv)
 
   tpl = "s2 is %(s2) and s3 is %(s3) \"%(undefined)\"";
 
-  format_values(tpl, symbol_table, cout);
+  format_values(tpl, v, cout);
   cout << endl;
 
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Dom, 09 Out 2011 17:55:01 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 18:11:37 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -52,7 +52,7 @@ void Paje::BaseEvent::set_event_type(Paje::BaseEventType * evt_type)
 /////
 // Trigger functions
 bool Paje::BaseEvent::do_start(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) {
   string containerName = format_values(this->eventType->container->formatName,symbols);
@@ -64,7 +64,7 @@ bool Paje::BaseEvent::do_start(double timestamp,
 }
 
 bool Paje::BaseEvent::do_end(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) {
   
@@ -76,7 +76,7 @@ bool Paje::BaseEvent::do_end(double timestamp,
 }
 
 bool Paje::BaseEvent::do_trigger(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) {
   *priority = DEFAULT_EVENT_PRIO_TRIGG;
@@ -111,7 +111,7 @@ void Paje::BaseEvent::set_trigger_id(trigger_id_t trigger_field, event_id_t id)
 //Calls the correct function based on the id
 
 bool Paje::BaseEvent::trigger(event_id_t evt_id, double timestamp,
-    symbols_table_t * symbols, 
+    symbols_table_t ** symbols, 
     double * priority,
     ostream &out)
 {

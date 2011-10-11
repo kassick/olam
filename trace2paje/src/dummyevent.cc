@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/dummyevent.cc"
 // Created: "Ter, 04 Out 2011 13:48:25 -0300 (kassick)"
-// Updated: "Seg, 10 Out 2011 18:48:51 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 17:46:33 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -38,7 +38,7 @@ Paje::DummyEvent::DummyEvent(const string & name, Paje::BaseEventType * evt_type
 }
 
 bool Paje::DummyEvent::do_start(double timestamp,
-    symbols_table_t * symbols,
+    symbols_table_t ** symbols,
     double * priority,
     ostream &out)
 {
@@ -48,7 +48,7 @@ bool Paje::DummyEvent::do_start(double timestamp,
 
 
 bool Paje::DummyEvent::do_end(double timestamp,
-    symbols_table_t * symbols,
+    symbols_table_t ** symbols,
     double * priority,
     ostream &out)
 {
@@ -58,7 +58,7 @@ bool Paje::DummyEvent::do_end(double timestamp,
 
 
 bool Paje::DummyEvent::do_trigger(double timestamp,
-    symbols_table_t * symbols,
+    symbols_table_t ** symbols,
     double * priority,
     ostream &out)
 {

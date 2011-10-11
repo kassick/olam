@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Seg, 10 Out 2011 18:46:26 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 17:47:17 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,7 +37,7 @@ Paje::State::State(string& name, attribs_t * attribs) {
 }
 
 bool Paje::State::do_start(double timestamp,
-    symbols_table_t * symbols,
+    symbols_table_t ** symbols,
     double * priority,
     ostream &out)
 {
@@ -58,7 +58,7 @@ bool Paje::State::do_start(double timestamp,
 }
 
 bool Paje::State::do_end(double timestamp,
-    symbols_table_t * symbols,
+    symbols_table_t ** symbols,
     double * priority,
     ostream &out)
 {

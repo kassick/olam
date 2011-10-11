@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Dom, 09 Out 2011 17:51:32 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 17:47:17 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -42,18 +42,18 @@ namespace Paje {
       Event(const string & name, attribs_t * attr);
 
       virtual bool do_start(double timestamp,
-          symbols_table_t * symbols, 
+          symbols_table_t ** symbols, 
           double * priotity,
           ostream &out);
 
 
       virtual bool do_end(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priotity,
           ostream &out);
 
       virtual bool do_trigger(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out);
 

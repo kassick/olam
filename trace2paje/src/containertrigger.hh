@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.hh"
 // Created: "Ter, 04 Out 2011 14:07:16 -0300 (kassick)"
-// Updated: "Seg, 10 Out 2011 17:06:13 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 17:46:33 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -84,12 +84,12 @@ namespace Paje {
       ContainerCreateTrigger(Paje::Container * c, hierarchy_t * n);
 
       virtual bool do_start(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out);
 
       virtual bool do_end(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out);
       

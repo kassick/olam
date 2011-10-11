@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 16:24:02 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 18:11:52 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -106,7 +106,7 @@ string Paje::Link::toString() {
 /////
 // Trigger functions
 bool Paje::Link::do_start(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out)
 {
@@ -180,7 +180,7 @@ bool Paje::Link::do_start(double timestamp,
 }
 
 bool Paje::Link::do_end(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) 
 {
@@ -243,7 +243,7 @@ bool Paje::Link::do_end(double timestamp,
 }
 
 bool Paje::Link::do_trigger(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) {
   // Actually, Link should call PajeLink....

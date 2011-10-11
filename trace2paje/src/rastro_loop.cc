@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qua, 05 Out 2011 18:45:30 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 18:16:39 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -71,11 +71,22 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
   char * fname;
   set<string> opened_files;
   double timestamp;
+
+#define _GLOBAL_TABLE 0
+#define _LOCAL_TABLE 1
+#define _END_TABLE 2
+  symbols_table_t *symbols[4];
   
   rst_event_t event;
   rst_file_t data;
   set<Paje::event_id_t> ignored_ids;
-  symbols_table_t symbols;
+
+  map<pair<decltype(rst_event_t::id1),decltype(rst_event_t::id2)>, symbols_table_t *>    symbols_per_file;
+
+  symbols[_END_TABLE] = NULL;
+  // symbols[1] is local-to-file symbols,  
+  symbols[_GLOBAL_TABLE] = new symbols_table_t(); // global symbols / dirty table
+
   
   strcpy(syncfile,"/tmp/rastroXXXXXX");
   if (mkstemp(syncfile) == -1)
@@ -125,7 +136,6 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
-    symbols_table_t tmp_table;
 
     //cerr << "evemt type == " << event.type << " == " << evt_id << endl;
     int nevts = 0;
@@ -134,8 +144,17 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
     event_id_map_t::iterator it;
     
     // load constant symbols into the tables
-    symbols[Paje::idf1_name].set_value(event.id1);
-    symbols[Paje::idf2_name].set_value(event.id2);
+    (*(symbols[_GLOBAL_TABLE]))[Paje::idf1_name].set_value(event.id1);
+    (*(symbols[_GLOBAL_TABLE]))[Paje::idf2_name].set_value(event.id2);
+
+    if (symbols_per_file.count(make_pair(event.id1,event.id2))) {
+      symbols[_LOCAL_TABLE] = symbols_per_file[make_pair(event.id1,event.id2)];
+    } else {
+      symbols[_LOCAL_TABLE] = new symbols_table_t();
+      symbols_per_file[make_pair(event.id1,event.id2)] = symbols[_LOCAL_TABLE];
+    }
+
+
     timestamp = (double) event.timestamp / 1000000 ;
    
 
@@ -166,10 +185,10 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
       ++nevts;
       entry.evt = it->second;
-      entry.evt->load_symbols(evt_id, &event,&symbols);
+      entry.evt->load_symbols(evt_id, &event,symbols[_GLOBAL_TABLE]);
       entry.evt->trigger(evt_id,
                         timestamp,
-                        &symbols,
+                        symbols,
                         &(entry.priority),
                         tmp_out);
       

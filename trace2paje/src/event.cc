@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Dom, 09 Out 2011 18:10:25 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 17:46:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -41,7 +41,7 @@ Paje::Event::Event(const string &name, attribs_t * attribs) {
 
 
 bool Paje::Event::do_start(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) 
 {
@@ -51,7 +51,7 @@ bool Paje::Event::do_start(double timestamp,
 
 
 bool Paje::Event::do_end(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) 
 {
@@ -59,7 +59,7 @@ bool Paje::Event::do_end(double timestamp,
 }
 
 bool Paje::Event::do_trigger(double timestamp,
-          symbols_table_t * symbols,
+          symbols_table_t ** symbols,
           double * priority,
           ostream &out) {
 
