@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong-2/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Seg, 10 Out 2011 19:09:13 -0300 (kassick)"
+ * Updated: "Ter, 11 Out 2011 16:02:34 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
       buf[0] = rank;
       buf[NELEM-1] = rank;
       // even rank sends
-      rst_event_iii(PING_IN,tag,rank,rank+1);
+      rst_event_ii(PING_IN,tag,rank+1);
 
       MPI_Send(buf,NELEM,MPI_INT, rank+1, tag, MPI_COMM_WORLD);
 
@@ -84,7 +84,7 @@ int main(int argc, char ** argv)
       rst_event_ii(PING_R_IN,tag,rank-1);
       MPI_Recv(buf,NELEM,MPI_INT, rank-1, tag, MPI_COMM_WORLD,&status);
       
-      rst_event_iii(PING_OUT,tag,rank-1,rank);
+      rst_event_ii(PING_OUT,tag,rank-1);
 
       printf("Rank %d got %d from %d, tag %d\n",rank,buf[0],rank-1,tag);
       tag++;

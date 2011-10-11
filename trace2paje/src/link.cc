@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Seg, 10 Out 2011 18:45:49 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 16:24:02 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -65,8 +65,8 @@ void check_missing_links() {
         if (p.second.size() > 0) {
           cerr << "[Warning] Link with type " << p.first.typeName
                << ", key " << p.first.key 
-               << "on " << p.first.containerName
-               << "has " << p.second.size() << " lost arrows" << endl;
+               << " on " << p.first.containerName
+               << " has " << p.second.size() << " lost arrows (pending)" << endl;
         }
       } );
   
@@ -76,8 +76,8 @@ void check_missing_links() {
         if (p.second.size() > 0) {
           cerr << "[Warning] Link with type " << p.first.typeName
                << ", key " << p.first.key 
-               << "on " << p.first.containerName
-               << "has " << p.second.size() << " lost arrows" << endl;
+               << " on " << p.first.containerName
+               << " has " << p.second.size() << " lost arrows (started)" << endl;
         }
       } );
 }
@@ -95,7 +95,7 @@ string Paje::Link::toString() {
   stringstream out;
 
   out << Paje::BaseEvent::toString();
-  out << "   " << "Key format: " << format_key << endl;
+  out << "   " << "Key format: " << format_key_start << "|" << format_key_end << endl;
 
   return out.str();
 }
@@ -119,10 +119,12 @@ bool Paje::Link::do_start(double timestamp,
   string sourceContainer, thisValue;
 
   link_key.containerName = format_values(lt->container->formatName, symbols);
-  link_key.key           = format_values(this->format_key, symbols);
+  link_key.key           = format_values(this->format_key_start, symbols);
   link_key.typeName      = lt->typeName;
   sourceContainer = format_values(lt->source->formatName, symbols);
-  thisValue       = format_values(this->formatValue,symbols);
+  thisValue       = format_values(this->formatValue_start,symbols);
+  cerr << "11format val start is " << this->formatValue_start << endl;
+  cerr << "11thisvalue = " << thisValue << endl;
 
   pajeStartLink(timestamp,
                  link_key.containerName,
@@ -191,10 +193,10 @@ bool Paje::Link::do_end(double timestamp,
   string destContainer, thisValue;
 
   link_key.containerName = format_values(lt->container->formatName, symbols);
-  link_key.key           = format_values(this->format_key, symbols);
+  link_key.key           = format_values(this->format_key_end, symbols);
   link_key.typeName      = lt->typeName;
   destContainer   = format_values(lt->dest->formatName, symbols);
-  thisValue       = format_values(this->formatValue,symbols);
+  thisValue       = format_values(this->formatValue_end,symbols);
 
 
   bool add_to_pending = true;
@@ -251,14 +253,34 @@ bool Paje::Link::do_trigger(double timestamp,
 }
 
 void Paje::Link::fill_from_attr(attribs_t * attrs) {
+
   Paje::BaseEvent::fill_from_attr(attrs);
+  this->formatValue_start = this->formatValue;
+  this->formatValue_end   = this->formatValue;
+  
   walk_tree_head_first(attrs,[&](attribs_t * n, int level) {
         SemanticAttribute * attr = n->getVal();
+
+
         switch (attr->id) {
           case ID_LINK:
             break; // name has already been set
           case ID_KEY_FORMAT:
-            this->format_key = attr->vals.name;
+            this->format_key_start = attr->vals.name;
+            this->format_key_end   = attr->vals.name;
+            break;
+          case ID_KEY_FORMAT_START:
+            this->format_key_start = attr->vals.name;
+            break;
+          case ID_KEY_FORMAT_END:
+            this->format_key_end = attr->vals.name;
+            break;
+          case ID_VALUE_FORMAT_START:
+            this->formatValue_start = attr->vals.name;
+            cerr << "format val start is " << this->formatValue_start << endl;
+            break;
+          case ID_VALUE_FORMAT_END:
+            this->formatValue_end   = attr->vals.name;
             break;
           default:
             break;

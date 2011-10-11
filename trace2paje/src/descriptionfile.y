@@ -60,6 +60,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %union {
   char* string;
   long long int_lit;
+  int id;
   void * ptr;
   Paje::Container   * container;
   attribs_t * attr_node;
@@ -137,6 +138,9 @@ attribs_t * create_nop_attr(attribs_t * n)
 %type<attr_node> event_id_statement;
 %type<attr_node> pin_ids_statement;
 %type<attr_node> linktype_param;
+%type<id> opt_start_or_end;
+%type<attr_node> link_key_param;
+%type<attr_node> link_value_param;
 
 
 
@@ -652,25 +656,47 @@ link_param: TOK_TYPE IDENTIFIER {
 
                   $$ = n;
                 }
-          | TOK_VALUE STRING_LIT {
-
-                  attr = new_semantic_attribute();
-                  attr->id = ID_FORMAT_NAME;
-                  attr->vals.name = $2;
-                  
-                  n = new attribs_t(attr);
-                  $$ = n;
-            }
-          | TOK_KEY STRING_LIT {
-
-                  attr = new_semantic_attribute();
-                  attr->id = ID_KEY_FORMAT;
-                  attr->vals.name = $2;
-                  
-                  n = new attribs_t(attr);
-                  $$ = n;
-            }
+          | link_value_param { $$ = $1; }
+          | link_key_param {$$ = $1;}
           ;
+
+link_key_param: TOK_KEY opt_start_or_end STRING_LIT {
+                  attr = new_semantic_attribute();
+                  if ($2 != ID_NOP)
+                  {
+                    attr->id = $2;
+                  } else { 
+                    attr->id = ID_KEY_FORMAT;
+                  }
+                  
+                  attr->vals.name = $3;
+                  
+                  n = new attribs_t(attr);
+                  $$ = n;
+            }
+            ;
+
+link_value_param: TOK_VALUE opt_start_or_end STRING_LIT {
+                attr = new_semantic_attribute();
+                if ($2 == ID_KEY_FORMAT_START)
+                  attr->id = ID_VALUE_FORMAT_START;
+                else if ($2 == ID_KEY_FORMAT_END)
+                  attr->id = ID_VALUE_FORMAT_END;
+                else
+                  attr->id = ID_FORMAT_NAME;
+
+                attr->vals.name = $3;
+                  
+                n = new attribs_t(attr);
+                $$ = n;
+            }
+            ;
+
+opt_start_or_end: TOK_START { $$ = ID_KEY_FORMAT_START; }
+                | TOK_END   { $$ = ID_KEY_FORMAT_END;   }
+                |           { $$ = ID_NOP; }
+                ;
+
 
 
 pin_ids_statement:

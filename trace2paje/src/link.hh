@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.hh"
 // Created: "Ter, 04 Out 2011 14:03:20 -0300 (kassick)"
-// Updated: "Dom, 09 Out 2011 17:57:45 -0300 (kassick)"
+// Updated: "Ter, 11 Out 2011 15:47:02 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,7 +37,10 @@ namespace Paje {
 
   class Link: public BaseEvent {
     public:
-      string format_key;
+      string format_key_start, 
+             format_key_end,
+             formatValue_start,
+             formatValue_end;
       Link(string &name, attribs_t * attribs);
 
       virtual bool do_start(double timestamp,

@@ -24,10 +24,12 @@ CONTAINER Machine {
 
 LINK ping {
   #VALUE "msg_%(src).%(tag)"
-  KEY "%(src)##%(tag)##%(dst)"
+  VALUE START "msg_to_%(otherrank)"
+  VALUE END "msg_to_%(rank)"
+  KEY START "%(rank)##%(tag)##%(otherrank)"
+  KEY END "%(otherrank)##%(tag)##%(rank)"
   i tag
-  i src
-  i dst
+  i otherrank
 }
 
 STATE ping_s {
