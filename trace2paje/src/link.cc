@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 18:11:52 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 19:08:56 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -123,8 +123,6 @@ bool Paje::Link::do_start(double timestamp,
   link_key.typeName      = lt->typeName;
   sourceContainer = format_values(lt->source->formatName, symbols);
   thisValue       = format_values(this->formatValue_start,symbols);
-  cerr << "11format val start is " << this->formatValue_start << endl;
-  cerr << "11thisvalue = " << thisValue << endl;
 
   pajeStartLink(timestamp,
                  link_key.containerName,
@@ -277,7 +275,7 @@ void Paje::Link::fill_from_attr(attribs_t * attrs) {
             break;
           case ID_VALUE_FORMAT_START:
             this->formatValue_start = attr->vals.name;
-            cerr << "format val start is " << this->formatValue_start << endl;
+            //cerr << "format val start is " << this->formatValue_start << endl;
             break;
           case ID_VALUE_FORMAT_END:
             this->formatValue_end   = attr->vals.name;

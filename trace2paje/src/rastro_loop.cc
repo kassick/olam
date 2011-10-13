@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 18:16:39 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 19:07:53 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -176,6 +176,7 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
     cerr << endl;
     */
 
+    // Generate output strings for all events served with this id
     for(it = equal_range.first;
         it != equal_range.second;
         ++it) 
@@ -183,9 +184,16 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
       serve_entry_t entry;
       ostringstream tmp_out;
 
+      // Serve the event
+      //cerr << "serving " << it->second->name << endl;
       ++nevts;
       entry.evt = it->second;
       entry.evt->load_symbols(evt_id, &event,symbols[_GLOBAL_TABLE]);
+      entry.evt->push_symbols(evt_id, symbols[_GLOBAL_TABLE],symbols[_LOCAL_TABLE]);
+      
+      
+      
+      
       entry.evt->trigger(evt_id,
                         timestamp,
                         symbols,
@@ -194,7 +202,14 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
       
 
       entry.output = tmp_out.str();
+
+
+      // push to do the output later
       evt_serve_list.push_back( entry );
+
+
+
+
 
       //entry.output.clear();
     }

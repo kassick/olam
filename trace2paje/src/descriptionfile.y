@@ -101,6 +101,8 @@ attribs_t * create_nop_attr(attribs_t * n)
 %token<ptr> TOK_LINK     ;
 %token<ptr> TOK_PIN_IDS  ;
 %token<ptr> TOK_KEY      ;
+%token<ptr> TOK_AS       ;
+%token<ptr> TOK_PUSH     ;
 
 
 %type<ptr> code
@@ -141,6 +143,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %type<id> opt_start_or_end;
 %type<attr_node> link_key_param;
 %type<attr_node> link_value_param;
+%type<attr_node> push_param;
 
 
 
@@ -516,6 +519,7 @@ event_param: TOK_TYPE IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
             }
+          | push_param;
           ;
 
 state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
@@ -596,6 +600,7 @@ state_param: TOK_TYPE IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
             }
+          | push_param;
           ;
 
 
@@ -658,6 +663,7 @@ link_param: TOK_TYPE IDENTIFIER {
                 }
           | link_value_param { $$ = $1; }
           | link_key_param {$$ = $1;}
+          | push_param;
           ;
 
 link_key_param: TOK_KEY opt_start_or_end STRING_LIT {
@@ -810,3 +816,19 @@ event_id_statement:
               }
             ;
 
+
+push_param: TOK_PUSH IDENTIFIER TOK_AS IDENTIFIER
+          {
+            attribs_t *idf_node = create_attr(ID_IDF,NULL);
+            idf_node->getVal()->vals.identifier_name = $2;
+            
+            attribs_t *idf_node2 = create_attr(ID_AS_IDF,NULL);
+            idf_node2->getVal()->vals.identifier_name = $4;
+
+
+            n = create_attr(ID_PUSH_PARAM,idf_node);
+            n->addChild(idf_node2);
+
+            $$ = n;
+          }
+          ;

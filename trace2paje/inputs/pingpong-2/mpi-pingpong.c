@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong-2/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Ter, 11 Out 2011 16:02:34 -0300 (kassick)"
+ * Updated: "Qui, 13 Out 2011 19:07:01 -0300 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -93,7 +93,7 @@ int main(int argc, char ** argv)
 
 
   MPI_Finalize();
-  rst_event_s(FINALIZE_N, hostname);
+  rst_event(FINALIZE_N);
 
   rst_finalize();
 

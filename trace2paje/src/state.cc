@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:47:17 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 18:57:27 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -130,6 +130,12 @@ bool Paje::State::fits_in_event_type(
 
 
 
+void Paje::State::push_symbols(Paje::event_id_t id, symbols_table_t * from,
+                                   symbols_table_t * to)
+{
+  if ( (id == this->start_id) )
+    Paje::BaseEvent::push_symbols(id,from,to);
+}
 
 
 

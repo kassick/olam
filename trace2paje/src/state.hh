@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.hh"
 // Created: "Ter, 04 Out 2011 13:59:55 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:47:17 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 18:58:04 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -54,8 +54,11 @@ namespace Paje {
 
       virtual void gen_auto_ids(long int * base_id, set<event_id_t> & unique_ids);
       virtual bool fits_in_event_type(const BaseEventType* evt_type) const;
-  } ;
+      virtual void push_symbols(event_id_t id,
+                                   symbols_table_t * from,
+                                   symbols_table_t * to);
 
+  } ;
 
 }// namespace
 

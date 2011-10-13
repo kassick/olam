@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.hh"
 // Created: "Qui, 25 Ago 2011 14:38:26 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:27:28 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 18:28:37 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -93,6 +93,8 @@ namespace Paje {
 
 
 
+extern bool symbols_format_ok;
+
 
 typedef map<string,Paje::Symbol> symbols_table_t;
 
@@ -101,7 +103,7 @@ extern symbols_table_t * symbol_table;
 void init_symbols();
 
 string format_values(string & tpl, symbols_table_t **symbols,bool warn = true);
-void   format_values(string & tpl, symbols_table_t **symbols,ostream &out,
+bool   format_values(string & tpl, symbols_table_t **symbols,ostream &out,
                             bool warn = true);
 
 #endif

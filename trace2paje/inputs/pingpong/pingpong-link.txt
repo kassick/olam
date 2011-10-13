@@ -1,5 +1,5 @@
 CONTAINER Machine {
-  NAME "%(hostname)"
+  NAME "%(my_hostname)"
   CREATE init
   DESTROY finalize
 
@@ -36,11 +36,12 @@ STATE ping_s {
 EVENT init {
   VALUE "%(EVT_NAME)"
   s hostname
+
+  PUSH hostname AS my_hostname
 }
 
 EVENT finalize {
   VALUE "%(EVT_NAME)"
-  s hostname
 }
 
 ID ping_s 4001 101

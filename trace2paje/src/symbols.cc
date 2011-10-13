@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:30:34 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 19:01:19 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -73,6 +73,9 @@ namespace Paje {
 
     memcpy( & (this->val), & (org.val), sizeof(org.val));
     this->holds = org.holds;
+    if (this->holds == s) {
+      this->val.s == strdup(org.val.s);
+    }
 
     return *this;
   }
@@ -129,21 +132,24 @@ namespace Paje {
 //#define FMT_REGEX "[#0-9]+"
 
 
+bool symbols_format_ok;
+
 string format_values(string & tpl,
     symbols_table_t **symbols,
     bool warn) {
   stringstream out;
 
-  format_values(tpl,symbols,out,warn);
+  symbols_format_ok = format_values(tpl,symbols,out,warn);
 
   return out.str();
 }
 
 
-void format_values(string & tpl, 
+bool format_values(string & tpl, 
     symbols_table_t **symbols,
     ostream &out, bool warn)
 {
+  bool all_ok = true;
   string tmp = tpl;
   smatch res;
   string fmt_regex("%\\((?P<id>" ID_REGEX ")(:(?P<fmt>" FMT_REGEX "))?\\)");
@@ -203,6 +209,8 @@ void format_values(string & tpl,
         out << ")";
         if (warn)
           cerr << "No symbol ``" << id << "´´, ignoring" << endl;
+
+        all_ok = false;
       }
     
       tmp = res.suffix().str();
@@ -213,6 +221,8 @@ void format_values(string & tpl,
     }
 
   }
+
+  return all_ok;
 
 }
 

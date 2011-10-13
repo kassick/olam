@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 18:11:37 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 19:08:23 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -187,6 +187,7 @@ void Paje::BaseEvent::add_symbol_from_tree(attribs_t * attrs)
 ///
 void Paje::BaseEvent::fill_from_attr(attribs_t * attrs)
 {
+  pushlist_entry_t e;
   walk_tree_head_first(attrs,[&](attribs_t * n, int level) {
         SemanticAttribute * attr = n->getVal();
         switch (attr->id) {
@@ -205,6 +206,19 @@ void Paje::BaseEvent::fill_from_attr(attribs_t * attrs)
             this->add_symbol_from_tree(n);
             return false; // no need to descend into this branch
             break;
+          case ID_PUSH_PARAM:
+            assert(n->childrenCount() == 2);
+            for(auto an_it = n->begin(); an_it != n->end(); ++an_it)
+            {
+              if ((*an_it)->getVal()->id == ID_IDF) {
+                e.first = (*an_it)->getVal()->vals.identifier_name;
+              } else if ((*an_it)->getVal()->id == ID_AS_IDF) {
+                e.second = (*an_it)->getVal()->vals.identifier_name;
+              }
+            }
+            pushlist.push_back(e);
+            break;
+
           default:
             break;
         }
@@ -280,6 +294,20 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
 
   return ret;
 
+}
+
+void Paje::BaseEvent::push_symbols(Paje::event_id_t id,
+    symbols_table_t * from,
+                                   symbols_table_t * to)
+{
+      // now save the ids that must be saved in the local table
+      for (auto push_it = this->pushlist.begin();
+                push_it != this->pushlist.end();
+                ++ push_it)
+      {
+        //cerr << "Push " << push_it->first << " as " << push_it->second << endl;
+        (*to )[push_it->second] = (* from)[push_it->first];
+      }
 }
 
 
@@ -433,9 +461,14 @@ string Paje::BaseEvent::toString() {
   out << endl;
 
   out << "   " << "Fields:" << endl;
-  identifier_list_t::iterator it;
-  for (it = identifier_names.begin(); it != identifier_names.end(); ++it)
+  for (auto it = identifier_names.begin(); it != identifier_names.end(); ++it)
     out << "      " << (*it).type << " " << (*it).field_name << endl;
+
+  out << "   " << "Pushes:" << endl;
+  for (auto it = pushlist.begin(); it != pushlist.end(); ++ it)
+  {
+    out << "      " << (*it).first << " => " << (*it).second << endl;
+  }
 
   return out.str();
 }

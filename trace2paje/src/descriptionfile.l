@@ -45,6 +45,8 @@ END                     return TOK_END      ;
 FROM                    return TOK_SOURCE   ;
 TO                      return TOK_DEST     ;
 KEY                     return TOK_KEY      ;
+PUSH                    return TOK_PUSH     ;
+AS                      return TOK_AS       ;
 
 [icwlfds]               { // rastro type tokens, kind of symplistic but functional
                           yylval.string = strdup(yytext);

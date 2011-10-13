@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/tree/tree.hpp"
 // Created: "Qui, 28 Jul 2011 20:31:25 -0300 (kassick)"
-// Updated: "Sex, 23 Set 2011 19:29:16 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 18:05:24 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -75,7 +75,11 @@ class TreeNode {
     {
       return const_iterator( children.end() );
     }
-   
+
+    unsigned long childrenCount() const {
+      return children.size();
+    }
+
 
      TreeNode(const T& val)
      {

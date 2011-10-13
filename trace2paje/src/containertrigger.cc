@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:46:04 -0300 (kassick)"
+// Updated: "Qui, 13 Out 2011 18:55:35 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -37,6 +37,7 @@ Paje::ContainerCreateTrigger::ContainerCreateTrigger(Paje::Container * c,hierarc
 {
   this->container = c;
   this->hierarchy = n;
+  this->name = "ContainerCreateTrigger for " + c->typeName ;
 }
 
 bool Paje::ContainerCreateTrigger::load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols)
@@ -57,6 +58,25 @@ bool Paje::ContainerCreateTrigger::load_symbols(event_id_t id, rst_event_t *even
     create_evt->load_symbols(create_evt->start_id, event, symbols);
   }
 
+}
+
+void Paje::ContainerCreateTrigger::push_symbols(Paje::event_id_t id, symbols_table_t * from,
+                                   symbols_table_t * to)
+{
+  if ( (id == this->end_id) && (event_names->count(this->container->destroyEvent)) )
+  {
+    // When destroying an event, load the symbols from it's associated
+    // event
+    Paje::BaseEvent * destroy_evt = (*event_names)[this->container->destroyEvent];
+    destroy_evt->push_symbols(id,from,to);
+  }
+  if ( (id == this->start_id) && (event_names->count(this->container->createEvent)) )
+  {
+    Paje::BaseEvent * create_evt = (*event_names)[this->container->createEvent];
+    create_evt->push_symbols(id,from,to);
+  }
+
+  Paje::BaseEvent::push_symbols(id,from,to);
 }
 
 
