@@ -1,25 +1,29 @@
-CONTAINER Machine {
-  NAME "%(my_hostname)"
-  CREATE init
-  DESTROY finalize
-
-  CONTAINER Rank {
-    NAME "rank_%(rank)"
-    CREATE PARENT
-    DESTROY PARENT
-  
-    STATETYPE PingState {
-      ping_s
-      ping_r
-    }
-
-
-  }
+CONTAINER ROOT {
 
   LINKTYPE PingLink FROM Rank TO Rank {
     ping
   }
 
+  CONTAINER Machine {
+    NAME "%(my_hostname)"
+    CREATE init
+    DESTROY finalize
+
+    CONTAINER Rank {
+      NAME "rank_%(rank)"
+      CREATE PARENT
+      DESTROY PARENT
+    
+      STATETYPE PingState {
+        ping_s
+        ping_r
+      }
+
+
+    }
+
+
+  }
 }
 
 LINK ping {

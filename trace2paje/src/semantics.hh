@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.hh"
 // Created: "Seg, 01 Ago 2011 15:46:26 -0300 (kassick)"
-// Updated: "Qui, 06 Out 2011 16:00:43 -0300 (kassick)"
+// Updated: "Sex, 14 Out 2011 15:31:52 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,6 +45,7 @@ using namespace std;
 
 #define DUMMY_EVENT_TYPE_KEY "#"
 #define DUMMY_EVENT_TYPE_NAME "___DUMMY___"
+#define DSC_ROOT_CONTAINER "ROOT"
 
 
 SemanticAttribute * new_semantic_attribute();

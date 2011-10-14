@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/container.cc"
 // Created: "Qua, 27 Jul 2011 11:07:19 -0300 (kassick)"
-// Updated: "Ter, 04 Out 2011 14:21:44 -0300 (kassick)"
+// Updated: "Sex, 14 Out 2011 15:44:24 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -95,14 +95,18 @@ namespace Paje {
   Container::Container(string _typeName,attribs_t *t) {
     //cout << "Creating from tree" <<endl;
     init(_typeName)  ;
-                     
+    this->fill_from_attr(t);
+  }
+
+  void Container::fill_from_attr(attribs_t *attr_tree)
+  {
     //For each node   of the subtree (non-descending into sub-containers)
     //fill in the f  ields from the attributes
     //ATTENTION: The walk function does not descend into children when cb
     //returns false -- hence here, stopping at the first non-toplevel
     //container makes sure it just reads the attributes of the current
     //container
-    walk_tree_head_first(t, [&](attribs_t * n, int level)
+    walk_tree_head_first(attr_tree, [&](attribs_t * n, int level)
         {
           SemanticAttribute* attr = n->getVal();
           //cerr << "Creating container " << _typeName << " " << level << endl;
@@ -115,7 +119,7 @@ namespace Paje {
 
 
     // Fill in event types
-    walk_tree(t,[&](SemanticAttribute * attr, int level) {
+    walk_tree(attr_tree,[&](SemanticAttribute * attr, int level) {
       if ((attr->id == ID_CONTAINER) && (level > 0))
         return true; // we're done
 

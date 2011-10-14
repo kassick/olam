@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 17:45:54 -0300 (kassick)"
+// Updated: "Sex, 14 Out 2011 15:41:29 -0300 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -192,27 +192,38 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
 
   if (!attr) return NULL;
 
+  // Descends into all container definitions
   if (attr->getVal()->id == ID_CONTAINER) {
     Paje::Container * c;
     char * container_type = attr->getVal()->vals.container_type;
-    if (container_type_names->count(container_type))
+
+
+    // Special case: root container is already on the hierarchy
+    if (!strcmp(container_type,DSC_ROOT_CONTAINER)) {
+      c = (*container_type_names)[container_type]->getVal();
+      c->fill_from_attr(attr);
+      h = toplevel_hierarchy;
+      top_ = toplevel_hierarchy;
+    } else if (container_type_names->count(container_type))
     {
+      // A container is already defined
       cerr << "Error: A container with type " << container_type << " has already been defined" <<endl;
       exit(1);
+    } else {
+      // it's a legit new container
+      c = new Paje::Container(container_type, attr);
+
+      c->parent = top->getVal(); // the tree takes care of this, but do_header needs to know who is the parent... matter of isolation
+
+      top_ = new hierarchy_t(c);
+      (*container_type_names)[container_type] = top_;
+      top->addChild(top_);
+
+      h = top_;
     }
 
-
-
-    c = new Paje::Container(container_type, attr);
-
-    c->parent = top->getVal(); // the tree takes care of this, but do_header needs to know who is the parent... matter of isolation
-
-    top_ = new hierarchy_t(c);
-    (*container_type_names)[container_type] = top_;
-    top->addChild(top_);
-
-    h = top_;
   } else {
+    // not a container, just pass the last top on
     top_ = top;
   }
 
@@ -847,13 +858,14 @@ void init_desc_parser()
   Paje::Container * zero;
   
 
-  zero = new Container("0");
-  zero->formatName = "0";
-
-  toplevel_hierarchy = new TreeNode < Paje::Container * >(zero);
-  attributes = new TreeNode < SemanticAttribute *>(NULL);
   container_type_names = new container_type_names_t();// must happen before creating a container
+  zero = new Container(PAJE_ROOT_CONTAINER);
+  zero->formatName = PAJE_ROOT_CONTAINER;
+  toplevel_hierarchy = new TreeNode < Paje::Container * >(zero);
+  (*container_type_names)[DSC_ROOT_CONTAINER] = toplevel_hierarchy;
+  (*container_type_names)[PAJE_ROOT_CONTAINER] = toplevel_hierarchy;
 
+  attributes = new TreeNode < SemanticAttribute *>(NULL);
   eventtype_names = new event_type_name_map_t();
   event_names     = new event_name_map_t();
   event_ids       = new event_id_map_t();
