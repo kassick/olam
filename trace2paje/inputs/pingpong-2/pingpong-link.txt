@@ -4,25 +4,29 @@ CONTAINER ROOT {
     ping
   }
 
-  CONTAINER Machine {
-    NAME "%(my_hostname)"
+  CONTAINER Cluster {
+    NAME "%(my_cluster)"
     CREATE init
     DESTROY finalize
 
-    CONTAINER Rank {
-      NAME "rank_%(rank)"
-      CREATE PARENT
-      DESTROY PARENT
-    
-      STATETYPE PingState {
-        ping_s
-        ping_r
+
+    CONTAINER Machine {
+      NAME "%(my_hostname)"
+
+      CONTAINER Rank {
+        NAME "rank_%(rank)"
+        CREATE PARENT
+        DESTROY PARENT
+      
+        STATETYPE PingState {
+          ping_s
+          ping_r
+        }
+
+
       }
 
-
     }
-
-
   }
 }
 
@@ -47,9 +51,10 @@ STATE ping_r {
 }
 
 EVENT init {
-  VALUE "%(EVT_NAME)"
+  s cluster
   s hostname
   PUSH hostname AS my_hostname
+  PUSH cluster AS my_cluster
 }
 
 EVENT finalize {

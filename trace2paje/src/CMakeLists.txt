@@ -53,7 +53,7 @@ set_property(SOURCE
   container.cc semantics.cc paje.cc rastro2paje.cc symbols.cc
   PROPERTY COMPILE_FLAGS "-std=c++0x")
 
-target_link_libraries(rastro2paje fl boost_regex boost_filesystem ${RASTRO_LIBRARIES})
+target_link_libraries(rastro2paje fl boost_regex boost_filesystem boost_system ${RASTRO_LIBRARIES})
 
 
 

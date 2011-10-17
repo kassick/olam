@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong-2/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Qui, 13 Out 2011 19:07:01 -0300 (kassick)"
+ * Updated: "Seg, 17 Out 2011 18:00:26 -0200 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -25,25 +25,27 @@
 
 #include <mpi.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "evt_defs.h"
 #include <rastro.h>
 #include "rst_functions.h"
 
-#define MAX_HOSTNAME 200
+#define MAX_HOSTNAME 20
 #define NELEM 100000000
 
 int main(int argc, char ** argv)
 {
   char hostname[MAX_HOSTNAME];
+  char clustername[MAX_HOSTNAME];
   int hostname_len = MAX_HOSTNAME;
   int rank;
   int * buf;
 
   int tag = 0;
+  int dbg = 0;
   
   MPI_Status status;
-
-
 
 
   MPI_Init(&argc, &argv);
@@ -53,7 +55,8 @@ int main(int argc, char ** argv)
 
   rst_init(rank,10); // 2nd is ignore
 
-  rst_event_s(INIT_N, hostname);
+  strcpy(clustername,"clustername");
+  rst_event_ss(INIT_N, clustername,hostname);
 
   buf = malloc(sizeof(int)*NELEM);
   if (!buf)

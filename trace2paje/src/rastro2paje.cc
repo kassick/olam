@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Dom, 09 Out 2011 19:56:24 -0300 (kassick)"
+// Updated: "Seg, 17 Out 2011 16:25:02 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -221,7 +221,7 @@ void generate_c_header(const string & fname)
   ofstream h_file;
   fs::path filepath;
   filepath = fname;
-  string module_name = filepath.stem();
+  string module_name = filepath.stem().string();
   boost::to_upper(module_name);
 
   h_file.open(fname);
@@ -261,7 +261,7 @@ void generate_fort_header(const string & fname)
   ofstream h_file;
 
   filepath = fname;
-  string module_name = filepath.stem();
+  string module_name = filepath.stem().string();
 
   h_file.open(fname);
   if (!h_file.good())
@@ -385,7 +385,7 @@ int main(int argc, char** argv)
     //yyin = stdin;
   } else {
     pathname = global_opts.fin_name;
-    files_to_parse.push(pathname.filename());
+    files_to_parse.push(pathname.filename().string());
   }
 
   // Creates basic structures
