@@ -61,6 +61,6 @@ EVENT finalize {
   VALUE "%(EVT_NAME)"
 }
 
-ID ping_s 4001 101
+ID ping_s START 4001
 ID ping_r END 4002
 ID ping   4001 4002

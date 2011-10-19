@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.hh"
 // Created: "Qui, 25 Ago 2011 14:38:26 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 18:28:37 -0300 (kassick)"
+// Updated: "Qua, 19 Out 2011 16:49:04 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -43,8 +43,10 @@ using namespace std;
 
 
 #define SYMBOL_FREE_STR_PRE \
-    if (this->holds == s) \
-      free (this->val.s);
+    if (this->holds == s) { \
+      free (this->val.s);   \
+      this->holds = invalid;\
+    }
 
 #define SYMBOL_NO_PRE
 #define SYMBOL_NO_FUNCT
@@ -85,6 +87,7 @@ namespace Paje {
       void format(string fmt,ostream &s);
 
       Symbol();
+      Symbol(const Symbol &s);
       ~Symbol();
 
   } ;

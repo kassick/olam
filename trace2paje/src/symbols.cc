@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 19:01:19 -0300 (kassick)"
+// Updated: "Qua, 19 Out 2011 17:03:54 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -54,7 +54,14 @@ namespace Paje {
   impl_set_type(uint64_t,l)
   //impl_set_type(float,f)
   impl_set_type(double,d)
-  impl_set_type_funct(const char*,s, SYMBOL_FREE_STR_PRE, strdup)
+  //impl_set_type_funct(const char*,s, SYMBOL_FREE_STR_PRE, strdup)
+  void Symbol::set_value(const char * str1) {
+    if (this->holds == s)
+      free(this->val.s);
+
+    this->val.s = strdup(str1);
+    this->holds = s;
+  }
 
 
   Symbol::Symbol() {
@@ -62,8 +69,19 @@ namespace Paje {
     this->holds = invalid;
   }
 
+  Symbol::Symbol(const Symbol& org) {
+    this->holds = org.holds;
+    if (this->holds == s)
+      this->val.s == strdup(org.val.s);
+    else
+      memcpy( & (this->val), & (org.val), sizeof(org.val));
+  }
+
+
   Symbol::~Symbol() {
-    SYMBOL_FREE_STR_PRE ;
+    //SYMBOL_FREE_STR_PRE ;
+    if (this->holds == s)
+      free(this->val.s);
   }
 
   Symbol& Symbol::operator= (const Symbol & org)
@@ -71,11 +89,14 @@ namespace Paje {
     if (this == &org)
       return *this;
 
-    memcpy( & (this->val), & (org.val), sizeof(org.val));
+    if (this->holds == s)
+      free(this->val.s);
+
     this->holds = org.holds;
-    if (this->holds == s) {
-      this->val.s == strdup(org.val.s);
-    }
+    if (this->holds == s)
+      this->val.s = strdup(org.val.s);
+    else
+      memcpy( & (this->val), & (org.val), sizeof(org.val));
 
     return *this;
   }
@@ -263,7 +284,7 @@ int main(int argc, char ** argv)
   cout << "now format it" << endl;
 
 
-  string tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:10.2G)";
+  string tpl = "this is a prefix of %(null:10) %(str1:.10s) is followed by %(float1) and %(double1:e)";
 
   symbols_table_t* v[2];
   v[0] = symbol_table;
