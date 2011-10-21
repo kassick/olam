@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 19:08:23 -0300 (kassick)"
+// Updated: "Qui, 20 Out 2011 22:23:53 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -206,7 +206,7 @@ void Paje::BaseEvent::fill_from_attr(attribs_t * attrs)
             this->add_symbol_from_tree(n);
             return false; // no need to descend into this branch
             break;
-          case ID_PUSH_PARAM:
+          case ID_PUSH_START_PARAM:
             assert(n->childrenCount() == 2);
             for(auto an_it = n->begin(); an_it != n->end(); ++an_it)
             {
@@ -216,7 +216,19 @@ void Paje::BaseEvent::fill_from_attr(attribs_t * attrs)
                 e.second = (*an_it)->getVal()->vals.identifier_name;
               }
             }
-            pushlist.push_back(e);
+            pushlist_start.insert(e);
+            break;
+          case ID_PUSH_END_PARAM:
+            assert(n->childrenCount() == 2);
+            for(auto an_it = n->begin(); an_it != n->end(); ++an_it)
+            {
+              if ((*an_it)->getVal()->id == ID_IDF) {
+                e.first = (*an_it)->getVal()->vals.identifier_name;
+              } else if ((*an_it)->getVal()->id == ID_AS_IDF) {
+                e.second = (*an_it)->getVal()->vals.identifier_name;
+              }
+            }
+            pushlist_end.insert(e);
             break;
 
           default:
@@ -300,14 +312,26 @@ void Paje::BaseEvent::push_symbols(Paje::event_id_t id,
     symbols_table_t * from,
                                    symbols_table_t * to)
 {
+  if ((id == this->trigger_id) || (id == this->start_id))
+  {
       // now save the ids that must be saved in the local table
-      for (auto push_it = this->pushlist.begin();
-                push_it != this->pushlist.end();
+      for (auto push_it = this->pushlist_start.begin();
+                push_it != this->pushlist_start.end();
                 ++ push_it)
       {
         //cerr << "Push " << push_it->first << " as " << push_it->second << endl;
         (*to )[push_it->second] = (* from)[push_it->first];
       }
+  } else if (id == this->end_id) {
+    // now save the ids that must be saved in the local table
+      for (auto push_it = this->pushlist_end.begin();
+                push_it != this->pushlist_end.end();
+                ++ push_it)
+      {
+        //cerr << "Push " << push_it->first << " as " << push_it->second << endl;
+        (*to )[push_it->second] = (* from)[push_it->first];
+      }
+  }
 }
 
 
@@ -465,9 +489,13 @@ string Paje::BaseEvent::toString() {
     out << "      " << (*it).type << " " << (*it).field_name << endl;
 
   out << "   " << "Pushes:" << endl;
-  for (auto it = pushlist.begin(); it != pushlist.end(); ++ it)
+  for (auto it = pushlist_start.begin(); it != pushlist_start.end(); ++ it)
   {
-    out << "      " << (*it).first << " => " << (*it).second << endl;
+    out << "      " << (*it).first << " => " << (*it).second << "(start)" << endl;
+  }
+  for (auto it = pushlist_end.begin(); it != pushlist_end.end(); ++ it)
+  {
+    out << "      " << (*it).first << " => " << (*it).second << "(end)" << endl;
   }
 
   return out.str();

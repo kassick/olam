@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/symbols.cc"
 // Created: "Qui, 25 Ago 2011 14:03:15 -0300 (kassick)"
-// Updated: "Qua, 19 Out 2011 17:03:54 -0200 (kassick)"
+// Updated: "Qui, 20 Out 2011 22:42:23 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -102,7 +102,7 @@ namespace Paje {
   }
 
 
-  void Symbol::format(string fmt,ostream &ss)
+  void Symbol::format(const string &fmt,ostream &ss)
   {
     string format =  "%" + fmt;
     char cc = fmt[fmt.length()-1];
@@ -155,7 +155,7 @@ namespace Paje {
 
 bool symbols_format_ok;
 
-string format_values(string & tpl,
+string format_values(const string & tpl,
     symbols_table_t **symbols,
     bool warn) {
   stringstream out;
@@ -166,7 +166,7 @@ string format_values(string & tpl,
 }
 
 
-bool format_values(string & tpl, 
+bool format_values(const string & tpl, 
     symbols_table_t **symbols,
     ostream &out, bool warn)
 {

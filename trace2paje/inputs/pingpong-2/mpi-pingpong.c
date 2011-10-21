@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong-2/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Seg, 17 Out 2011 18:00:26 -0200 (kassick)"
+ * Updated: "Qui, 20 Out 2011 22:49:29 -0200 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -81,7 +81,6 @@ int main(int argc, char ** argv)
       sleep(1);
 
       printf("Rank %d sent %d to %d, tag %d\n",rank,buf[0],rank+1,tag);
-      tag++;
       buf[0]+=10;
     } else {
       rst_event_ii(PING_R_IN,tag,rank-1);
@@ -90,7 +89,6 @@ int main(int argc, char ** argv)
       rst_event_ii(PING_OUT,tag,rank-1);
 
       printf("Rank %d got %d from %d, tag %d\n",rank,buf[0],rank-1,tag);
-      tag++;
     }
   }
 

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.hh"
 // Created: "Ter, 04 Out 2011 11:50:46 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 18:53:56 -0300 (kassick)"
+// Updated: "Qui, 20 Out 2011 22:01:36 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -68,7 +68,7 @@ namespace Paje {
 
   typedef list<identifier_entry_t> identifier_list_t;
   typedef pair<string,string> pushlist_entry_t;
-  typedef list<pushlist_entry_t> pushlist_t;
+  typedef set<pushlist_entry_t> pushlist_t;
 
 
   //************************************************
@@ -87,7 +87,7 @@ namespace Paje {
       identifier_list_t identifier_names;
       map<string, stack<double>> timestamp_map;
 
-      pushlist_t pushlist;
+      pushlist_t pushlist_start, pushlist_end;
 
       BaseEvent();
 

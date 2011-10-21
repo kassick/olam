@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 19:07:53 -0300 (kassick)"
+// Updated: "Qui, 20 Out 2011 22:48:14 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -63,7 +63,7 @@ typedef struct _serve_entry_t {
 
 } serve_entry_t;
 
-double  rastro_loop_events(list<string> &files_to_open, ostream &out)
+double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug)
 {
 
   // Open files, use a tmp sync file
@@ -257,6 +257,28 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out)
 
   // close files
   rst_close_file( &data );
+
+  if (debug)
+  {
+    cerr << " === Symbols per file at the end of output === " << endl;
+    for (auto it  = symbols_per_file.begin(); 
+              it != symbols_per_file.end();
+            ++it)
+    {
+      cerr << "Rastro (" << Paje::idf1_name << "=" << it->first.first 
+           << " , " << Paje::idf2_name << "=" << it->first.second << ")" << endl;
+        for (auto symbol_it  = it->second->begin();
+                symbol_it != it->second->end();
+              ++symbol_it)
+      {
+        cerr << "      " << symbol_it->first << " => ";
+        symbol_it->second.format("",cerr);
+        cerr << endl;
+      }
+    }
+  }
+
+
 
   return timestamp;
 }

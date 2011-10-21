@@ -53,6 +53,20 @@ attribs_t * create_nop_attr(attribs_t * n)
   return create_attr(ID_NOP,n);
 }
 
+attribs_t * create_push_param(int id, char* orgname, char * asname) {
+
+            attribs_t *idf_node = create_attr(ID_IDF,NULL);
+            idf_node->getVal()->vals.identifier_name = orgname;
+            
+            attribs_t *idf_node2 = create_attr(ID_AS_IDF,NULL);
+            idf_node2->getVal()->vals.identifier_name = asname;
+
+
+            attribs_t * n = create_attr(id,idf_node);
+            n->addChild(idf_node2);
+
+            return n;
+}
 
 
 %}
@@ -144,6 +158,7 @@ attribs_t * create_nop_attr(attribs_t * n)
 %type<attr_node> link_key_param;
 %type<attr_node> link_value_param;
 %type<attr_node> push_param;
+%type<attr_node> push_param_start_and_end;
 
 
 
@@ -519,7 +534,7 @@ event_param: TOK_TYPE IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
             }
-          | push_param;
+          | push_param_start_and_end;
           ;
 
 state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
@@ -816,19 +831,25 @@ event_id_statement:
               }
             ;
 
+push_param: push_param_start_and_end {$$ = $1}
+          | TOK_PUSH TOK_START IDENTIFIER TOK_AS IDENTIFIER
+            {
+              $$ = create_push_param(ID_PUSH_START_PARAM,$3,$5);
+            }
+          | TOK_PUSH TOK_END IDENTIFIER TOK_AS IDENTIFIER
+            {
+              $$ = create_push_param(ID_PUSH_START_PARAM,$3,$5);
+            }
+          ;
 
-push_param: TOK_PUSH IDENTIFIER TOK_AS IDENTIFIER
+push_param_start_and_end: TOK_PUSH IDENTIFIER TOK_AS IDENTIFIER
           {
-            attribs_t *idf_node = create_attr(ID_IDF,NULL);
-            idf_node->getVal()->vals.identifier_name = $2;
-            
-            attribs_t *idf_node2 = create_attr(ID_AS_IDF,NULL);
-            idf_node2->getVal()->vals.identifier_name = $4;
+            attribs_t *push_top = create_nop_attr(NULL);
+            n = create_push_param(ID_PUSH_START_PARAM,$2,$4);
+            push_top->addChild(n);
+            n = create_push_param(ID_PUSH_END_PARAM,strdup($2),strdup($4));
+            push_top->addChild(n);
 
-
-            n = create_attr(ID_PUSH_PARAM,idf_node);
-            n->addChild(idf_node2);
-
-            $$ = n;
+            $$ = push_top;
           }
           ;

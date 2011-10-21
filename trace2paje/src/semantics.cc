@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sex, 14 Out 2011 15:41:29 -0300 (kassick)"
+// Updated: "Qui, 20 Out 2011 22:24:58 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -127,8 +127,11 @@ const string SemanticAttribute::toString() const {
       s <<"As Identifier ``" << vals.name << "´´";
       break;
 
-    case ID_PUSH_PARAM:
-      s << "Push";
+    case ID_PUSH_START_PARAM:
+      s << "Push on START";
+      break;
+    case ID_PUSH_END_PARAM:
+      s << "Push on END";
       break;
 
     case ID_LINK_TYPE:

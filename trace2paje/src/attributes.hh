@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 17:31:47 -0300 (kassick)"
+// Updated: "Qui, 20 Out 2011 22:02:10 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -51,7 +51,8 @@ enum _attrib_ids {
   ID_RASTRO_VALUE_NAME,
   ID_IDF,
   ID_AS_IDF,
-  ID_PUSH_PARAM,
+  ID_PUSH_START_PARAM,
+  ID_PUSH_END_PARAM,
   ID_EVENT_ID = 50,
   ID_EVENT_START,
   ID_STATE_START,
