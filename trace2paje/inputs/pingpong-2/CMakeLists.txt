@@ -9,22 +9,11 @@ ADD_CUSTOM_COMMAND(
    )
 
 ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/evt_defs.h
-  COMMAND ${TRACE_CONVERTER} -i ${CMAKE_CURRENT_SOURCE_DIR}/pingpong.txt --c-header ${CMAKE_CURRENT_SOURCE_DIR}/evt_defs.h
+  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/evt_defs.h ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.c ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.h
+  COMMAND  ${TRACE_CONVERTER} -i ${CMAKE_CURRENT_SOURCE_DIR}/pingpong.txt --c-header ${CMAKE_CURRENT_SOURCE_DIR}/evt_defs.h --rst-c-functions ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.c --rst-c-header ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.h
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ids.txt
 )
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.dsc
-  COMMAND ${TRACE_CONVERTER} -i ${CMAKE_CURRENT_SOURCE_DIR}/pingpong.txt --rst-signatures ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.dsc
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ids.txt
-)
-
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.c
-  COMMAND ${RASTRO_GENERATE}  -c ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.c -h ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.h ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.dsc
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/rst_functions.dsc
-)
 
 
 

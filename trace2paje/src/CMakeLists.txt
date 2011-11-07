@@ -41,6 +41,7 @@ add_executable(rastro2paje
   pajeelement.cc
   symbols.cc
   rastro_loop.cc
+  rastro_generate.c
   tree/tree.hpp # my tree implementation
   rastro2paje.cc
   ${BISON_DescriptionFileParser_OUTPUTS}

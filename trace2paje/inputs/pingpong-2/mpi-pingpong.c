@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/trace2paje/inputs/pingpong-2/mpi-pingpong.c"
  * Created: "Ter, 04 Out 2011 17:13:06 -0300 (kassick)"
- * Updated: "Qui, 20 Out 2011 22:49:29 -0200 (kassick)"
+ * Updated: "Seg, 07 Nov 2011 17:40:47 -0200 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */

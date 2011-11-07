@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:46:38 -0200 (kassick)"
+// Updated: "Seg, 07 Nov 2011 17:34:28 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -36,6 +36,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "rastro_generate.h"
+
 extern "C"
 {
         extern FILE *yyin, *yyout;
@@ -57,6 +59,8 @@ typedef enum _EXE_TYPE {
     EXE_GEN_FORT_HEADER   = 20,
     EXE_GEN_RST_FUNCTION_SIGNATURES 
                           = 30,
+    EXE_GEN_RST_FUNCTIONS_SOURCE
+                          = 31,
     EXE_GEN_PAJE          = 100,
     EXE_NOP               = 101,
   } exe_enum_t;
@@ -71,6 +75,11 @@ struct _global_opts {
   long int auto_id_base;
   string ids_file, c_header, fort_header, rst_signatures;
   bool print_tree;
+
+
+  // These are for the embeded rastro_generate
+  bool has_rst_cheader, has_rst_csource, has_rst_fmodule;
+  string rst_cheader, rst_csource, rst_fmodule;
 } global_opts;
 
 static const char *optString = "i:o:hg:";
@@ -84,6 +93,9 @@ static const struct option longOpts[] = {
     { "c-header"              , required_argument, NULL, 0 },
     { "fort-header"           , required_argument, NULL, 0 },
     { "rst-signatures"        , required_argument, NULL, 0 },
+    { "rst-c-functions"       , required_argument, NULL, 0 },
+    { "rst-c-header"          , required_argument, NULL, 0 },
+    { "rst-fort-module"       , required_argument, NULL, 0 },
     { "print-tree"            , no_argument      , NULL, 0 },
     { NULL, no_argument, NULL, 0  }
 };
@@ -114,6 +126,15 @@ void usage(char ** argv)
        << "--rst-signatures <file>   : "
            << "Generate a file compatible with rastro-generate"
            << endl
+       << "--rst-c-functions         : "
+           << "Generate a C file with the functions to call libRastro events"
+           << endl
+       << "--rst-c-header            : "
+           << "Generate a C header file with the functions to call libRastro events"
+           << endl
+       << "--rst-fort-module         : "
+           << "Generate a Fortran90 module file with the functions to call libRastro events"
+           << endl
        << "--print-tree              : "
            << "Prints the tree after parsing the file"
            <<endl;
@@ -130,6 +151,10 @@ int parse_opts(int argc, char ** argv)
   global_opts.fin_name  = "stdin";
   global_opts.auto_id_base = AUTO_ID_BASE_DEFAULT;
   global_opts.print_tree = false;
+
+  global_opts.has_rst_csource = false;
+  global_opts.has_rst_cheader = false;
+  global_opts.has_rst_fmodule = false;
 
   while (( opt = getopt_long( argc, argv, optString, longOpts, &longIndex ) ) != -1 )
   {
@@ -168,8 +193,19 @@ int parse_opts(int argc, char ** argv)
           global_opts.rst_signatures = optarg;
         } else if (!strcmp(longOpts[longIndex].name, "print-tree")) {
           global_opts.print_tree = true;
-        } else if (!strcmp(longOpts[longIndex].name,"help"))
-        {
+        } else if (!strcmp(longOpts[longIndex].name, "rst-c-functions")) {
+          global_opts.has_rst_csource = true;
+          global_opts.rst_csource = optarg;
+          global_opts.exe_type.push_back(EXE_GEN_RST_FUNCTIONS_SOURCE);
+        } else if (!strcmp(longOpts[longIndex].name, "rst-c-header")) {
+          global_opts.has_rst_cheader = true;
+          global_opts.rst_cheader = optarg;
+          global_opts.exe_type.push_back(EXE_GEN_RST_FUNCTIONS_SOURCE);
+        } else if (!strcmp(longOpts[longIndex].name, "rst-fort-module")) {
+          global_opts.has_rst_fmodule = true;
+          global_opts.rst_fmodule = optarg;
+          global_opts.exe_type.push_back(EXE_GEN_RST_FUNCTIONS_SOURCE);
+        } else if (!strcmp(longOpts[longIndex].name,"help")) {
           usage(argv);
           exit(0);
         }
@@ -285,31 +321,80 @@ void generate_fort_header(const string & fname)
   h_file.close();
 }
 
+
+
+/*
+ *--------------------------------------------------------------------------------------
+ *      Method: generate_rst_signatures_list
+ *      Description:  Creates a list of signatures based on the events described
+ *      in the input
+ *--------------------------------------------------------------------------------------
+ */
+void generate_rst_signatures_list(set<string> & signatures) {
+  for_each(ordered_event_names->begin(), ordered_event_names->end(),
+      [&](pair<string, Paje::BaseEvent*> p) {
+        p.second->get_rst_function_signature(signatures);
+      });
+}
+
+
+
+void generate_rst_signatures_to_file(set<string> & signatures, FILE* fout) {
+  for_each(signatures.begin(), signatures.end(),
+      [&](string s) {
+      if (s.size())
+        fprintf(fout,"%s\n",s.c_str());
+      } );
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  generate_rst_signatures
+ *  Description:  Creates a file containing signatures to stand-alone
+ *  rastro-generate
+ * =====================================================================================
+ */
 void generate_rst_signatures(const string & fname)
 {
-  ofstream h_file;
+  FILE *h_file;
   set<string> signatures;
 
-  h_file.open(fname);
-  if (!h_file.good())
+  h_file  = fopen(fname.c_str(), "w");
+  if (!h_file)
   {
     cerr << "[Error] Could not open file " << fname << endl;
     exit(1);
   }
   
-  for_each(ordered_event_names->begin(), ordered_event_names->end(),
-      [&](pair<string, Paje::BaseEvent*> p) {
-        p.second->get_rst_function_signature(signatures);
-      });
+  generate_rst_signatures_list(signatures);
 
-  for_each(signatures.begin(), signatures.end(),
-      [&](string s) {
-      if (s.size())
-        h_file << s << endl;
-      } );
+  generate_rst_signatures_to_file(signatures,h_file);
 
-  h_file.close();
+  fclose(h_file);
 }
+
+
+FILE* generate_rst_signatures_to_tmpfile()
+{
+  FILE *h_file;
+  set<string> signatures;
+
+  h_file  = tmpfile();
+  if (!h_file)
+  {
+    cerr << "[Error] Could not tmp file" << endl;
+    exit(1);
+  }
+  
+  generate_rst_signatures_list(signatures);
+
+  generate_rst_signatures_to_file(signatures,h_file);
+  rewind(h_file);
+
+  return h_file;
+}
+
+
 
 void generate_paje_output(const string & fname,int oind, int argc, char ** argv)
 {
@@ -507,6 +592,7 @@ int main(int argc, char** argv)
   sort(global_opts.exe_type.begin(),
        global_opts.exe_type.end() ); // luckly, there can be a hierarchy of what must be done before
 
+  bool sources_generated = false;
   for_each(global_opts.exe_type.begin(),global_opts.exe_type.end(),
       [&](exe_enum_t exe_type) {
 
@@ -526,6 +612,20 @@ int main(int argc, char** argv)
           case EXE_GEN_RST_FUNCTION_SIGNATURES:
             generate_rst_signatures(global_opts.rst_signatures);
             break;
+          case EXE_GEN_RST_FUNCTIONS_SOURCE:
+            if (!sources_generated)
+            {
+              FILE *tmp_signatures = generate_rst_signatures_to_tmpfile();
+              generate_rst_functions(
+                           global_opts.has_rst_csource, global_opts.rst_csource.c_str(),
+                           global_opts.has_rst_cheader, global_opts.rst_cheader.c_str(),
+                           global_opts.has_rst_fmodule, global_opts.rst_fmodule.c_str(),
+                            tmp_signatures);
+              sources_generated = true;
+              fclose(tmp_signatures);
+            }
+            break;
+
 
 
           default:
