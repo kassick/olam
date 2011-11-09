@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 19:08:56 -0300 (kassick)"
+// Updated: "Qua, 09 Nov 2011 18:41:55 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -131,6 +131,21 @@ bool Paje::Link::do_start(double timestamp,
                  thisValue,
                  link_key.key,
                  out);
+
+  // Special case: if start == end, we must call the end here and exit in
+  // do_end
+  if (this->start_id == this->end_id) {
+    string destContainer   = format_values(lt->dest->formatName, symbols);
+    string otherValue = format_values(this->formatValue_end,symbols);
+    pajeEndLink(timestamp,
+                   link_key.containerName,
+                   lt->typeName,
+                   destContainer,
+                   otherValue,
+                   link_key.key,
+                   out);
+    return true;
+  }
   
  
   bool add_to_started = true;
@@ -189,6 +204,11 @@ bool Paje::Link::do_end(double timestamp,
   *priority = 0;
 
   string destContainer, thisValue;
+  
+  // do not process the end event if ids are equal
+  if (this->start_id == this->end_id) {
+    return true;
+  }
 
   link_key.containerName = format_values(lt->container->formatName, symbols);
   link_key.key           = format_values(this->format_key_end, symbols);
