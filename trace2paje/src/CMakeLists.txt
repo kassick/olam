@@ -48,6 +48,8 @@ add_executable(rastro2paje
   ${FLEX_DescriptionFileScanner_OUTPUTS}
 )
 set_property(TARGET rastro2paje PROPERTY COMPILE_FLAGS "-std=c++0x")
+set_property(TARGET rastro2paje PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
+#set_property(TARGET rastro2paje PROPERTY BUILD_WITH_INSTALL_RPATH true)
 #set_property(TARGET rastro2paje PROPERTY IMPORTED_LOCATION "${RASTRO_PREFIX}/lib")
 
 set_property(SOURCE 
@@ -59,6 +61,7 @@ target_link_libraries(rastro2paje fl boost_regex boost_filesystem boost_system $
 
 
 
+install (TARGETS rastro2paje DESTINATION bin)
 
 
 

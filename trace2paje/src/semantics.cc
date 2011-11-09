@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:24:58 -0200 (kassick)"
+// Updated: "Qua, 09 Nov 2011 16:17:32 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -596,10 +596,7 @@ void map_pre_triggers(Paje::BaseEvent * evt)
   return;
 }
 
-void add_event_do_id_map(Paje::BaseEvent * evt)
-{
-  map_pre_triggers(evt);
-  
+void add_event_to_unique_ids(Paje::BaseEvent * evt) {
   // adds the end_id
   if (evt->end_id)
   {
@@ -620,7 +617,13 @@ void add_event_do_id_map(Paje::BaseEvent * evt)
     event_ids->insert (pair<event_id_t,Paje::BaseEvent*>(evt->start_id, evt));
     unique_ids.insert(evt->start_id);
   }
+}
+
+void add_event_do_id_map(Paje::BaseEvent * evt)
+{
+  map_pre_triggers(evt);
   
+  add_event_to_unique_ids(evt);
   // map_pos_triggers(evt); // do we have any trigger for post-event?
 }
 
@@ -636,6 +639,12 @@ void events_to_id_map()
       {
         cerr << "Warning: Event " << p.first << " has no defined type" << endl;
         // this event won't be mapped to event ids
+
+        // Make sure that it's ids are mapped on unique ...
+
+        // Make sure that it's ids are mapped on unique ...
+        if (p.second->has_ids())
+          add_event_to_unique_ids(p.second);
       } else {
         // adds the trigger id
         add_event_do_id_map(p.second);
