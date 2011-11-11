@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 18:55:35 -0300 (kassick)"
+// Updated: "Sex, 11 Nov 2011 16:22:55 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -131,6 +131,7 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
           p->containerName = containerName;
           p->typeName      = c->typeName;
           p->parentName    = parentName;
+          p->container     = c;
           p->nchild = 0;
             
           /*
@@ -273,7 +274,8 @@ void destroy_missing_containers(double timestamp, ostream & out)
 
             if ( (thisContainer->typeName == it->second.typeName))
             {
-              cerr << "[Warning] Destroying missing container " << it->second.containerName << endl;
+              if (!it->second.container->destroyWithParent)
+                cerr << "[Warning] Destroying missing container " << it->second.containerName << endl;
               pajeDestroyContainer(timestamp,
                                     it->second.typeName,
                                     it->second.containerName,
