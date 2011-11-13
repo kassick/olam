@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.hh"
 // Created: "Ter, 04 Out 2011 11:50:46 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:01:36 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 01:46:24 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -33,6 +33,7 @@ extern "C" {
 #include "symbols.hh"
 #include "attributes.hh"
 #include "container.hh"
+#include "usermap.hh"
 
 #include <sstream>
 #include <string>
@@ -88,6 +89,8 @@ namespace Paje {
       map<string, stack<double>> timestamp_map;
 
       pushlist_t pushlist_start, pushlist_end;
+      map_entries_t map_list;
+      map_entries_t get_list;
 
       BaseEvent();
 
@@ -124,6 +127,9 @@ namespace Paje {
       virtual void push_symbols(event_id_t id,
                                    symbols_table_t * from,
                                    symbols_table_t * to);
+      virtual void map_symbols(Paje::event_id_t evt_id, symbols_table_t ** symbols, user_defined_maps_t & usermaps);
+      virtual void get_symbols_from_map (Paje::event_id_t evt_id, symbols_table_t * dest_symbols, symbols_table_t ** symbols, user_defined_maps_t & usermaps);
+
       void add_symbol_from_tree(attribs_t * attrs);
 
       virtual string toString();

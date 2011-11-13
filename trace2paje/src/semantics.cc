@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Qua, 09 Nov 2011 16:17:32 -0200 (kassick)"
+// Updated: "Sáb, 12 Nov 2011 22:36:28 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -157,6 +157,28 @@ const string SemanticAttribute::toString() const {
 
     case ID_EVENT:
       s << "Event ``" << vals.name<<"´´";
+      break;
+    case ID_MAP:
+      s << "MAP";
+      break;
+    case ID_MAP_NAME:
+      s << "on ``" << vals.name << "´´";
+      break;
+    case ID_MAP_KEY:
+      s << "key ``" << vals.name << "´´";
+      break;
+    case ID_MAP_VALUE:
+      s << "value ``" << vals.name << "´´";
+      break;
+
+    case ID_MAP_START:
+      s << "(start only)";
+      break;
+    case ID_MAP_END:
+      s << "(end only)";
+      break;
+    case ID_MAP_START_AND_END:
+      s << "(start and end)";
       break;
 
     default:

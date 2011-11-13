@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Sex, 11 Nov 2011 16:22:55 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 01:52:52 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -77,6 +77,46 @@ void Paje::ContainerCreateTrigger::push_symbols(Paje::event_id_t id, symbols_tab
   }
 
   Paje::BaseEvent::push_symbols(id,from,to);
+}
+
+void Paje::ContainerCreateTrigger::map_symbols(Paje::event_id_t evt_id, symbols_table_t ** symbols, user_defined_maps_t & usermaps)
+{
+  if ( (evt_id == this->start_id)&& (event_names->count(this->container->createEvent)) )
+  {
+    Paje::BaseEvent * create_evt = (*event_names)[this->container->createEvent];
+    create_evt->map_symbols(evt_id, symbols,usermaps);
+  }
+  
+  if ( (evt_id == this->end_id) && (event_names->count(this->container->destroyEvent)) )
+  {
+    Paje::BaseEvent * destroy_evt = (*event_names)[this->container->destroyEvent];
+    destroy_evt->map_symbols(evt_id, symbols,usermaps);
+
+  }
+
+  Paje::BaseEvent::map_symbols(evt_id, symbols, usermaps);
+
+}
+      
+
+
+void Paje::ContainerCreateTrigger::get_symbols_from_map (Paje::event_id_t evt_id, 
+        symbols_table_t * dest_symbols, symbols_table_t ** symbols, user_defined_maps_t & usermaps)
+{
+  if ( (evt_id == this->start_id)&& (event_names->count(this->container->createEvent)) )
+  {
+    Paje::BaseEvent * create_evt = (*event_names)[this->container->createEvent];
+    create_evt->get_symbols_from_map(evt_id, dest_symbols, symbols, usermaps);
+  }
+  
+  if ( (evt_id == this->end_id) && (event_names->count(this->container->destroyEvent)) )
+  {
+    Paje::BaseEvent * destroy_evt = (*event_names)[this->container->destroyEvent];
+    destroy_evt->get_symbols_from_map(evt_id, dest_symbols, symbols, usermaps);
+
+  }
+
+  Paje::BaseEvent::get_symbols_from_map(evt_id, dest_symbols, symbols, usermaps);
 }
 
 

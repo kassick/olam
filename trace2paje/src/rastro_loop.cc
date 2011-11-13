@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:48:14 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:14:38 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -76,7 +76,9 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
 #define _LOCAL_TABLE 1
 #define _END_TABLE 2
   symbols_table_t *symbols[4];
-  
+
+  user_defined_maps_t usermaps;
+
   rst_event_t event;
   rst_file_t data;
   set<Paje::event_id_t> ignored_ids;
@@ -137,7 +139,7 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
   while (rst_decode_event(&data, &event)) {
     Paje::event_id_t evt_id = event.type;
 
-    //cerr << "evemt type == " << event.type << " == " << evt_id << endl;
+    //cerr << "event type == " << event.type << " == " << evt_id << endl;
     int nevts = 0;
 
     pair<event_id_map_t::iterator,event_id_map_t::iterator> equal_range;
@@ -188,12 +190,23 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
       //cerr << "serving " << it->second->name << endl;
       ++nevts;
       entry.evt = it->second;
+
+      if (debug)
+        cerr << "=== Serving id " << evt_id << " with " << entry.evt->name << endl;
+
+      // Loads symbols from this evvent
       entry.evt->load_symbols(evt_id, &event,symbols[_GLOBAL_TABLE]);
+
+      // loads some symbols from defined user maps
+      entry.evt->get_symbols_from_map(evt_id, symbols[_GLOBAL_TABLE], symbols, usermaps);
+
+      // saves predefined symbols in local table
       entry.evt->push_symbols(evt_id, symbols[_GLOBAL_TABLE],symbols[_LOCAL_TABLE]);
-      
-      
-      
-      
+
+      // saves predefined symbols in map
+      entry.evt->map_symbols(evt_id, symbols, usermaps);
+     
+      // now generate paje output for this event
       entry.evt->trigger(evt_id,
                         timestamp,
                         symbols,

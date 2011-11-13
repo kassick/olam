@@ -68,6 +68,33 @@ attribs_t * create_push_param(int id, char* orgname, char * asname) {
             return n;
 }
 
+attribs_t * create_map_param(int id, int start_or_end,
+                                char * map_name, 
+                                char* map_key, char *map_value)
+{
+  attribs_t *map_node,
+            *value_node,
+            *key_node,
+            *map_name_node;
+
+  value_node = create_attr(ID_MAP_VALUE,NULL);
+  value_node->getVal()->vals.identifier_name = map_value;
+
+  map_name_node = create_attr(ID_MAP_NAME,NULL);
+  map_name_node->getVal()->vals.name = map_name;
+
+  key_node = create_attr(ID_MAP_KEY,NULL);
+  key_node->getVal()->vals.name = map_key;
+  
+  map_node = create_attr(id,NULL);
+  map_node->addChild(key_node);
+  map_node->addChild(value_node);
+  map_node->addChild(map_name_node);
+  map_node->addChild(create_attr(start_or_end,NULL));
+
+  return map_node;
+}
+
 
 %}
 
@@ -110,13 +137,16 @@ attribs_t * create_push_param(int id, char* orgname, char * asname) {
 %token<ptr> TOK_ID       ;
 %token<ptr> TOK_START    ;
 %token<ptr> TOK_END      ;
-%token<ptr> TOK_SOURCE   ;
-%token<ptr> TOK_DEST     ;
 %token<ptr> TOK_LINK     ;
 %token<ptr> TOK_PIN_IDS  ;
 %token<ptr> TOK_KEY      ;
 %token<ptr> TOK_AS       ;
 %token<ptr> TOK_PUSH     ;
+%token<ptr> TOK_MAP      ;
+%token<ptr> TOK_TO       ;
+%token<ptr> TOK_IN       ;
+%token<ptr> TOK_GET      ;
+%token<ptr> TOK_FROM     ;
 
 
 %type<ptr> code
@@ -157,8 +187,19 @@ attribs_t * create_push_param(int id, char* orgname, char * asname) {
 %type<id> opt_start_or_end;
 %type<attr_node> link_key_param;
 %type<attr_node> link_value_param;
+
 %type<attr_node> push_param;
 %type<attr_node> push_param_start_and_end;
+
+%type<attr_node> map_param;
+%type<attr_node> map_start_param;
+%type<attr_node> map_end_param;
+%type<attr_node> map_start_and_end_param;
+
+%type<attr_node> get_param;
+%type<attr_node> get_start_param;
+%type<attr_node> get_end_param;
+%type<attr_node> get_start_and_end_param;
 
 
 
@@ -356,7 +397,7 @@ eventtype_param: TOK_EVENT_TYPE IDENTIFIER '{' accept_list '}' {
                   
                }
 
-linktype_param: TOK_LINKTYPE IDENTIFIER TOK_SOURCE IDENTIFIER TOK_DEST
+linktype_param: TOK_LINKTYPE IDENTIFIER TOK_FROM IDENTIFIER TOK_TO
                             IDENTIFIER opt_accept_list  {
                   // link type node with type name
                   attr = new_semantic_attribute();
@@ -534,7 +575,9 @@ event_param: TOK_TYPE IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
             }
-          | push_param_start_and_end;
+          | push_param_start_and_end
+          | map_start_and_end_param
+          | get_start_and_end_param
           ;
 
 state_statement: TOK_STATE IDENTIFIER '{' state_params '}' {
@@ -615,7 +658,9 @@ state_param: TOK_TYPE IDENTIFIER {
                   n = new attribs_t(attr);
                   $$ = n;
             }
-          | push_param;
+          | push_param
+          | map_param
+          | get_param
           ;
 
 
@@ -853,3 +898,56 @@ push_param_start_and_end: TOK_PUSH IDENTIFIER TOK_AS IDENTIFIER
             $$ = push_top;
           }
           ;
+
+
+
+map_start_param: TOK_MAP TOK_START STRING_LIT TOK_TO IDENTIFIER TOK_IN STRING_LIT 
+             {
+                $$ = create_map_param(ID_MAP, ID_MAP_START,
+                        $7, $3, $5);
+              }
+
+map_end_param: TOK_MAP TOK_END STRING_LIT TOK_TO IDENTIFIER TOK_IN STRING_LIT 
+             {
+                $$ = create_map_param(ID_MAP, ID_MAP_END,
+                        $7, $3, $5);
+             }
+
+map_start_and_end_param:
+            TOK_MAP STRING_LIT TOK_TO IDENTIFIER TOK_IN STRING_LIT 
+             {
+                $$ = create_map_param(ID_MAP, ID_MAP_START_AND_END,
+                        $6, $2, $4);
+             }
+
+get_start_param: TOK_GET TOK_START IDENTIFIER TOK_FROM STRING_LIT TOK_KEY STRING_LIT
+        {
+            // e.g.
+            // GET filename FROM "map_for_%(my_rank)" KEY "%(file_handle)"
+            $$ = create_map_param(ID_MAP_GET, ID_MAP_START, $5, $7, $3 );
+        }
+
+get_end_param: TOK_GET TOK_END IDENTIFIER TOK_FROM STRING_LIT TOK_KEY STRING_LIT
+        {
+            // e.g.
+            // GET filename FROM "map_for_%(my_rank)" KEY "%(file_handle)"
+            $$ = create_map_param(ID_MAP_GET, ID_MAP_END, $5, $7, $3 );
+        }
+
+get_start_and_end_param:
+                TOK_GET IDENTIFIER TOK_FROM STRING_LIT TOK_KEY STRING_LIT
+        {
+            // e.g.
+            // GET filename FROM "map_for_%(my_rank)" KEY "%(file_handle)"
+            $$ = create_map_param(ID_MAP_GET, ID_MAP_START_AND_END, $4, $6, $2 );
+        }
+
+map_param: map_start_param
+         | map_end_param
+         | map_start_and_end_param
+         ;
+
+get_param: get_start_and_end_param
+         | get_start_param
+         | get_end_param
+         ;

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Seg, 07 Nov 2011 17:34:28 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:11:40 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -582,6 +582,13 @@ int main(int argc, char** argv)
       cerr << "====================" << endl;
       cerr << "== Hierarchy =======" << endl;
       print_tree(toplevel_hierarchy);
+
+      cerr << "====================" << endl;
+      cerr << " == ID-Map =========" << endl;
+
+      for_each(event_ids->begin(), event_ids->end(), [&]( pair<Paje::event_id_t, Paje::BaseEvent *> p) {
+          cerr << p.first << " == > " << p.second->name << endl;
+        });
 
     }
   } // Parsing

@@ -42,6 +42,7 @@ add_executable(rastro2paje
   symbols.cc
   rastro_loop.cc
   rastro_generate.c
+  usermap.cc
   tree/tree.hpp # my tree implementation
   rastro2paje.cc
   ${BISON_DescriptionFileParser_OUTPUTS}
@@ -95,6 +96,7 @@ add_executable(scanner_test
   paje.cc
   paje_functions.cc
   pajeelement.cc
+  usermap.cc
   tree/tree.hpp # my tree implementation
   ${FLEX_DescriptionFileScanner_OUTPUTS} 
   ${BISON_DescriptionFileParser_OUTPUTS}

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:23:53 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 01:43:35 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -236,6 +236,10 @@ void Paje::BaseEvent::fill_from_attr(attribs_t * attrs)
         }
         return false;
       });
+
+
+    fill_entry_list(ID_MAP    , map_list, attrs);
+    fill_entry_list(ID_MAP_GET, get_list, attrs);
 }
 
 
@@ -331,6 +335,88 @@ void Paje::BaseEvent::push_symbols(Paje::event_id_t id,
         //cerr << "Push " << push_it->first << " as " << push_it->second << endl;
         (*to )[push_it->second] = (* from)[push_it->first];
       }
+  }
+}
+
+
+/*************************************
+ * Push Symbols to Map
+ * */
+
+void Paje::BaseEvent::map_symbols(Paje::event_id_t evt_id, 
+    symbols_table_t ** symbols,
+    user_defined_maps_t & usermaps)
+{
+  for (auto it = map_list.begin(); it != map_list.end(); ++it)
+  {
+    int tmp_symbol = 0;
+    // either it happens on BOTH or it needs to be defined to happen on
+    // START or END
+    if ((it->when & USER_MAP_BOTH) || 
+        ( (it->when & USER_MAP_START) && (evt_id == start_id) ) ||
+        ( (it->when & USER_MAP_END  ) && (evt_id == end_id  ) )
+       )
+    {
+      string mapname = format_values(it->map_name_format, symbols);
+
+      // look for a symbol named idf_name on all tables
+      bool mapped = false;
+      while (symbols[tmp_symbol])
+      {
+        if (symbols[tmp_symbol]->count(it->idf_name))
+        {
+          string key = format_values(it->key, symbols);
+          // copy the symbol from the symbol table
+          (usermaps[mapname])[key] = (*(symbols[tmp_symbol]))[it->idf_name] ;
+          mapped = true;
+          break;
+        }
+        tmp_symbol++;
+      }
+
+      if (!mapped) {
+        cerr << "[Warning] Could not map " << mapname << "[" << it->key << "] = " << it->idf_name << endl;
+      }
+    }
+  }
+}
+
+
+
+void Paje::BaseEvent::get_symbols_from_map (Paje::event_id_t evt_id, 
+    symbols_table_t * dest_symbols,
+    symbols_table_t ** symbols,
+    user_defined_maps_t & usermaps)
+{
+  
+
+  for (auto it = get_list.begin(); it != get_list.end(); ++it)
+  {
+    // either it happens on BOTH or it needs to be defined to happen on
+    // START or END
+
+    if ((it->when & USER_MAP_BOTH) || 
+        ( (it->when & USER_MAP_START) && (evt_id == start_id) ) ||
+        ( (it->when & USER_MAP_END  ) && (evt_id == end_id  ) )
+       )
+    {
+      string mapname = format_values(it->map_name_format, symbols);
+
+      if (!(usermaps.count(mapname)))
+      {
+        cerr << "[Warning] No user map named " << mapname << endl;
+        continue;
+      }
+
+      string key = format_values(it->key, symbols);
+      if (! ((usermaps[mapname]).count(key))) {
+        cerr << "[Warning] Map " << mapname << " has no key " << key << endl;
+        continue;
+      }
+
+      (*dest_symbols)[it->idf_name] = ((usermaps[mapname])[key]);
+
+    }
   }
 }
 
@@ -496,6 +582,32 @@ string Paje::BaseEvent::toString() {
   for (auto it = pushlist_end.begin(); it != pushlist_end.end(); ++ it)
   {
     out << "      " << (*it).first << " => " << (*it).second << "(end)" << endl;
+  }
+
+  out << "   " << "Maps:" << endl;
+  for (auto it =  map_list.begin(); it != map_list.end(); ++it)
+  {
+    out << "      " << it->map_name_format 
+        << "[" << it->key << "] = " << it->idf_name << "( ";
+    if (it->when & USER_MAP_START)
+      out << "start ";
+    if (it->when & USER_MAP_END)
+      out << "end ";
+    out << ")" << endl;
+  }
+
+  out << "   " << "Gets:" << endl;
+  for (auto it =  get_list.begin(); it != get_list.end(); ++it)
+  {
+    out << "      " << it->idf_name << " = "
+      << it->map_name_format  << "[" << it->key << "]" << "( " ;
+
+    if (it->when & USER_MAP_START)
+      out << "start ";
+    if (it->when & USER_MAP_END)
+      out << "end ";
+
+    out << ")" << endl;
   }
 
   return out.str();

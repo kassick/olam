@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/attributes.hh"
 // Created: "Seg, 01 Ago 2011 16:11:04 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:02:10 -0200 (kassick)"
+// Updated: "Sáb, 12 Nov 2011 22:35:23 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -67,6 +67,14 @@ enum _attrib_ids {
   ID_VALUE_FORMAT_START,
   ID_VALUE_FORMAT_END,
   ID_PIN_IDS,
+  ID_MAP,
+  ID_MAP_GET,
+  ID_MAP_START,
+  ID_MAP_END,
+  ID_MAP_START_AND_END,
+  ID_MAP_NAME,
+  ID_MAP_KEY,
+  ID_MAP_VALUE,
 
   ID_NOP
 };

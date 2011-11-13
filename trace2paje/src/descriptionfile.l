@@ -42,11 +42,16 @@ ID                      return TOK_ID       ;
 PIN_IDS                 return TOK_PIN_IDS  ;
 START                   return TOK_START    ;
 END                     return TOK_END      ;
-FROM                    return TOK_SOURCE   ;
-TO                      return TOK_DEST     ;
 KEY                     return TOK_KEY      ;
 PUSH                    return TOK_PUSH     ;
 AS                      return TOK_AS       ;
+TO                      return TOK_TO       ;
+IN                      return TOK_IN       ;
+FROM                    return TOK_FROM     ;
+MAP                     return TOK_MAP      ;
+GET                     return TOK_GET      ;
+
+
 
 [icwlfds]               { // rastro type tokens, kind of symplistic but functional
                           yylval.string = strdup(yytext);

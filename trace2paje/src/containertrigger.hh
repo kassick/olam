@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.hh"
 // Created: "Ter, 04 Out 2011 14:07:16 -0300 (kassick)"
-// Updated: "Sex, 11 Nov 2011 16:22:25 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 01:52:16 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -93,12 +93,17 @@ namespace Paje {
           symbols_table_t ** symbols,
           double * priority,
           ostream &out);
-      
+     
+
+      // need to overload these so that we load from the right event -- the
+      // create and destroy events
       virtual bool load_symbols(event_id_t id, rst_event_t *event, symbols_table_t * symbols);
       virtual void push_symbols(event_id_t id,
                                    symbols_table_t * from,
                                    symbols_table_t * to);
       
+      virtual void map_symbols(Paje::event_id_t evt_id, symbols_table_t ** symbols, user_defined_maps_t & usermaps);
+      virtual void get_symbols_from_map (Paje::event_id_t evt_id, symbols_table_t * dest_symbols, symbols_table_t ** symbols, user_defined_maps_t & usermaps);
 
     protected:
       Container * container;
