@@ -1,0 +1,4 @@
+RASTRO (id1,id2)
+
+INCLUDE "filenames.txt"
+INCLUDE "ids.txt"

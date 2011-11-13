@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 01:52:52 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 03:40:24 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -141,7 +141,7 @@ bool Paje::ContainerCreateTrigger::do_start(double timestamp,
     containerName = PAJE_ROOT_CONTAINER;
   }
 
-  walk_tree_head_first(hierarchy,[&](hierarchy_t * n, int level)
+  walk_tree_head_first(this->hierarchy,[&](hierarchy_t * n, int level)
       {
         Paje::Container * c = n->getVal();
         parentName = containerName;
@@ -221,20 +221,23 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
     double * priority,
     ostream &out)
 {
-  string containerName;
   
   // needs to destroy all children
   walk_tree_depth_first(this->hierarchy,[&](hierarchy_t * n, int level)
       {
         Paje::Container * thatcontainer = n->getVal();
+        if (this->container->typeName == thatcontainer->typeName)
+          return true; // WE DO NOT WANT TO CLOSE THE SIBLINGS!
+
         string parentName = format_values(thatcontainer->parent->formatName,symbols);
 
        
-        /*
-        cerr << "Container type " << thatcontainer->typeName << "child of " 
-              << thatcontainer->parent->typeName << "(" << parentName << ")"
-              << endl;
-              */
+        
+/*         cerr << "Container type " << thatcontainer->typeName << " child of " 
+ *               << thatcontainer->parent->typeName << "(" << parentName << ")"
+ *               << endl;
+ */
+              
 
         map<string,Paje::unique_container_name_t>::iterator it;
 
@@ -242,14 +245,15 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
         while (it != container_unique_names.end())
         {
 
-        /*
-            cerr << "Kill? ("
-                    << it->second.containerName << ","
-                    << it->second.parentName << ","
-                    << it->second.typeName << ","
-                    << it->second.nchild << ")"  
-                    << endl;
-                    */
+        
+/*             cerr << "Kill? ("
+ *                     << it->second.containerName << ","
+ *                     << it->second.parentName << ","
+ *                     << it->second.typeName << ","
+ *                     << it->second.nchild << ")"  
+ *                     << endl;
+ */
+                    
 
             if ( (thatcontainer->typeName == it->second.typeName) &&
                  (parentName == it->second.parentName) &&
@@ -278,9 +282,22 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
         return false;
       }
     );
+  
+  // now close THIS container
+  
+  string containerName = format_values(this->container->formatName, symbols);
+  auto it = container_unique_names.find(containerName);
+  if ( (it != container_unique_names.end()) &&
+       (it->second.nchild == 0 ) )
+  {
 
-
-
+    close_pending_states(timestamp, containerName, this->container, out);
+    pajeDestroyContainer(timestamp,
+                          this->container->typeName,
+                          containerName,
+                          out);
+    container_unique_names.erase(it);
+  }
 
 
   *priority = CONTAINER_DESTROY_PRIO;
@@ -288,6 +305,14 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
 }
 
 
+double Paje::ContainerCreateTrigger::get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols)
+{
+  if (evt_id == this->end_id)
+    return CONTAINER_DESTROY_PRIO;
+  else
+    return CONTAINER_CREATE_PRIO;
+
+}
 
 
 void destroy_missing_containers(double timestamp, ostream & out)

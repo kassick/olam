@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 01:43:35 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:29:58 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -49,6 +49,22 @@ void Paje::BaseEvent::set_event_type(Paje::BaseEventType * evt_type)
 
 }
 
+double Paje::BaseEvent::get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols)
+{
+  if (evt_id == end_id) {
+    string containerName = format_values(this->eventType->container->formatName,symbols);
+    return get_timestamp(containerName,timestamp);
+  }
+
+  if (evt_id == start_id)
+  {
+    return DEFAULT_EVENT_PRIO;
+  }
+ 
+  // defaults to return a trigger prio
+  return DEFAULT_EVENT_PRIO_TRIGG;
+}
+
 /////
 // Trigger functions
 bool Paje::BaseEvent::do_start(double timestamp,
@@ -62,6 +78,8 @@ bool Paje::BaseEvent::do_start(double timestamp,
   
   return false;
 }
+
+
 
 bool Paje::BaseEvent::do_end(double timestamp,
           symbols_table_t ** symbols,
@@ -457,6 +475,17 @@ double Paje::BaseEvent::pop_timestamp(const string & containerName, const double
   {
     double ret = this->timestamp_map[containerName].top();
     this->timestamp_map[containerName].pop();
+    return ret;
+  } else {
+    return DEFAULT_EVENT_PRIO;
+  }
+}
+
+double Paje::BaseEvent::get_timestamp(const string & containerName, const double timestamp)
+{
+  if (this->timestamp_map.count(containerName))
+  {
+    double ret = this->timestamp_map[containerName].top();
     return ret;
   } else {
     return DEFAULT_EVENT_PRIO;

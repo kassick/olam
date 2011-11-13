@@ -1,0 +1,41 @@
+RASTRO(id1,id2)
+  CONTAINER FileName {
+    CREATE Open
+    DESTROY Close
+
+    NAME "%(filename)"
+
+    STATETYPE S {
+      Open
+      Close
+      Write
+    }
+  }
+
+STATE Open {
+  s filename
+  VALUE "Open"
+}
+
+EVENT Opened {
+  i fd
+  s filename
+
+  MAP "%(fd)" TO filename IN "filenames"
+}
+
+
+STATE Close {
+  VALUE "Close"
+  i fd
+  GET filename FROM "filenames" KEY "%(fd)"
+}
+
+STATE Write {
+  VALUE "Write"
+  i fd
+  GET filename FROM "filenames" KEY "%(fd)"
+}
+
+ID Opened 4010
+ID Open END 4010

@@ -31,7 +31,7 @@ add_custom_target(mpi-run
   DEPENDS mpi-pingpong
 )
 
-add_custom_target(run 
+add_custom_target(mpi-pingpong-paje
   COMMAND ${TRACE_CONVERTER} -i pingpong.txt -o pingpong.paje *.rst
   DEPENDS mpi-run
 )

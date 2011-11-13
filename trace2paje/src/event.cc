@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:46:56 -0300 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:38:16 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -67,6 +67,11 @@ bool Paje::Event::do_trigger(double timestamp,
   // like creating an event!!! (I'll just ignore it for now)
   *priority = 0;
   return true;
+}
+
+double Paje::Event::get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols)
+{
+  return 0;
 }
 
 

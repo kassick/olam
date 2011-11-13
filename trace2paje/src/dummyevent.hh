@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/dummyevent.hh"
 // Created: "Ter, 04 Out 2011 13:48:27 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:46:34 -0300 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:49:09 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -55,6 +55,7 @@ namespace Paje {
         virtual bool has_ids() const;
 
         virtual void gen_auto_ids(long int * base_id, set<event_id_t> & unique_ids);
+        virtual double get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols);
   };
 
 } // namespace paje

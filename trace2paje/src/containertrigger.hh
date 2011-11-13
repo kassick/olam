@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.hh"
 // Created: "Ter, 04 Out 2011 14:07:16 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 01:52:16 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:35:19 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -94,6 +94,7 @@ namespace Paje {
           double * priority,
           ostream &out);
      
+      virtual double get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols);
 
       // need to overload these so that we load from the right event -- the
       // create and destroy events

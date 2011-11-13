@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.hh"
 // Created: "Ter, 04 Out 2011 11:50:46 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 01:46:24 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:37:48 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -138,6 +138,8 @@ namespace Paje {
 
       virtual void push_timestamp(const string & containerName, const double timestamp);
       virtual double pop_timestamp(const string & containerName, const double timestamp);
+      virtual double get_timestamp(const string & containerName, const double timestamp);
+      virtual double get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols);
 
       //virtual double get_priority(const string & containerName) const;
 

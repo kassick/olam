@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/dummyevent.cc"
 // Created: "Ter, 04 Out 2011 13:48:25 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:46:33 -0300 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:49:32 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -44,6 +44,11 @@ bool Paje::DummyEvent::do_start(double timestamp,
 {
   *priority = 0;
   return true;
+}
+
+double Paje::DummyEvent::get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols)
+{
+  return 0;
 }
 
 

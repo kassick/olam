@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.hh"
 // Created: "Qua, 03 Ago 2011 16:14:50 -0300 (kassick)"
-// Updated: "Ter, 11 Out 2011 17:47:17 -0300 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:35:36 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -56,6 +56,8 @@ namespace Paje {
           symbols_table_t ** symbols,
           double * priority,
           ostream &out);
+      
+      virtual double get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols);
 
       virtual bool has_ids() const;
 

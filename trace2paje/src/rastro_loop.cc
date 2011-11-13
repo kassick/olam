@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 02:14:38 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 02:52:21 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,7 +45,7 @@ extern "C" {
 typedef struct _serve_entry_t {
   double priority;
 
-  string output;
+  //string output;
 
   Paje::BaseEvent * evt;
 
@@ -56,7 +56,7 @@ typedef struct _serve_entry_t {
 
     this->priority = org.priority;
     this->evt = org.evt;
-    this->output = org.output;
+    //this->output = org.output;
 
     return *this;
   }
@@ -178,21 +178,18 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
     cerr << endl;
     */
 
-    // Generate output strings for all events served with this id
+    // Get all events that are triggered by this id and their priorities
     for(it = equal_range.first;
         it != equal_range.second;
         ++it) 
     {
       serve_entry_t entry;
-      ostringstream tmp_out;
 
-      // Serve the event
-      //cerr << "serving " << it->second->name << endl;
       ++nevts;
       entry.evt = it->second;
 
       if (debug)
-        cerr << "=== Serving id " << evt_id << " with " << entry.evt->name << endl;
+        cerr << "=== Will serve id " << evt_id << " with " << entry.evt->name << endl;
 
       // Loads symbols from this evvent
       entry.evt->load_symbols(evt_id, &event,symbols[_GLOBAL_TABLE]);
@@ -200,34 +197,16 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
       // loads some symbols from defined user maps
       entry.evt->get_symbols_from_map(evt_id, symbols[_GLOBAL_TABLE], symbols, usermaps);
 
-      // saves predefined symbols in local table
-      entry.evt->push_symbols(evt_id, symbols[_GLOBAL_TABLE],symbols[_LOCAL_TABLE]);
-
-      // saves predefined symbols in map
-      entry.evt->map_symbols(evt_id, symbols, usermaps);
-     
-      // now generate paje output for this event
-      entry.evt->trigger(evt_id,
-                        timestamp,
-                        symbols,
-                        &(entry.priority),
-                        tmp_out);
+      // get priority for this event
+      entry.priority = entry.evt->get_priority(evt_id, timestamp, symbols);
       
-
-      entry.output = tmp_out.str();
-
-
       // push to do the output later
       evt_serve_list.push_back( entry );
-
-
-
-
-
-      //entry.output.clear();
     }
 
 
+
+    // make the events list happen in the correct order
     sort(evt_serve_list.begin(), evt_serve_list.end(),
         [](serve_entry_t e1, serve_entry_t e2) {
           return (e1.priority > e2.priority);
@@ -246,7 +225,36 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
         evt_serve_list_it < evt_serve_list.end();
         ++evt_serve_list_it)
     {
-      out << evt_serve_list_it->output;
+      double dummy_prio;
+      // we must repeat some work here -- different events triggered by the
+      // same id MAY use conflicting symbol names...
+      //
+      //
+      Paje::BaseEvent * evt = evt_serve_list_it->evt;
+      
+      if (debug)
+        cerr << "=== Serving id " << evt_id << " with " << evt->name << endl;
+
+      // Loads symbols from this evvent
+      evt->load_symbols(evt_id, &event,symbols[_GLOBAL_TABLE]);
+
+      // loads some symbols from defined user maps
+      evt->get_symbols_from_map(evt_id, symbols[_GLOBAL_TABLE], symbols, usermaps);
+      // saves predefined symbols in local table
+      evt->push_symbols(evt_id, symbols[_GLOBAL_TABLE],symbols[_LOCAL_TABLE]);
+
+      // saves predefined symbols in map
+      evt->map_symbols(evt_id, symbols, usermaps);
+     
+      // now generate paje output for this event
+      evt->trigger(evt_id,
+                        timestamp,
+                        symbols,
+                        &(dummy_prio),
+                        out);
+      
+
+           //out << evt_serve_list_it->output;
 
       /*
       pair<string,Paje::BaseEvent*> p = *it;
