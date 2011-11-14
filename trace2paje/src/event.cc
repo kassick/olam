@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/event.cc"
 // Created: "Sex, 02 Set 2011 15:23:14 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 02:38:16 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 23:25:59 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*

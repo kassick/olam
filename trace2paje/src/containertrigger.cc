@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 03:40:24 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 23:25:54 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*

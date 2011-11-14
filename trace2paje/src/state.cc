@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Qui, 13 Out 2011 18:57:27 -0300 (kassick)"
+// Updated: "Dom, 13 Nov 2011 23:25:56 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -45,14 +45,16 @@ bool Paje::State::do_start(double timestamp,
 
   Paje::BaseEvent::do_start(timestamp, symbols, priority, out);
   
-  containerName = format_values(eventType->container->formatName, symbols);
+  if (this->eventType) {
+    containerName = format_values(eventType->container->formatName, symbols);
 
-  eventValue = format_values(this->formatValue, symbols);
+    eventValue = format_values(this->formatValue, symbols);
 
-  pajePushState(timestamp,
-                containerName,
-                eventType->typeName,
-                eventValue, out);
+    pajePushState(timestamp,
+                  containerName,
+                  eventType->typeName,
+                  eventValue, out);
+  }
 
   return true;
 }
@@ -64,21 +66,23 @@ bool Paje::State::do_end(double timestamp,
 {
   string containerName;
 
-  Paje::BaseEvent::do_end(timestamp, symbols, priority, out);
-  containerName = format_values(eventType->container->formatName, symbols);
+  if (this->eventType) {
+    Paje::BaseEvent::do_end(timestamp, symbols, priority, out);
+    containerName = format_values(eventType->container->formatName, symbols);
 
-  if (*priority   > 0) // happened somewhere in time
-  {
+    if (*priority   > 0) // happened somewhere in time
+    {
 
-    pajePopState(timestamp,
-                  containerName,
-                  eventType->typeName,
-                  out);
-  } else {
-    cerr << "[Warning] Can not pop state " << this->name 
-         << " in container " << containerName
-         << ": no previous state pushed that we can pop"
-         << endl;
+      pajePopState(timestamp,
+                    containerName,
+                    eventType->typeName,
+                    out);
+    } else {
+      cerr << "[Warning] Can not pop state " << this->name 
+           << " in container " << containerName
+           << ": no previous state pushed that we can pop"
+           << endl;
+    }
   }
 
   return true;

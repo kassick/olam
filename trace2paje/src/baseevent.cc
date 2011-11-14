@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 02:29:58 -0200 (kassick)"
+// Updated: "Dom, 13 Nov 2011 23:25:51 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -51,14 +51,16 @@ void Paje::BaseEvent::set_event_type(Paje::BaseEventType * evt_type)
 
 double Paje::BaseEvent::get_priority(event_id_t evt_id, double timestamp, symbols_table_t ** symbols)
 {
-  if (evt_id == end_id) {
-    string containerName = format_values(this->eventType->container->formatName,symbols);
-    return get_timestamp(containerName,timestamp);
-  }
+  if (this->eventType) {
+    if (evt_id == end_id) {
+      string containerName = format_values(this->eventType->container->formatName,symbols);
+      return get_timestamp(containerName,timestamp);
+    }
 
-  if (evt_id == start_id)
-  {
-    return DEFAULT_EVENT_PRIO;
+    if (evt_id == start_id)
+    {
+      return DEFAULT_EVENT_PRIO;
+    }
   }
  
   // defaults to return a trigger prio
@@ -71,8 +73,11 @@ bool Paje::BaseEvent::do_start(double timestamp,
           symbols_table_t ** symbols,
           double * priority,
           ostream &out) {
-  string containerName = format_values(this->eventType->container->formatName,symbols);
-  this->push_timestamp(containerName,timestamp);
+  if (this->eventType)
+  {
+    string containerName = format_values(this->eventType->container->formatName,symbols);
+    this->push_timestamp(containerName,timestamp);
+  }
   
   *priority = DEFAULT_EVENT_PRIO;
   
@@ -86,9 +91,14 @@ bool Paje::BaseEvent::do_end(double timestamp,
           double * priority,
           ostream &out) {
   
-  string containerName = format_values(this->eventType->container->formatName,symbols);
+  if (this->eventType)
+  {
+    string containerName = format_values(this->eventType->container->formatName,symbols);
   
-  *priority = pop_timestamp(containerName,timestamp);
+    *priority = pop_timestamp(containerName,timestamp);
+  } else {
+    *priority = DEFAULT_EVENT_PRIO;
+  }
   
   return false;
 }
