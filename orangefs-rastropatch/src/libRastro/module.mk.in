@@ -1,0 +1,19 @@
+DIR := src/libRastro
+
+
+ifdef HAVE_RASTRO
+
+LIBSRC += \
+    $(DIR)/rastro_functs.c \
+    $(DIR)/uniq_ids_q.c
+SERVERSRC += \
+    $(DIR)/rastro_functs.c \
+    $(DIR)/uniq_ids_q.c
+
+SERVERCFLAGS += -I@RASTRO_INCS@ -I$(DIR)
+
+SERVERSRC += $(srcdir)/src/libRastro/rastro_functs.c
+MODCFLAGS_$(DIR) += -I@RASTRO_INCS@ -I$(DIR)
+MODCFLAGS_$(DIR)/rastro_functs.c += -I@RASTRO_INCS@ -DRASTRO_SUPPORT
+
+endif
