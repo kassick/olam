@@ -593,7 +593,6 @@ static PINT_sm_action setup_local_datafile_handles(
         s_op->resp.u.create.datafile_handles[0] = 
             s_op->u.create.handle_array_local[0];
         js_p->error_code = 0;
-                rst_event_ll(CREATE_DATAFILE_N,s_op->resp.u.create.metafile_handle, s_op->resp.u.create.datafile_handles[0]);
         return(SM_ACTION_COMPLETE);
     }
     else
@@ -606,7 +605,6 @@ static PINT_sm_action setup_local_datafile_handles(
                 s_op->resp.u.create.datafile_handles[i] = 
                     s_op->u.create.handle_array_local[tmp_index];
             
-                rst_event_ll(CREATE_DATAFILE_N,s_op->resp.u.create.metafile_handle, s_op->resp.u.create.datafile_handles[i]);
                 tmp_index++;
             }
         }
@@ -636,9 +634,9 @@ static PINT_sm_action write_keyvals(
                 s_op->resp.u.create.datafile_handles[i] = 
                     s_op->u.create.handle_array_remote[tmp_index];
                 
-                rst_event_ll(CREATE_DATAFILE_N,s_op->resp.u.create.metafile_handle, s_op->resp.u.create.datafile_handles[i]);
                 tmp_index++;
             }
+            
         }
     }
 
@@ -725,6 +723,24 @@ static PINT_sm_action write_keyvals(
         keyval_count, TROVE_SYNC, NULL, smcb,
         0, js_p, &j_id, server_job_context,
         s_op->req->hints);
+
+#ifdef HAVE_RASTRO
+    // trace the mapping of this file handle to the handles of
+    // other servers
+    if(s_op->resp.u.create.stuffed)
+    {
+        rst_event_ll(CREATE_DATAFILE_N,s_op->resp.u.create.metafile_handle, 
+                s_op->resp.u.create.datafile_handles[0]);
+    } else {
+        int i;
+        for (i = 0; i < s_op->resp.u.create.datafile_count ; i ++ )
+        {
+            rst_event_ll(CREATE_DATAFILE_N,s_op->resp.u.create.metafile_handle, 
+                s_op->resp.u.create.datafile_handles[i]);
+        }
+    }
+
+#endif
     return ret;
 }
 
