@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 23:25:51 -0200 (kassick)"
+// Updated: "Qui, 17 Nov 2011 18:50:45 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -396,6 +396,11 @@ void Paje::BaseEvent::map_symbols(Paje::event_id_t evt_id,
           string key = format_values(it->key, symbols);
           // copy the symbol from the symbol table
           (usermaps[mapname])[key] = (*(symbols[tmp_symbol]))[it->idf_name] ;
+          //cerr << "Mapping " << key << " to ";
+          //       (*(symbols[tmp_symbol]))[it->idf_name].format("",cerr);
+          //cerr << "(" << it->idf_name << ") in map " <<  mapname << endl;
+
+
           mapped = true;
           break;
         }
