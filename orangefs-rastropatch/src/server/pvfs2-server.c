@@ -208,11 +208,16 @@ struct server_configuration_s *PINT_get_server_config(void)
 
 static inline void get_cluster_and_hostname(char * hostname, int hn_len, char * clustername, int cl_len)
 {
-    char * dash_pos;
+    char * dash_pos, *dot_pos;
+
     gethostname(hostname,hn_len);
+    dot_pos = strchr(hostname,'.');
+    if (dot_pos)
+        *dot_pos = 0;
 
     strncpy(clustername,hostname, strlen(hostname) );
 
+    // strip clustername from hostname
     dash_pos = strchr(clustername,'-');
     if (dash_pos)
         *dash_pos = 0;

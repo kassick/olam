@@ -208,7 +208,8 @@ main( int argc, char *argv[] )
     
 #endif
 
-    rst_event_ss(APPINIT_N, hostname, cluster);
+    rst_event_ss(MACHINEINIT_N, hostname, clustername);
+    rst_event(APPINIT_N);
 
     if ( params.use_db ) {
         db_insert( state.my_rank, 0, "partial", &params, &state, NULL, NULL );
