@@ -1511,8 +1511,8 @@ static int dbpf_dspace_getattr_op_svc(struct dbpf_op *op_p)
     ret = dbpf_dspace_attr_get(op_p->coll_p, ref, op_p->u.d_getattr.attr_p);
     if(ret < 0)
     {
-        return(ret);
         rst_event(DBPF_GETATTRDSPACE_OUT);
+        return(ret);
     }
     rst_event(DBPF_GETATTRDSPACE_OUT);
 

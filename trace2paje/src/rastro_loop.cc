@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 02:52:21 -0200 (kassick)"
+// Updated: "Qui, 17 Nov 2011 18:34:14 -0200 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -293,6 +293,34 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, bool debug
               ++symbol_it)
       {
         cerr << "      " << symbol_it->first << " => ";
+        symbol_it->second.format("",cerr);
+        cerr << endl;
+      }
+    }
+
+
+
+    cerr << " === Global Symbols === " << endl;
+    for (auto symbol_it  = symbols[_GLOBAL_TABLE]->begin();
+                symbol_it != symbols[_GLOBAL_TABLE]->end();
+              ++symbol_it)
+      {
+        cerr << "      " << symbol_it->first << " => ";
+        symbol_it->second.format("",cerr);
+        cerr << endl;
+      }
+
+    cerr << "=== Maps at the end of input ===" <<endl;
+    for (auto map_it = usermaps.begin();
+              map_it != usermaps.end();
+              ++ map_it)
+    {
+      cerr << "Map " << map_it->first << endl;
+      for (auto symbol_it = map_it->second.begin();
+                symbol_it != map_it->second.end();
+                ++symbol_it)
+      {
+        cerr << "   " << symbol_it->first << "  == >  " ;
         symbol_it->second.format("",cerr);
         cerr << endl;
       }
