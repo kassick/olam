@@ -271,7 +271,7 @@ static int dbpf_dspace_create_op_svc(struct dbpf_op *op_p)
         new_handle);
     if(ret < 0)
     {
-        rst_event(DBPF_CREATEDSPACE_OUT);
+        rst_event_l(DBPF_CREATEDSPACE_OUT, llu(new_handle) );
         trove_handle_free(op_p->coll_p->coll_id, new_handle);
         return(ret);
     }
@@ -281,7 +281,8 @@ static int dbpf_dspace_create_op_svc(struct dbpf_op *op_p)
 
     *op_p->u.d_create.out_handle_p = new_handle;
 
-    rst_event(DBPF_CREATEDSPACE_OUT);
+    //rst_event(DBPF_CREATEDSPACE_OUT);
+    rst_event_l(DBPF_CREATEDSPACE_OUT, llu(new_handle) );
     return DBPF_OP_COMPLETE;
 }
 
