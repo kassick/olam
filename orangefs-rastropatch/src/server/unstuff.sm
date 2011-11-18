@@ -291,17 +291,6 @@ static PINT_sm_action get_handles(
         s_op->req->hints);
 
 
-#ifdef HAVE_RASTRO
-    if (ret >= 0) {
-        int i;
-        for (i = 0; i < s_op->u.unstuff.num_dfiles_req; i++)
-        {
-            rst_event_ll(CREATE_DATAFILE_N,
-                    s_op->req->u.unstuff.handle,
-                    s_op->u.unstuff.dfile_array[i]);
-        }
-    }
-#endif
 
     return ret;
 }
@@ -341,6 +330,19 @@ static PINT_sm_action set_handles_on_object(
     s_op->val.buffer_sz =
         s_op->resp.u.unstuff.attr.u.meta.dfile_count * sizeof(PVFS_handle);
 
+#ifdef HAVE_RASTRO
+    do {
+        int i;
+        for (   i = 0;
+                i < s_op->resp.u.unstuff.attr.u.meta.dfile_count;
+                i++)
+        {
+            rst_event_ll(CREATE_DATAFILE_N,
+                    s_op->req->u.unstuff.handle,
+                    llu(s_op->resp.u.unstuff.attr.u.meta.dfile_array[i])) ;
+        }
+    } while(0);
+#endif
 
     return job_trove_keyval_write(
         s_op->req->u.unstuff.fs_id,
