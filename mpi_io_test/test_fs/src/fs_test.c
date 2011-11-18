@@ -208,7 +208,7 @@ main( int argc, char *argv[] )
     
 #endif
 
-    rst_event_ss(MACHINEINIT_N, hostname, clustername);
+    rst_event_ss(MACHINEINIT_N, hostname, cluster);
     rst_event(APPINIT_N);
 
     if ( params.use_db ) {
