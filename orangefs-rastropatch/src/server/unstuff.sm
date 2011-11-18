@@ -22,6 +22,18 @@
 
 #define STATE_UNSTUFF 33
 
+#ifdef HAVE_RASTRO
+
+#include "src/libRastro/rastro_functs.h"
+#include "src/libRastro/rastro_evt_ids.h"
+
+#else
+// No Rastro ; disable events
+#define RASTRO_DISABLE_EVENTS 1
+#include "src/libRastro/rastro_functions.h"
+
+#endif
+
 %%
 
 machine pvfs2_unstuff_sm
@@ -277,6 +289,20 @@ static PINT_sm_action get_handles(
         &j_id,
         server_job_context,
         s_op->req->hints);
+
+
+#ifdef HAVE_RASTRO
+    if (ret >= 0) {
+        int i;
+        for (i = 0; i < s_op->u.unstuff.num_dfiles_req; i++)
+        {
+            rst_event_ll(CREATE_DATAFILE_N,
+                    s_op->req->u.unstuff.handle,
+                    s_op->u.unstuff.dfile_array[i]);
+        }
+    }
+#endif
+
     return ret;
 }
 
@@ -314,6 +340,7 @@ static PINT_sm_action set_handles_on_object(
         s_op->resp.u.unstuff.attr.u.meta.dfile_array; 
     s_op->val.buffer_sz =
         s_op->resp.u.unstuff.attr.u.meta.dfile_count * sizeof(PVFS_handle);
+
 
     return job_trove_keyval_write(
         s_op->req->u.unstuff.fs_id,
