@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Qui, 17 Nov 2011 18:50:45 -0200 (kassick)"
+// Updated: "Ter, 22 Nov 2011 15:45:33 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -486,25 +486,37 @@ void Paje::BaseEvent::push_timestamp(const string & containerName, const double 
 
 double Paje::BaseEvent::pop_timestamp(const string & containerName, const double timestamp)
 {
-  if (this->timestamp_map.count(containerName))
+
+  auto it = this->timestamp_map.find(containerName);
+  if (it != this->timestamp_map.end())
   {
-    double ret = this->timestamp_map[containerName].top();
-    this->timestamp_map[containerName].pop();
-    return ret;
-  } else {
-    return DEFAULT_EVENT_PRIO;
-  }
+    if (it->second.size())
+    {
+      // we have something to pop
+      double ret = it->second.top();
+      it->second.pop();
+      return ret;
+    }
+  } 
+
+  return DEFAULT_EVENT_PRIO;
+
 }
 
 double Paje::BaseEvent::get_timestamp(const string & containerName, const double timestamp)
 {
-  if (this->timestamp_map.count(containerName))
+  auto it = this->timestamp_map.find(containerName);
+  if (it != this->timestamp_map.end())
   {
-    double ret = this->timestamp_map[containerName].top();
-    return ret;
-  } else {
-    return DEFAULT_EVENT_PRIO;
+    if (it->second.size())
+    {
+      // we have something to pop
+      double ret = it->second.top();
+      return ret;
+    }
   }
+
+  return DEFAULT_EVENT_PRIO;
 }
 
 #if 0

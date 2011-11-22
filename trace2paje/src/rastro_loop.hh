@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.hh"
 // Created: "Ter, 27 Set 2011 15:33:14 -0300 (kassick)"
-// Updated: "Qui, 20 Out 2011 22:45:18 -0200 (kassick)"
+// Updated: "Ter, 22 Nov 2011 15:17:18 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -38,7 +38,8 @@ extern "C" {
 
 #define _RST_BUF_SIZE 100000
 
-double  rastro_loop_events(list<string> &files_to_open, ostream &out,bool debug) ;
+double  rastro_loop_events(list<string> &files_to_open, ostream &out, unsigned int n_maps, bool remap, bool debug)
+  ;
 
 
 #endif

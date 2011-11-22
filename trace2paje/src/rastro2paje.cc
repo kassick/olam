@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 02:11:40 -0200 (kassick)"
+// Updated: "Ter, 22 Nov 2011 15:25:45 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -76,6 +76,9 @@ struct _global_opts {
   string ids_file, c_header, fort_header, rst_signatures;
   bool print_tree;
 
+  bool remap;
+  int n_maps;
+
 
   // These are for the embeded rastro_generate
   bool has_rst_cheader, has_rst_csource, has_rst_fmodule;
@@ -97,6 +100,8 @@ static const struct option longOpts[] = {
     { "rst-c-header"          , required_argument, NULL, 0 },
     { "rst-fort-module"       , required_argument, NULL, 0 },
     { "print-tree"            , no_argument      , NULL, 0 },
+    { "map-before"            , required_argument, NULL, 0 },
+    { "remap"                 , no_argument      , NULL, 0 },
     { NULL, no_argument, NULL, 0  }
 };
 
@@ -135,6 +140,15 @@ void usage(char ** argv)
        << "--rst-fort-module         : "
            << "Generate a Fortran90 module file with the functions to call libRastro events"
            << endl
+       << "--map-before <number>     : "
+           << "Loops the input <number> times before doing output so that maps are correctly filled before execution"
+           << endl
+       << "--remap                   : "
+          << "Runs the mapping code again when generating output"
+          <<endl
+       << "--rst-fort-module         : "
+           << "Generate a Fortran90 module file with the functions to call libRastro events"
+           << endl
        << "--print-tree              : "
            << "Prints the tree after parsing the file"
            <<endl;
@@ -155,6 +169,9 @@ int parse_opts(int argc, char ** argv)
   global_opts.has_rst_csource = false;
   global_opts.has_rst_cheader = false;
   global_opts.has_rst_fmodule = false;
+
+  global_opts.n_maps = 0;
+  global_opts.remap = false;
 
   while (( opt = getopt_long( argc, argv, optString, longOpts, &longIndex ) ) != -1 )
   {
@@ -205,6 +222,10 @@ int parse_opts(int argc, char ** argv)
           global_opts.has_rst_fmodule = true;
           global_opts.rst_fmodule = optarg;
           global_opts.exe_type.push_back(EXE_GEN_RST_FUNCTIONS_SOURCE);
+        } else if (!strcmp(longOpts[longIndex].name, "map-before")) {
+          global_opts.n_maps = atoi(optarg);
+        } else if (!strcmp(longOpts[longIndex].name,"remap"))  {
+          global_opts.remap = true;
         } else if (!strcmp(longOpts[longIndex].name,"help")) {
           usage(argv);
           exit(0);
@@ -432,7 +453,8 @@ void generate_paje_output(const string & fname,int oind, int argc, char ** argv)
   event_types_to_paje(*fout); // Define event types
 
   // Here loop around the paje events and dumps the events
-  double timestamp = rastro_loop_events(rst_files_to_open,*fout,global_opts.print_tree); // loop every rst file and map events
+  double timestamp = rastro_loop_events(rst_files_to_open,*fout, global_opts.n_maps, global_opts.remap, global_opts.print_tree);
+  // double timestamp = rastro_loop_events(rst_files_to_open,*fout,global_opts.print_tree); // loop every rst file and map events
 
 
 

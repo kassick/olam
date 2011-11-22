@@ -21,6 +21,7 @@ ADD_CUSTOM_COMMAND(
 
 add_executable(mpi-pingpong mpi-pingpong.c rst_functions.c evt_defs.h)
 include_directories(${MPI_C_INCLUDE_PATH})
+include_directories(${MPI_CXX_INCLUDE_PATH})
 include_directories ("${RASTRO_INCLUDES}" )
 set_property(TARGET mpi-pingpong PROPERTY COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS})
 set_property(TARGET mpi-pingpong PROPERTY LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_C_LINK_FLAGS})
