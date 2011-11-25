@@ -45,6 +45,7 @@ add_executable(rastro2paje
   usermap.cc
   tree/tree.hpp # my tree implementation
   rastro2paje.cc
+  logging.cc
   ${BISON_DescriptionFileParser_OUTPUTS}
   ${FLEX_DescriptionFileScanner_OUTPUTS}
 )

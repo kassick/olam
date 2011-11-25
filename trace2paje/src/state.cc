@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/state.cc"
 // Created: "Ter, 04 Out 2011 13:59:53 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 23:25:56 -0200 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:07:24 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,6 +26,7 @@
 #include "state.hh"
 #include "statetype.hh"
 #include "semantic_types.hh"
+#include "logging.hh"
 #include <algorithm>
 #include <typeinfo>
 

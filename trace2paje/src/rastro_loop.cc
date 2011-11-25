@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro_loop.cc"
 // Created: "Ter, 27 Set 2011 10:23:09 -0300 (kassick)"
-// Updated: "Ter, 22 Nov 2011 15:29:54 -0600 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:11:22 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,6 +26,7 @@
 #include "semantics.hh"
 #include "paje.hh"
 #include "rastro_helper.hh"
+#include "logging.hh"
 #include <ostream>
 #include <string>
 #include <string.h>
@@ -96,14 +97,14 @@ static double  _rastro_loop_events(list<string> &files_to_open, ostream &out, us
   strcpy(syncfile,"/tmp/rastroXXXXXX");
   if (mkstemp(syncfile) == -1)
   {
-    cerr << "could not make sync file " << syncfile << endl;
+    ERROR(logger) << "could not make sync file " << syncfile << endl;
   }
 
   for_each(files_to_open.begin(), files_to_open.end(),
       [&](string & item)
       {
         if (! opened_files.count(item)) {
-          cerr << "opening rastro " << item <<endl;
+          INFO(logger) << "opening rastro " << item <<endl;
           fname = strdup(item.c_str());
           int ret = rst_open_file(fname, &data, syncfile, _RST_BUF_SIZE);
           free(fname);
@@ -111,11 +112,11 @@ static double  _rastro_loop_events(list<string> &files_to_open, ostream &out, us
           opened_files.insert(item);
 
           if (ret == -1) {
-            cerr << "Error: trace file " << item << " could not be opened" << endl;
+            ERROR(logger) << "trace file " << item << " could not be opened" << endl;
             exit(1);
           }
         } else {
-          cerr << "Warning:: double open " << item << endl;
+          WARN(logger) << "double open " << item << endl;
         }
       }
     );
@@ -313,15 +314,15 @@ double  rastro_loop_events(list<string> &files_to_open, ostream &out, unsigned i
   for (int i = 1; i <= n_maps; i++ )
   {
     // runs the mapping code, but generate no output
-    cerr << "[Info] Mapping #" << i <<endl;
+    INFO(logger) << "Mapping #" << i <<endl;
     _rastro_loop_events(files_to_open, out, usermaps, debug, true, false);
   }
 
-  cerr << "[Info] Output" << endl;
+  INFO(logger) << "Output" << endl;
   double timestamp = _rastro_loop_events(files_to_open, out, usermaps, debug,  (n_maps == 0) || remap, true);
 
 
-  cerr << "[Info] Output ended after " << timestamp << " seconds" <<endl;
+  INFO(logger) << "Output ended after " << timestamp << " seconds" <<endl;
 
 
   return timestamp;

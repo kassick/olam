@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/containertrigger.cc"
 // Created: "Ter, 04 Out 2011 14:07:13 -0300 (kassick)"
-// Updated: "Dom, 13 Nov 2011 23:25:54 -0200 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:06:35 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -28,6 +28,7 @@
 #include "paje_functions.hh"
 #include "semantic_types.hh"
 #include "state.hh"
+#include "logging.hh"
 #include <map>
 
 map<string,Paje::unique_container_name_t> Paje::container_unique_names;
@@ -268,7 +269,7 @@ bool Paje::ContainerCreateTrigger::do_end(double timestamp,
               // tell parent it has less one child
               Paje::unique_container_name_t &p = container_unique_names[parentName];
               if (!p.nchild)
-                cerr << "[Warning] Internal Error: Container " 
+                WARN(logger) << "Internal Error: Container " 
                      << parentName 
                      << " already has 0 children; how come are we destroying it yet?" 
                      << endl;
@@ -340,7 +341,7 @@ void destroy_missing_containers(double timestamp, ostream & out)
             if ( (thisContainer->typeName == it->second.typeName))
             {
               if (!it->second.container->destroyWithParent)
-                cerr << "[Warning] Destroying missing container " << it->second.containerName << endl;
+                WARN(logger) << "Destroying missing container " << it->second.containerName << endl;
               pajeDestroyContainer(timestamp,
                                     it->second.typeName,
                                     it->second.containerName,
@@ -349,7 +350,7 @@ void destroy_missing_containers(double timestamp, ostream & out)
               
               Paje::unique_container_name_t &p = container_unique_names[it->second.parentName];
               if (!p.nchild)
-                cerr << "[Warning] Internal Error: Container " 
+                WARN(logger) << "Internal Error: Container " 
                      << it->second.parentName 
                      << " already has 0 children; how come are we destroying it yet?" 
                      << endl;

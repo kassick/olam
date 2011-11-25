@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/baseevent.cc"
 // Created: "Ter, 04 Out 2011 11:51:35 -0300 (kassick)"
-// Updated: "Ter, 22 Nov 2011 15:45:33 -0600 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:22:25 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,6 +25,7 @@
 #include "baseevent.hh"
 #include "baseeventtype.hh"
 #include "semantic_types.hh"
+#include "logging.hh"
 
 #include <cassert>
 #include <boost/algorithm/string.hpp>
@@ -297,7 +298,7 @@ bool Paje::BaseEvent::load_symbols(event_id_t id, rst_event_t *event, symbols_ta
             symbol.set_value( event->v_ ## PAJE_NAME [ count_ ## SHORT_NAME ] );\
             count_ ## SHORT_NAME ++  ;                                      \
           } else if (needs_all_symbols) {                                   \
-            cerr << "[Warning] Not enought values of type " << #SHORT_NAME  \
+            WARN(logger) << "Not enought values of type " << #SHORT_NAME  \
                  << " for id " << id                                        \
                  << " in event " << this->name                              \
                  << endl;                                                   \
@@ -408,7 +409,7 @@ void Paje::BaseEvent::map_symbols(Paje::event_id_t evt_id,
       }
 
       if (!mapped) {
-        cerr << "[Warning] Could not map " << mapname << "[" << it->key << "] = " << it->idf_name << endl;
+        WARN(logger) << "Could not map " << mapname << "[" << it->key << "] = " << it->idf_name << endl;
       }
     }
   }
@@ -437,13 +438,13 @@ void Paje::BaseEvent::get_symbols_from_map (Paje::event_id_t evt_id,
 
       if (!(usermaps.count(mapname)))
       {
-        cerr << "[Warning] No user map named " << mapname << endl;
+        WARN(logger) << "No user map named " << mapname << endl;
         continue;
       }
 
       string key = format_values(it->key, symbols);
       if (! ((usermaps[mapname]).count(key))) {
-        cerr << "[Warning] Map " << mapname << " has no key " << key << endl;
+        WARN(logger) << "Map " << mapname << " has no key " << key << endl;
         continue;
       }
 

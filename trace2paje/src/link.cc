@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/link.cc"
 // Created: "Ter, 04 Out 2011 14:03:18 -0300 (kassick)"
-// Updated: "Qua, 09 Nov 2011 18:41:55 -0200 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:07:05 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -25,6 +25,7 @@
 
 #include "link.hh"
 #include "paje_functions.hh"
+#include "logging.hh"
 
 
 #include <map>
@@ -63,7 +64,7 @@ void check_missing_links() {
       [](pair<link_key_t, timestamp_list_t> p)
       {
         if (p.second.size() > 0) {
-          cerr << "[Warning] Link with type " << p.first.typeName
+          WARN(logger) << "Link with type " << p.first.typeName
                << ", key " << p.first.key 
                << " on " << p.first.containerName
                << " has " << p.second.size() << " lost arrows (pending)" << endl;
@@ -74,7 +75,7 @@ void check_missing_links() {
       [](pair<link_key_t, timestamp_list_t> p)
       {
         if (p.second.size() > 0) {
-          cerr << "[Warning] Link with type " << p.first.typeName
+          WARN(logger) << "Link with type " << p.first.typeName
                << ", key " << p.first.key 
                << " on " << p.first.containerName
                << " has " << p.second.size() << " lost arrows (started)" << endl;
@@ -162,7 +163,7 @@ bool Paje::Link::do_start(double timestamp,
       add_to_started = false;
 
       if (entry.second < timestamp) {
-        cerr << "[Warning] Arrow of type " << lt->typeName << " key " << link_key.key << " ends before it begins" << endl;
+        WARN(logger) << "Arrow of type " << lt->typeName << " key " << link_key.key << " ends before it begins" << endl;
         // this should always happen in this block, the if is just so we make
         // it clear
 
@@ -232,7 +233,7 @@ bool Paje::Link::do_end(double timestamp,
 
       if (entry.second > timestamp)
       {
-        cerr << "[Warning] Arrow of type " << lt->typeName << " key " << link_key.key << " ends before it begins" << endl;
+        WARN(logger) << "Arrow of type " << lt->typeName << " key " << link_key.key << " ends before it begins" << endl;
         timestamp = entry.second; // flaten arrow
       }
 

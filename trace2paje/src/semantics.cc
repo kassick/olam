@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/semantics.cc"
 // Created: "Seg, 01 Ago 2011 15:34:08 -0300 (kassick)"
-// Updated: "Sáb, 12 Nov 2011 22:36:28 -0200 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:23:17 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -26,6 +26,7 @@
 #include "paje.hh"
 #include "tree.hpp"
 #include "attributes.hh"
+#include "logging.hh"
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -232,7 +233,7 @@ hierarchy_t * attr_to_container_hierarchy(attribs_t * attr, hierarchy_t *top)
     } else if (container_type_names->count(container_type))
     {
       // A container is already defined
-      cerr << "Error: A container with type " << container_type << " has already been defined" <<endl;
+      ERROR(logger) << "A container with type " << container_type << " has already been defined" <<endl;
       exit(1);
     } else {
       // it's a legit new container
@@ -274,7 +275,7 @@ void attr_to_event_types(attribs_t * attribs)
       container_name = attr->vals.name;
       
       if (container_type_names->count(container_name) == 0) {
-        cerr << "Error: Event Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        ERROR(logger) << "Event Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
         exit(1);
       }
       
@@ -291,7 +292,7 @@ void attr_to_event_types(attribs_t * attribs)
           if (attr->id == ID_EVENT_TYPE_DEF) {
             if (eventtype_names->count(attr->vals.name))
             {
-              cerr << "Error: EventType " << attr->vals.name << " has already been defined" << endl;
+              ERROR(logger) << "EventType " << attr->vals.name << " has already been defined" << endl;
               exit(1);
             } 
 
@@ -315,7 +316,7 @@ void attr_to_state_types(attribs_t * attribs)
       container_name = attr->vals.name;
       
       if (container_type_names->count(container_name) == 0) {
-        cerr << "Error: State Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        ERROR(logger) << "State Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
         exit(1);
       }
       
@@ -332,7 +333,7 @@ void attr_to_state_types(attribs_t * attribs)
           if (attr->id == ID_STATE_TYPE_DEF) {
             if (eventtype_names->count(attr->vals.name))
             {
-              cerr << "Error: StateType " << attr->vals.name << " has already been defined" << endl;
+              ERROR(logger) << " StateType " << attr->vals.name << " has already been defined" << endl;
               exit(1);
             } 
 
@@ -361,12 +362,12 @@ void attr_to_event_types(attribs_t * attribs)
     {
       if (eventtype_names->count(attr->vals.name))
       {
-        cerr << "Error: EventType " << attr->vals.name << " has already been defined" << endl;
+        ERROR(logger) << " EventType " << attr->vals.name << " has already been defined" << endl;
         exit(1);
       }
 
       if (container_type_names->count(container_name) == 0) {
-        cerr << "Error: Event Type " << attr->vals.name << " can not find it's container type " << container_name << endl;
+        ERROR(logger) << " Event Type " << attr->vals.name << " can not find it's container type " << container_name << endl;
         exit(1);
       }
 
@@ -393,7 +394,7 @@ void attr_to_link_types(attribs_t * attribs)
       container_name = attr->vals.name;
       
       if (container_type_names->count(container_name) == 0) {
-        cerr << "Error: Link Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
+        ERROR(logger) << " Link Type " << attr->vals.name << "can not find it's container type " << container_name << endl;
         exit(1);
       }
       
@@ -410,7 +411,7 @@ void attr_to_link_types(attribs_t * attribs)
           if (attr->id == ID_LINK_TYPE) {
             if (eventtype_names->count(attr->vals.name))
             {
-              cerr << "Error: LinkType " << attr->vals.name << " has already been defined" << endl;
+              ERROR(logger) << " LinkType " << attr->vals.name << " has already been defined" << endl;
               exit(1);
             } 
 
@@ -436,7 +437,7 @@ void attr_to_events(attribs_t * attribs)
         // last man standing policy: if the link already exists, then just
         // decorate if with whatever other information there may be here
         if (event_names->count(name)) {
-          cerr << "Name clash: " << name << endl;
+          ERROR(logger) << "Name clash: " << name << endl;
           exit(1);
         } else {
           evt = new Paje::Event(name, n);
@@ -463,7 +464,7 @@ void attr_to_links(attribs_t * attribs)
         // last man standing policy: if the link already exists, then just
         // decorate if with whatever other information there may be here
         if (event_names->count(name)) {
-          cerr << "Name clash: " << name << endl;
+          ERROR(logger) << "Name clash: " << name << endl;
           exit(1);
         } else {
           link = new Paje::Link(name, n);
@@ -489,7 +490,7 @@ void attr_to_states(attribs_t * attribs)
         // last man standing policy: if the link already exists, then just
         // decorate if with whatever other information there may be here
         if (event_names->count(name)) {
-          cerr << "Name clash: " << name << endl;
+          ERROR(logger) << "Name clash: " << name << endl;
           exit(1);
         } else {
           state = new Paje::State(name, n);
@@ -526,13 +527,13 @@ void map_accept_attrs(attribs_t * attribs)
               if (attr1->id == ID_ACCEPT_LIST) {
                 //cerr << "  accepts " << attr1->vals.name << endl;
                 if (!event_names->count(attr1->vals.name)) {
-                  cerr << "Warning: Event type " << event_type_name << " accepts undefined event " << attr1->vals.name << endl;
+                  WARN(logger) << "Event type " << event_type_name << " accepts undefined event " << attr1->vals.name << endl;
                 } else {
                   Paje::BaseEvent * evt = (*event_names)[attr1->vals.name];
                   if (evt->fits_in_event_type(evt_type))
                     evt->set_event_type(evt_type);
                   else {
-                    cerr << "[Error] Event type " << event_type_name 
+                    ERROR(logger) << "Event type " << event_type_name 
                           << " can not accept ``" << attr1->vals.name << "´´"
                           << endl;
                     exit(1);
@@ -568,7 +569,7 @@ void create_container_create_events()
           if (! event_names->count(c->createEvent) )
           {
             // Used an event without
-            cerr << "[Error] Container " << c->typeName << " creates on unexistent event " << c->createEvent << endl;
+            ERROR(logger) << "Container " << c->typeName << " creates on unexistent event " << c->createEvent << endl;
             exit(1);
           }   */
 
@@ -589,7 +590,7 @@ void create_container_create_events()
           // make sure the event exists
           if (! event_names->count(c->destroyEvent) )
           {
-            cerr << "[Error] Container " << c->typeName << " destroys on unexistent event " << c->destroyEvent << endl;
+            ERROR(logger) << "Container " << c->typeName << " destroys on unexistent event " << c->destroyEvent << endl;
             exit(1);
           }
           */
@@ -659,7 +660,7 @@ void events_to_id_map()
   for_each(event_names->begin(), event_names->end(), [&](pair<string, Paje::BaseEvent *> p) {
       if (p.second->eventType == NULL)
       {
-        cerr << "Warning: Event " << p.first << " has no defined type" << endl;
+        WARN(logger) << " Event " << p.first << " has no defined type" << endl;
         // this event won't be mapped to event ids
 
         // Make sure that it's ids are mapped on unique ...
@@ -685,7 +686,7 @@ void check_unique_container_types()
         Paje::Container * c = h->getVal();
         if (container_type_names->find(c->typeName) != container_type_names->end())
         {
-          cerr << "Error: A container with type " << c->typeName << " has already been defined" <<endl;
+          ERROR(logger) << " A container with type " << c->typeName << " has already been defined" <<endl;
           return true;
         }
         (*container_type_names)[c->typeName] = h;
@@ -717,7 +718,7 @@ void check_unique_event_types()
         {
           if (eventtype_names->count(*it))
           {
-            cerr << "Error: An event type named " << *it << " has already been defined" <<endl;
+            ERROR(logger) << " An event type named " << *it << " has already been defined" <<endl;
             return true;
           }
 
@@ -762,7 +763,7 @@ void hierarchy_to_paje(ostream &out)
 
         return false;
       })) {
-    cerr << "Error while dumping paje hierarchy. What on earth!? " <<endl;
+    ERROR(logger) << "Error while dumping paje hierarchy. What on earth!? " <<endl;
   }
 }
 
@@ -806,7 +807,7 @@ void event_types_to_paje(ostream &out)
 //Get an event name or wanr that it does not exist
 Paje::BaseEvent * get_event_or_warn(const string & evt_name) {
   if (! event_names->count(evt_name) ) {
-    cerr << "[Warning] Event " << evt_name 
+    WARN(logger) << "Event " << evt_name 
           << " is referred but has no definition, "
           << "treating as Dummy" << endl;
     Paje::DummyEvent * evt = new DummyEvent(evt_name,(*eventtype_names)[DUMMY_EVENT_TYPE_KEY]);

@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/trace2paje/src/rastro2paje.cc"
 // Created: "Ter, 26 Jul 2011 13:01:06 -0300 (kassick)"
-// Updated: "Ter, 22 Nov 2011 15:25:45 -0600 (kassick)"
+// Updated: "Qui, 24 Nov 2011 21:21:18 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -30,6 +30,7 @@
 #include "semantics.hh"
 #include "paje.hh"
 #include "rastro_loop.hh"
+#include "logging.hh"
 #include <getopt.h>
 #include <string.h>
 #include <set>
@@ -37,6 +38,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "rastro_generate.h"
+
+logging::Logger logger;
+
 
 extern "C"
 {
@@ -79,6 +83,8 @@ struct _global_opts {
   bool remap;
   int n_maps;
 
+  int verbosity;
+
 
   // These are for the embeded rastro_generate
   bool has_rst_cheader, has_rst_csource, has_rst_fmodule;
@@ -102,6 +108,7 @@ static const struct option longOpts[] = {
     { "print-tree"            , no_argument      , NULL, 0 },
     { "map-before"            , required_argument, NULL, 0 },
     { "remap"                 , no_argument      , NULL, 0 },
+    { "verbosity"             , required_argument, NULL, 0 },
     { NULL, no_argument, NULL, 0  }
 };
 
@@ -151,7 +158,11 @@ void usage(char ** argv)
            << endl
        << "--print-tree              : "
            << "Prints the tree after parsing the file"
-           <<endl;
+           <<endl
+       <<  "--verbosity              : "
+           << "0 = SILENT ; 1 = INFO ; 2 = WARNINGS. Default = 1"
+           << endl;
+
 }
 
 #define AUTO_ID_BASE_DEFAULT 4000
@@ -172,6 +183,8 @@ int parse_opts(int argc, char ** argv)
 
   global_opts.n_maps = 0;
   global_opts.remap = false;
+
+  global_opts.verbosity = 0;
 
   while (( opt = getopt_long( argc, argv, optString, longOpts, &longIndex ) ) != -1 )
   {
@@ -229,6 +242,8 @@ int parse_opts(int argc, char ** argv)
         } else if (!strcmp(longOpts[longIndex].name,"help")) {
           usage(argv);
           exit(0);
+        } else if (!strcmp(longOpts[longIndex].name,"verbosity")) {
+          global_opts.verbosity = atoi(optarg);
         }
         break;
       default:
@@ -254,7 +269,7 @@ void generate_ids_to_file(const string & fname)
 
   if (!ids_file.good())
   {
-    cerr << "[Error] Could not open file " << fname << endl;
+    ERROR(logger) << "Could not open file " << fname << endl;
     exit(1);
   }
 
@@ -285,7 +300,7 @@ void generate_c_header(const string & fname)
 
   if (!h_file.good())
   {
-    cerr << "[Error] Could not open file " << fname << endl;
+    ERROR(logger) << "Could not open file " << fname << endl;
     exit(1);
   }
 
@@ -323,7 +338,7 @@ void generate_fort_header(const string & fname)
   h_file.open(fname);
   if (!h_file.good())
   {
-    cerr << "[Error] Could not open file " << fname << endl;
+    ERROR(logger) << "Could not open file " << fname << endl;
     exit(1);
   }
 
@@ -383,7 +398,7 @@ void generate_rst_signatures(const string & fname)
   h_file  = fopen(fname.c_str(), "w");
   if (!h_file)
   {
-    cerr << "[Error] Could not open file " << fname << endl;
+    ERROR(logger) << "Could not open file " << fname << endl;
     exit(1);
   }
   
@@ -403,7 +418,7 @@ FILE* generate_rst_signatures_to_tmpfile()
   h_file  = tmpfile();
   if (!h_file)
   {
-    cerr << "[Error] Could not tmp file" << endl;
+    ERROR(logger) << "Could not tmp file" << endl;
     exit(1);
   }
   
@@ -429,7 +444,7 @@ void generate_paje_output(const string & fname,int oind, int argc, char ** argv)
     fout = new ofstream(fname);
     if (fout->fail())
     {
-      cerr << "[Error] Can not open file " << global_opts.fout_name << endl;
+      ERROR(logger) << "Can not open file " << global_opts.fout_name << endl;
       exit(1);
     }
   }
@@ -482,6 +497,16 @@ int main(int argc, char** argv)
 
 
   oind = parse_opts(argc, argv);
+
+  logger.level = FLAG_ERROR;
+  switch(global_opts.verbosity) {
+    case 2:
+      logger.level |= FLAG_WARN;
+    case 1:
+      logger.level |= FLAG_INFO;
+    case 0:
+      logger.level |= FLAG_ERROR;
+  }
 
 
   
