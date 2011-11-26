@@ -1,7 +1,7 @@
 // C++ source code
 // File: "/home/kassick/Work/olam/orangefs-rastropatch/src/libRastro/uniq_ids_q.h"
 // Created: "Dom, 13 Nov 2011 20:56:48 -0200 (kassick)"
-// Updated: "Sáb, 26 Nov 2011 00:34:16 -0600 (kassick)"
+// Updated: "Sáb, 26 Nov 2011 11:48:29 -0600 (kassick)"
 // $Id$
 // Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
 /*
@@ -56,6 +56,7 @@ void release_unique_op_id(unique_ids_queue_t * q, int id, rst_buffer_t * buf);
 // this should be elseqwhere to make this more generic...
 extern unique_ids_queue_t unique_io_ids;
 extern int rst_server_id;
+extern rst_buffer_t * rst_main_buffer;
 
 
 #endif

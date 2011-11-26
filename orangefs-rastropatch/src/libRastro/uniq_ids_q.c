@@ -1,7 +1,7 @@
 /* C source code
  * File: "/home/kassick/Work/olam/orangefs-rastropatch/src/libRastro/uniq_ids_q.c"
  * Created: "Dom, 13 Nov 2011 20:56:10 -0200 (kassick)"
- * Updated: "Sáb, 26 Nov 2011 00:36:43 -0600 (kassick)"
+ * Updated: "Sáb, 26 Nov 2011 11:48:19 -0600 (kassick)"
  * $Id$
  * Copyright (C) 2011, Rodrigo Virote Kassick <rvkassick@inf.ufrgs.br> 
  */
@@ -34,6 +34,7 @@
 
 unique_ids_queue_t unique_io_ids;
 int rst_server_id;
+rst_buffer_t * rst_main_buffer;
 
 void init_unique_op_id(unique_ids_queue_t * q)
 {

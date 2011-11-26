@@ -281,7 +281,12 @@ int main(int argc, char **argv)
     //rastro init aqui
     // App is 10 ; server is 20; client 
     rst_server_id = server_config.host_index;
-    rst_init(server_config.host_index,  20);
+    rst_main_buffer = malloc(sizeof(rst_buffer_t));
+    rst_main_buffer->do_destroy = 0;
+    rst_init_ptr_set_key(rst_main_buffer, server_config.host_index,  20 , 1 );
+
+    gossip_err("I'm initing rastro for thread %ld\n",pthread_self() );
+
     do {
         char hostname[100], clustername[100];
         get_cluster_and_hostname(hostname,100, clustername, 100);
@@ -1675,11 +1680,14 @@ static int server_shutdown(
         list_for_each_safe(pos, tmp, &(unique_io_ids.free_list))
         {
             unique_id_entry_t * uniq = list_entry(pos, unique_id_entry_t, FromAndToList);
+            uniq->rst_ptr->do_destroy = 1;
             rst_destroy_buffer(uniq->rst_ptr);
         }
     }
 
-    rst_finalize();
+    gossip_err("I'm finalizing rastro for thread %ld\n",pthread_self() );
+    rst_main_buffer->do_destroy = 1;
+    rst_destroy_buffer(rst_main_buffer);
 #endif
 
 
