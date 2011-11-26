@@ -41,6 +41,7 @@ struct alt_aio_item
     pthread_t *tids;
     int nent;
     int op_id;
+    rst_buffer_t* rst_buf;
 };
 static void* alt_lio_thread(void*);
 
@@ -107,6 +108,7 @@ int alt_lio_listio(int mode, struct aiocb * const list[],
 
         tmp_item->cb_p = list[i];
         tmp_item->sig = sig;
+        tmp_item->rst_buf = cur_op->op.rst_buf;
 
         /* setup state */
 #ifdef HAVE_AIOCB_ERROR_CODE
@@ -251,6 +253,8 @@ static void* alt_lio_thread(void* foo)
 {
     struct alt_aio_item* tmp_item = (struct alt_aio_item*)foo;
     int ret = 0;
+
+    pthread_setspecific (rst_key, tmp_item->rst_buf);
 
     if(tmp_item->cb_p->aio_lio_opcode == LIO_READ)
     {
