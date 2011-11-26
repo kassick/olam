@@ -1500,6 +1500,9 @@ static int server_shutdown(
     PINT_server_status_flag status,
     int ret, int siglevel)
 {
+#ifdef HAVE_RASTRO
+    struct list_head * pos, *tmp;
+#endif
     
     if (siglevel == SIGSEGV)
     {
@@ -1650,6 +1653,25 @@ static int server_shutdown(
                      "interface     [ stopped ]\n");
     }
 
+#ifdef HAVE_RASTRO
+    rst_event(MACHINEDESTROY_N);
+    rst_event(PVFSDESTROY_N);
+
+    // finalize all buffers for aio ops
+
+        list_for_each_safe(pos, tmp, &(unique_io_ids.free_list))
+        {
+            unique_id_entry_t * uniq = list_entry(pos, unique_id_entry_t, FromAndToList);
+            uniq->rst_ptr->do_destroy = 1;
+            rst_destroy_buffer(uniq->rst_ptr);
+        }
+
+    gossip_err("I'm finalizing rastro for thread %ld\n",pthread_self() );
+    rst_main_buffer->do_destroy = 1;
+    rst_destroy_buffer(rst_main_buffer);
+    rst_main_buffer->do_destroy = 0;
+#endif
+
     if (status & SERVER_GOSSIP_INIT)
     {
         gossip_debug(GOSSIP_SERVER_DEBUG,
@@ -1669,26 +1691,6 @@ static int server_shutdown(
         free(server_job_status_array);
     }
 
-#ifdef HAVE_RASTRO
-    rst_event(MACHINEDESTROY_N);
-    rst_event(PVFSDESTROY_N);
-
-    // finalize all buffers for aio ops
-    {
-        struct list_head * pos, *tmp;
-
-        list_for_each_safe(pos, tmp, &(unique_io_ids.free_list))
-        {
-            unique_id_entry_t * uniq = list_entry(pos, unique_id_entry_t, FromAndToList);
-            uniq->rst_ptr->do_destroy = 1;
-            rst_destroy_buffer(uniq->rst_ptr);
-        }
-    }
-
-    gossip_err("I'm finalizing rastro for thread %ld\n",pthread_self() );
-    rst_main_buffer->do_destroy = 1;
-    rst_destroy_buffer(rst_main_buffer);
-#endif
 
 
     if(siglevel == 0 && ret != 0)
