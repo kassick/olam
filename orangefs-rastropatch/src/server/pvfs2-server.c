@@ -51,6 +51,8 @@
 #include "pint-event.h"
 #include "pint-util.h"
 
+#include "src/libRastro/uniq_ids_q.h"
+
 #ifdef HAVE_RASTRO
 
 #warning Rastro Support Enabled
@@ -278,6 +280,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_RASTRO
     //rastro init aqui
     // App is 10 ; server is 20; client 
+    rst_server_id = server_config.host_index;
     rst_init(server_config.host_index,  20);
     do {
         char hostname[100], clustername[100];
@@ -1664,6 +1667,18 @@ static int server_shutdown(
 #ifdef HAVE_RASTRO
     rst_event(MACHINEDESTROY_N);
     rst_event(PVFSDESTROY_N);
+
+    // finalize all buffers for aio ops
+    {
+        struct list_head * pos, *tmp;
+
+        list_for_each_safe(pos, tmp, &(unique_io_ids.free_list))
+        {
+            unique_id_entry_t * uniq = list_entry(pos, unique_id_entry_t, FromAndToList);
+            rst_destroy_buffer(uniq->rst_ptr);
+        }
+    }
+
     rst_finalize();
 #endif
 

@@ -69,7 +69,11 @@ int alt_lio_listio(int mode, struct aiocb * const list[],
 #ifdef HAVE_RASTRO
 
     // creates the rastro container for this operation id
-    cur_op->op.short_id = get_unique_op_id( &( unique_io_ids ));
+    // get the rastro buffer to be used on the thread of this operation. It
+    // will only be used by the main thread on progress_notify
+
+    cur_op->op.short_id = get_unique_op_id( &( unique_io_ids ), & (cur_op->op.rst_buf) );
+
     rst_event_l(DBPF_INIT_OP_N, cur_op->op.short_id);
 
     if (cur_op->op.u.b_rw_list.opcode == LIO_READ)

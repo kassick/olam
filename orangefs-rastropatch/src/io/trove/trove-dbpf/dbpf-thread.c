@@ -20,6 +20,9 @@
 #include "dbpf-sync.h"
 #include "pint-context.h"
 #include "pint-mgmt.h"
+#include "server-config.h"
+
+#include "src/libRastro/uniq_ids_q.h"
 
 extern struct qlist_head dbpf_op_queue;
 extern gen_mutex_t dbpf_op_queue_mutex;
@@ -86,6 +89,10 @@ void *dbpf_thread_function(void *ptr)
     struct timeval base;
     struct timespec wait_time;
 
+#ifdef HAVE_RASTRO
+    rst_init(rst_server_id,   24);
+#endif
+
     gossip_debug(GOSSIP_TROVE_DEBUG, "dbpf_thread_function started\n");
 
     PINT_event_thread_start("TROVE-DBPF");
@@ -144,6 +151,10 @@ void *dbpf_thread_function(void *ptr)
 
     gossip_debug(GOSSIP_TROVE_DEBUG, "dbpf_thread_function ending\n");
     PINT_event_thread_stop();
+#ifdef HAVE_RASTRO
+    rst_finalize();
+#endif
+
 #endif
     return ptr;
 }

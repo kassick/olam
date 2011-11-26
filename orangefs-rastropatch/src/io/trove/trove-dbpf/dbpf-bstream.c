@@ -32,7 +32,7 @@
 #include "dbpf-alt-aio.h"
 
 #ifdef HAVE_RASTRO
-
+#include <rastro.h>
 #include "src/libRastro/rastro_functs.h"
 #include "src/libRastro/rastro_evt_ids.h"
 #include "src/libRastro/uniq_ids_q.h"
@@ -121,11 +121,11 @@ static void aio_progress_notification(union sigval sig)
 #ifdef HAVE_RASTRO
     // READ/WRITE OUT : On progress notification, finish a request
     if (op_p->u.b_rw_list.opcode == LIO_READ)
-        rst_event_ll(DBPF_READ_OUT, op_p->short_id,    op_p->u.b_rw_list.fd);
+        rst_event_ll_ptr(op_p->rst_buf, DBPF_READ_OUT, op_p->short_id,    op_p->u.b_rw_list.fd);
     else
-        rst_event_ll(DBPF_WRITE_OUT,op_p->short_id,    op_p->u.b_rw_list.fd);
+        rst_event_ll_ptr(op_p->rst_buf, DBPF_WRITE_OUT,op_p->short_id,    op_p->u.b_rw_list.fd);
 
-    release_unique_op_id(&( unique_io_ids ), op_p->short_id );
+    release_unique_op_id(&( unique_io_ids ), op_p->short_id , op_p->rst_buf );
 #endif
 
     /*

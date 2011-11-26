@@ -19,6 +19,7 @@ extern "C" {
 #include "dbpf-keyval-pcache.h"
 #include "dbpf-open-cache.h"
 #include "pint-event.h"
+#include <rastro.h>
 
 /* For unknown Berkeley DB errors, we return some large value
  */
@@ -541,6 +542,7 @@ struct dbpf_op
     TROVE_handle handle;
     TROVE_op_id id;
 #ifdef HAVE_RASTRO
+    rst_buffer_t *rst_buf;
     int short_id;
 #endif
     struct dbpf_collection *coll_p;

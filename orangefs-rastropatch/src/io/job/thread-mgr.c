@@ -16,8 +16,14 @@
 #include "trove.h"
 #include "pvfs2-internal.h"
 
+#include "server-config.h"
+#include "src/server/pvfs2-server.h"
+
 #include "pint-event.h"
 #include <stdio.h>
+
+#include <rastro.h>
+#include "src/libRastro/uniq_ids_q.h"
 
 #define THREAD_MGR_TEST_COUNT 5
 #define THREAD_MGR_TEST_TIMEOUT 10
@@ -88,7 +94,13 @@ static void *trove_thread_function(void *ptr)
     struct PINT_thread_mgr_trove_callback *tmp_callback;
     int timeout = thread_mgr_test_timeout;
 
+
 #ifdef __PVFS2_JOB_THREADED__
+#ifdef HAVE_RASTRO
+    // Initialize rastro buffer for THIS THREAD
+    rst_init(rst_server_id,   21 );
+#endif
+
     PINT_event_thread_start("TROVE");
     while (trove_thread_running)
 #endif
@@ -152,6 +164,13 @@ static void *trove_thread_function(void *ptr)
 #ifdef __PVFS2_JOB_THREADED__
     PINT_event_thread_stop();
 #endif
+
+#ifdef __PVFS2_JOB_THREADED__
+#ifdef HAVE_RASTRO
+    rst_finalize();
+#endif
+#endif
+
     return (NULL);
 }
 
@@ -173,6 +192,9 @@ static void *bmi_thread_function(void *ptr)
     thread_running = bmi_thread_running;
     gen_mutex_unlock(&bmi_thread_running_mutex);
 #ifdef __PVFS2_JOB_THREADED__
+#ifdef HAVE_RASTRO
+    rst_init(rst_server_id , 23);
+#endif
     PINT_event_thread_start("BMI");
     while (thread_running)
 #endif
@@ -300,6 +322,10 @@ static void *bmi_thread_function(void *ptr)
 
 #ifdef __PVFS2_JOB_THREADED__
     PINT_event_thread_stop();
+#ifdef HAVE_RASTRO
+    rst_finalize();
+#endif
+
 #endif
     return (NULL);
 }
@@ -316,6 +342,10 @@ static void *dev_thread_function(void *ptr)
     int timeout = thread_mgr_test_timeout;
 
 #ifdef __PVFS2_JOB_THREADED__
+#ifdef HAVE_RASTRO
+    // Initialize rastro buffer for THIS THREAD
+    rst_init(rst_server_id,   22 );
+#endif
     while (dev_thread_running)
 #endif
     {
@@ -366,6 +396,12 @@ static void *dev_thread_function(void *ptr)
 	}
 	gen_mutex_unlock(&dev_mutex);
     }
+#ifdef __PVFS2_JOB_THREADED__
+#ifdef HAVE_RASTRO
+    // Initialize rastro buffer for THIS THREAD
+    rst_finalize();
+#endif
+#endif
 
     return (NULL);
 }
