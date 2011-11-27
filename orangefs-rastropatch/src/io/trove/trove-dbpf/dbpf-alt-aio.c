@@ -15,7 +15,7 @@
 #else
 // No Rastro ; disable events
 #define RASTRO_DISABLE_EVENTS 1
-#include "src/libRastro/rastro_functions.h"
+#include "src/libRastro/rastro_functs.h"
 
 #endif
 
@@ -41,7 +41,9 @@ struct alt_aio_item
     pthread_t *tids;
     int nent;
     int op_id;
+#ifdef HAVE_RASTRO
     rst_buffer_t* rst_buf;
+#endif
 };
 static void* alt_lio_thread(void*);
 
@@ -108,7 +110,9 @@ int alt_lio_listio(int mode, struct aiocb * const list[],
 
         tmp_item->cb_p = list[i];
         tmp_item->sig = sig;
+#ifdef HAVE_RASTRO
         tmp_item->rst_buf = cur_op->op.rst_buf;
+#endif
 
         /* setup state */
 #ifdef HAVE_AIOCB_ERROR_CODE
@@ -254,7 +258,9 @@ static void* alt_lio_thread(void* foo)
     struct alt_aio_item* tmp_item = (struct alt_aio_item*)foo;
     int ret = 0;
 
+#ifdef HAVE_RASTRO
     pthread_setspecific (rst_key, tmp_item->rst_buf);
+#endif
 
     if(tmp_item->cb_p->aio_lio_opcode == LIO_READ)
     {

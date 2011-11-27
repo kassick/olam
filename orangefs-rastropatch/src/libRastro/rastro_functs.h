@@ -6,6 +6,13 @@
 #include "rastro.h"
 #include "rastro_private.h"
 
+
+#ifdef RASTRO_DISABLE_EVENTS
+#define rst_event(evt_id)
+#endif
+
+
+
 #ifndef RASTRO_DISABLE_EVENTS
 void rst_event_l_ptr(rst_buffer_t *ptr, u_int16_t type, u_int64_t l0);
 #define rst_event_l(type, l0) rst_event_l_ptr(RST_PTR, type, l0)

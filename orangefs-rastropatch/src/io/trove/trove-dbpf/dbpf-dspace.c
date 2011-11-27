@@ -49,7 +49,7 @@
 
 #else
 // No Rastro ; disable events
-#define RASTRO_DISABLE_EVENTS 1
+#define RASTRO_DISABLE_EVENTS
 #include "src/libRastro/rastro_functs.h"
 
 #endif
