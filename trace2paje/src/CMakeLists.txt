@@ -81,31 +81,32 @@ set_property(TARGET symbols_test PROPERTY COMPILE_DEFINITIONS SYMBOL_UNIT_TEST=1
 
 ###############################
 ## Scanner Test
-add_executable(scanner_test 
-  baseevent.cc
-  baseeventtype.cc
-  linktype.cc
-  statetype.cc
-  link.cc
-  dummyevent.cc
-  state.cc
-  containertrigger.cc
-  symbols.cc
-  event.cc
-  container.cc
-  semantics.cc
-  paje.cc
-  paje_functions.cc
-  pajeelement.cc
-  usermap.cc
-  tree/tree.hpp # my tree implementation
-  ${FLEX_DescriptionFileScanner_OUTPUTS} 
-  ${BISON_DescriptionFileParser_OUTPUTS}
-)
+#add_executable(scanner_test 
+#  baseevent.cc
+#  baseeventtype.cc
+#  linktype.cc
+#  statetype.cc
+#  link.cc
+#  dummyevent.cc
+#  state.cc
+#  containertrigger.cc
+#  symbols.cc
+#  event.cc
+#  container.cc
+#  semantics.cc
+#  paje.cc
+#  paje_functions.cc
+#  pajeelement.cc
+#  usermap.cc
+#  logging.cc
+#  tree/tree.hpp # my tree implementation
+#  ${FLEX_DescriptionFileScanner_OUTPUTS} 
+#  ${BISON_DescriptionFileParser_OUTPUTS}
+#)
 
-set_property(TARGET scanner_test PROPERTY COMPILE_FLAGS "-std=c++0x")
-set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS SCANNER_UNIT_TEST=1)
-target_link_libraries(scanner_test fl)
+#set_property(TARGET scanner_test PROPERTY COMPILE_FLAGS "-std=c++0x")
+#set_property(TARGET scanner_test PROPERTY COMPILE_DEFINITIONS SCANNER_UNIT_TEST=1)
+#target_link_libraries(scanner_test fl)
 
 
 
