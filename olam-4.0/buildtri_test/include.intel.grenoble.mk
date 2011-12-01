@@ -1,10 +1,10 @@
 # Activate appropriate parts below, comment out others:
 
 #-----------------  LINUX Portland Group pgf77/gcc ---------------
-F_COMP=pgf90
+#F_COMP=pgf90
 # If the compiler supports (and the user wants to use)
 # the module IEEE_ARITHMETIC, uncomment below
-IEEE_ARITHMETIC=yes
+#IEEE_ARITHMETIC=yes
 
 # If using MPI libraries:
 #MPI_PATH=/usr/local/mpich
@@ -17,23 +17,31 @@ IEEE_ARITHMETIC=yes
 #       -Mfree  -Mbyteswapio
 
 # DEBUG:
-F_OPTS=-O0 -g #  -pc 64 -Mfree  -Mbyteswapio -Mbounds
+#F_OPTS=-O0 -g #  -pc 64 -Mfree  -Mbyteswapio -Mbounds
 
-C_COMP=gcc
-C_OPTS=-O0 -DUNDERSCORE -DLITTLE
+#C_COMP=gcc
+#C_COMP=icc
+#C_OPTS=-O0 -DUNDERSCORE -DLITTLE
 
-NCARG_DIR=/opt/ncl/lib
+NCARG_DIR=/home/rkassick/Work/ncarg/lib/
 LIBNCARG=-L$(NCARG_DIR) -lncarg -lncarg_gks -lncarg_c \
-          -lX11 -ldl -lpthread -lgfortran
+          -lX11 -ldl -lpthread  -lgfortran
 
-HDF5_LIBS=-L/home/pedropl/stuff/hdf5-pgi-serial/lib -lhdf5_fortran -lhdf5 -lz -lm
-HDF5_INCS=-I/home/pedropl/stuff/hdf5-pgi-serial/include
+HDF5_DIR=/home/rkassick/Work/hdf5-serial-intel/
+HDF5_LIBS=-L$(HDF5_DIR)/lib 		  \
+      -lhdf5_fortran -lhdf5		  \
+      -lhdf5_hl -lhdf5hl_fortran	  \
+      -lz -lm
+HDF5_INCS=-I$(HDF5_DIR)/include
 # If using HDF5 fortran interface, uncomment below
 # There are chances to need "-lhdf5_fortran" on HDF5_LIBS above
 OLAM_HDF5_FORTRAN=yes
 
-NETCDF_LIBS=-lnetcdf
-NETCDF_INCS=
+NETCDF_DIR=/home/rkassick/Work/netcdf-serial-intel/
+NETCDF_LIBS=-L$(NETCDF_DIR)/lib -lnetcdf
+#/usr/local/lib/libnetcdff.a  /usr/local/lib/libnetcdf.a
+
+NETCDF_INCS=-I$(NETCDF_DIR)/include
 
 LOADER=$(F_COMP)
 LOADER_OPTS=$(F_OPTS)
@@ -41,23 +49,24 @@ LIBS=
 
 
 #-----------------  LINUX Intel Fortran ifort/gcc ---------------
-#F_COMP=mpif90
+F_COMP=mpif90
 #
 ## If using MPI libraries:
-##MPI_PATH=/usr/local/mpich
-##PAR_INCS=-I$(MPI_PATH)/include
-##PAR_LIBS=-L$(MPI_PATH)/lib -lmpich -lpmpich
-#OLAM_MPI=yes
+MPI_PATH=/usr/local/
+PAR_INCS=-I$(MPI_PATH)/include
+PAR_LIBS=-L$(MPI_PATH)/lib
+OLAM_MPI=yes
 #
 ## OPTIMIZED:
-##F_OPTS=-xHost -O3 -fno-alias -ip -traceback
+F_OPTS=-xHost -O3 -fno-alias -ip -traceback
+#F_OPTS=-O3
 #F_OPTS=-g -O3 -xHost -traceback
 #
 ## DEBUG:
 ##F_OPTS=-g -fp-model precise -check bounds -traceback \
 ##        -debug extended -check uninit -ftrapuv
 #
-#C_COMP=mpicc
+C_COMP=mpicc
 #C_OPTS=-DUNDERSCORE -DLITTLE
 #
 #NCARG_DIR=/opt/ncl/lib
@@ -70,8 +79,8 @@ LIBS=
 #NETCDF_LIBS=-lnetcdf
 #NETCDF_INCS=
 #
-#LOADER=$(F_COMP)
-#LOADER_OPTS=$(F_OPTS)
+LOADER=$(F_COMP)
+LOADER_OPTS=$(F_OPTS)
 #
 ## For Apple OSX: the stack size needs to be increased at link time
 ## LOADER_OPTS=$(F_OPTS) -Wl,-stack_size -Wl,0x10000000 -L/Developer/SDKs/MacOSX10.6.sdk/usr/lib
