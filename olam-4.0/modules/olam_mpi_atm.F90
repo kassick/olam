@@ -46,12 +46,21 @@ subroutine olam_mpi_init()
 #ifdef OLAM_MPI
 
   integer :: ierr
+  integer :: new_comm
+  integer :: df_start_result
+  integer :: is_client,config_size
+  integer :: new_myrank,new_mygroupsize
 
 ! Initialize MPI and determine process groupsize and myrank
   
   call MPI_Init(ierr)
   call MPI_Comm_size(MPI_COMM_WORLD,mgroupsize,ierr)
   call MPI_Comm_rank(MPI_COMM_WORLD,myrank,ierr)
+
+  call df_start_mpi_entity("config.xml",new_comm,new_myrank, new_mygroupsize, df_start_result)
+
+
+  print *, "Damaris Init: result=",df_start_result, "new rank=", new_myrank, "new size=", new_mygroupsize
 
 #else
 

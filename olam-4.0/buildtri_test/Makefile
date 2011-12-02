@@ -72,7 +72,8 @@ objects/Make.depend: $(SOURCE_FILES) sources.mk
 $(EXE): $(OBJECT_FILES)
 	@echo ""
 	$(LOADER) -o $(EXE) objects/*.o $(LOADER_OPTS)  \
-	    $(LIBNCARG) $(PAR_LIBS) $(LIBS) $(HDF5_LIBS) $(NETCDF_LIBS)
+	    $(LIBNCARG) $(PAR_LIBS) $(LIBS) $(HDF5_LIBS) $(NETCDF_LIBS) \
+	    $(DAMARIS_LIBS) $(DAMARIS_MOD)
 	@echo ""
 	@echo Finished building === $(EXE)
 	@echo ""
