@@ -561,6 +561,14 @@ if (infotyp == 'UNITS') then
       endif
    enddo
 
+   if (fldname(1:6) == 'ITAB_V' .and. meshtype == 1) then
+      write(io6,*) 'Plot field ',trim(fldname),' not available for hexagonal mesh.'
+      go to 1000
+   elseif (fldname(1:6) == 'ITAB_U' .and. meshtype == 2) then
+      write(io6,*) 'Plot field ',trim(fldname),' not available for triangular mesh.'
+      go to 1000
+   endif
+
    op%stagpt = fldlib(2,icase)(1:1)
    op%dimens = fldlib(2,icase)(2:3)
    op%label  = fldlib(3,icase)
@@ -1795,14 +1803,17 @@ case(153) ! 'FCELL_CANTEMPC'
 case(154) ! 'ARU'
    fldval = aru(k,i)
 case(155) ! 'ARV'
+   if (.not. allocated(arv)) go to 1000
    fldval = arv(k,i)
 case(156) ! 'ARW'
    fldval = arw(k,i)
 case(157) ! 'VOLT'
    fldval = volt(k,i)
 case(158) ! 'VOLU'
+   if (.not. allocated(volui)) go to 1000
    fldval = 1. / volui(k,i)
 case(159) ! 'VOLV'
+   if (.not. allocated(volvi)) go to 1000
    fldval = 1. / volvi(k,i)
 case(160) ! 'VOLW'
    fldval = 1. / volwi(k,i)
@@ -1818,12 +1829,16 @@ case(163) ! 'GLATM'
 case(164) ! 'GLONM'
    fldval = glonm(i)
 case(165) ! 'GLATU'
+   if (.not. allocated(glatu)) go to 1000
    fldval = glatu(i)
 case(166) ! 'GLONU'
+   if (.not. allocated(glonu)) go to 1000
    fldval = glonu(i)
 case(167) ! 'GLATV'
+   if (.not. allocated(glatv)) go to 1000
    fldval = glatv(i)
 case(168) ! 'GLONV'
+   if (.not. allocated(glonv)) go to 1000
    fldval = glonv(i)
 case(169) ! 'GLATW'
    fldval = glatw(i)
@@ -1832,12 +1847,16 @@ case(170) ! 'GLONW'
 case(171) ! 'LPM'
    fldval = real(lpm(i))
 case(172) ! 'LPU'
+   if (.not. allocated(lpu)) go to 1000
    fldval = real(lpu(i))
 case(173) ! 'LCU'
+   if (.not. allocated(lcu)) go to 1000
    fldval = real(lcu(i))
 case(174) ! 'LPV'
+   if (.not. allocated(lpv)) go to 1000
    fldval = real(lpv(i))
 case(175) ! 'LCV'
+   if (.not. allocated(lcv)) go to 1000
    fldval = real(lcv(i))
 case(176) ! 'LPW'
    fldval = real(lpw(i))
@@ -1850,16 +1869,22 @@ case(179) ! 'YEM'
 case(180) ! 'ZEM'
    fldval = zem(i)
 case(181) ! 'XEU'
+   if (.not. allocated(xeu)) go to 1000
    fldval = xeu(i)
 case(182) ! 'YEU'
+   if (.not. allocated(yeu)) go to 1000
    fldval = yeu(i)
 case(183) ! 'ZEU'
+   if (.not. allocated(zeu)) go to 1000
    fldval = zeu(i)
 case(184) ! 'XEV'
+   if (.not. allocated(xev)) go to 1000
    fldval = xev(i)
 case(185) ! 'YEV'
+   if (.not. allocated(yev)) go to 1000
    fldval = yev(i)
 case(186) ! 'ZEV'
+   if (.not. allocated(zev)) go to 1000
    fldval = zev(i)
 case(187) ! 'XEW'
    fldval = xew(i)

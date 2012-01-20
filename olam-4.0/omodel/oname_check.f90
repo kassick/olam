@@ -49,7 +49,7 @@ use misc_coms,   only: io6
 
 implicit none
 
-integer      :: nfatal, nwarn, ifm, ng, i, k, iplt, i_huge, izaux
+integer      :: nfatal, nwarn, ifm, ng, i, k, iplt, i_huge, idz
 real         :: r_huge, r_min, r_max, r_tiny, dzxmin, zb_min, zb_max
 real(kind=8) :: d_huge
 
@@ -120,51 +120,27 @@ call ichk_bnds( nl%iyear1,   "IYEAR1",       0,    9999, 0, nfatal, nwarn )
 call ichk_bnds( nl%mdomain, "MDOMAIN",       0,       4, 0, nfatal, nwarn )
 call ichk_bnds( nl%meshtype,"MESHTYPE",      1,       2, 0, nfatal, nwarn )
 
-call ichk_bnds( nl%ngrids,   "NGRIDS",       1, maxgrds, 0, nfatal, nwarn, &
-     msgmax="Increase maxgrds in max_dims.f90 if more nests are needed." )
-
 call ichk_bnds( nl%nzp,         "NZP",       3,   10000, 0, nfatal, nwarn, &
      msgmin="At least 3 vertical levels are needed for OLAM." )
 
 call ichk_bnds( nl%nxp,         "NXP",       1,   10000, 0, nfatal, nwarn )
 call rchk_bnds( nl%dtlong,   "DTLONG",  r_tiny,  r_huge, 0, nfatal, nwarn )
 call rchk_bnds( nl%deltax,   "DELTAX",  dzxmin,  r_huge, 0, nfatal, nwarn )
-call rchk_bnds( nl%deltaz,   "DELTAZ",      0.,  r_huge, 0, nfatal, nwarn )
-call rchk_bnds( nl%zbase,    "ZBASE",   zb_min,  zb_max, 0, nfatal, nwarn )
-call rchk_bnds( nl%dzbase,   "DZBASE",     0.0,  r_huge, 0, nfatal, nwarn )
-call rchk_bnds( nl%ztop,     "ZTOP",       0.0,  r_huge, 0, nfatal, nwarn )
-call rchk_bnds( nl%dztop,    "DZTOP",      0.0,  r_huge, 0, nfatal, nwarn )
-call ichk_bnds( nl%nzaux,    "NZAUX",       -1,      10, 0, nfatal, nwarn )
+call ichk_bnds( nl%ndz,         "NDZ",       1,      10, 0, nfatal, nwarn )
 
-do izaux=1, nl%nzaux
-   call rchk_bnds( nl%zaux(izaux),   "ZAUX",   0.0,  r_huge, 0, nfatal, nwarn )
-   call rchk_bnds( nl%dzaux(izaux),  "DZAUX",  0.0,  r_huge, 0, nfatal, nwarn )
+do idz=1, nl%ndz
+   call rchk_bnds( nl%hdz(idz), "HDZ",   0.0,  r_huge, 0, nfatal, nwarn )
+   call rchk_bnds( nl%dz (idz),  "DZ",   0.0,  r_huge, 0, nfatal, nwarn )
 
-   if (nl%zaux(izaux) <= nl%zbase) then
-      write(io6,*) 'FATAL - zaux(',izaux,') must be larger than zbase.'
-      nfatal = nfatal + 1
-   endif
-
-   if (nl%zaux(izaux) >= nl%ztop) then
-      write(io6,*) 'FATAL - zaux(',izaux,') must be less than ztop.'
-      nfatal = nfatal + 1
-   endif
-
-   if (izaux > 1 .and. nl%zaux(izaux) <= nl%zaux(izaux-1) ) then
-      write(io6,*) 'FATAL - zaux(',izaux,') must be larger than zaux(',izaux-1,').'
-      nfatal = nfatal + 1
+   if (idz > 1) then
+      if (nl%hdz(idz) <= nl%hdz(idz-1) ) then
+         write(io6,*) 'FATAL - hdz(',idz,') must be larger than hdz(',idz-1,').'
+         nfatal = nfatal + 1
+      endif
    endif
 enddo
 
-if (nl%deltaz >= dzxmin) then
-
-   call rchk_bnds( nl%dzrat,  "DRZAT",     1.0,    10.0, 0, nfatal, nwarn )
-   call rchk_bnds( nl%dzrat,  "DRZAT",     0.0,     1.2, 1, nfatal, nwarn, &
-        msgmax="Large DZRAT degrades 2nd-order accuracy in the vertical &
-              & differencing")
-   call rchk_bnds( nl%dzmax,  "DZMAX",  dzxmin,  r_huge, 0, nfatal, nwarn )
-
-else
+if (nl%ndz == 1) then
 
    call rchk_bnds( nl%zz(1),     "ZZ",  zb_min,  zb_max, 0, nfatal, nwarn )
    do k=2,nl%nzp
@@ -178,7 +154,14 @@ endif
 ! NESTED GRID DEFINITION
 !--------------------------------------------------------------------------
 
+call ichk_bnds( nl%ngrids,   "NGRIDS",       1, maxgrds, 0, nfatal, nwarn, &
+     msgmax="Increase maxgrds in max_dims.f90 if more nests are needed." )
+
 do ng=2, nl%ngrids
+   call ichk_bnds(nl%nconcave(ng), "NCONCAVE", 1, 3, 0, nfatal, nwarn )
+   call ichk_bnds(nl%mrows(ng),    "MROWS",    1, 5, 2, nfatal, nwarn )
+   call ichk_bnds(nl%moveall(ng),  "MOVEALL",  0, 1, 0, nfatal, nwarn )
+
    call ichk_bnds(nl%ngrdll(ng),  "NGRDLL",    1, maxngrdll, 0, nfatal, nwarn )
    call rchk_bnds(nl%grdrad(ng),  "GRDRAD", dzxmin, erad*2., 0, nfatal, nwarn )
 enddo
@@ -234,9 +217,12 @@ endif
 ! HISTORY FILE OUTPUT
 !--------------------------------------------------------------------------
 
-call ichk_bnds( nl%ioutput,   "IOUTPUT", 0,  1, 2, nfatal, nwarn )
-call ichk_bnds( nl%iclobber, "ICLOBBER", 0,  1, 2, nfatal, nwarn )
-call rchk_bnds( nl%frqstate, "FRQSTATE", nl%dtlong,  r_huge, 2, nfatal, nwarn )
+call ichk_bnds( nl%ioutput  , "IOUTPUT  ", 0, 1, 2, nfatal, nwarn )
+call ichk_bnds( nl%iclobber , "ICLOBBER ", 0, 1, 2, nfatal, nwarn )
+call ichk_bnds( nl%icompress, "ICOMPRESS", 0, 9, 2, nfatal, nwarn )
+call ichk_bnds( nl%iquiet   , "IQUIET   ", 0, 1, 1, nfatal, nwarn )
+
+call rchk_bnds( nl%frqstate, "FRQSTATE", nl%dtlong, r_huge, 2, nfatal, nwarn )
 
 !--------------------------------------------------------------------------
 ! Topography
