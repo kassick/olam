@@ -6,13 +6,13 @@ module hdf5_f2f
 
   implicit none
 
-  INTEGER(HID_T) :: fileid
-  integer(HID_T) :: mspcid
-!!$  integer(HID_T) :: propid
-  integer(HID_T) :: dsetid
-  integer(HID_T) :: dspcid
-  integer(HSIZE_T), dimension(7) :: dimsf
-  INTEGER(HSIZE_T) :: ndimsf
+  integer(HID_T)   :: fileid
+  integer(HID_T)   :: mspcid
+  integer(HID_T)   :: propid
+  integer(HID_T)   :: dsetid
+  integer(HID_T)   :: dspcid
+  integer(HSIZE_T) :: dimsf(7)
+  integer(HSIZE_T) :: ndimsf
 
   interface fh5_write
      module procedure fh5_write_integer_scalar,    &
@@ -39,7 +39,7 @@ module hdf5_f2f
           fh5d_read_logical_array
   end interface fh5d_read
 
-Contains
+contains
 
   subroutine fh5f_open(locfn, iaccess, hdferr)
 
@@ -107,14 +107,14 @@ Contains
 
   end subroutine fh5f_create
 
-  subroutine fh5_prepare_write(ndims, dims, hdferr)
+  subroutine fh5_prepare_write(ndims, dims, hdferr, icompress)
 
     implicit none
 
     integer, intent(IN) :: ndims
     integer, dimension(*), intent(IN) :: dims
     integer, intent(OUT) :: hdferr
-
+    integer, optional, intent(IN) :: icompress
     integer :: i
 
     dimsf = 1
@@ -126,12 +126,19 @@ Contains
 
     call h5screate_simple_f(ndims, dimsf, mspcid, hdferr)
 
-!!$    call h5pcreate_f(H5P_DATASET_CREATE_F, propid, hdferr)
-!!$
-!!$    call h5pset_chunk_f(propid, ndims, dimsf, hdferr)
-!!$    call h5pset_shuffle_f(propid, hdferr)
-!!$    call h5pset_deflate_f(propid, 5, hdferr)
+    call h5pcreate_f(H5P_DATASET_CREATE_F, propid, hdferr) 	 
 
+    ! Activate HDF5 array compression for valid icompress
+    if (present(icompress)) then
+       if (icompress > 0 .and. icompress < 10) then
+          if (.not. (ndims == 1 .and. dimsf(1) == 1)) then
+             call h5pset_chunk_f(propid, ndims, dimsf, hdferr) 	 
+             call h5pset_shuffle_f(propid, hdferr) 	 
+             call h5pset_deflate_f(propid, icompress, hdferr) 	 
+          endif
+       endif
+    endif
+	 
     return
 
   end subroutine fh5_prepare_write
@@ -145,8 +152,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
 
@@ -163,8 +169,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_REAL, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_REAL, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_REAL, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_REAL, buf_real, dimsf, hdferr, mspcid)
 
@@ -181,8 +186,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_CHARACTER, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_CHARACTER, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_CHARACTER, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_CHARACTER, buf_character, dimsf, hdferr, mspcid)
 
@@ -199,8 +203,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_DOUBLE, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_DOUBLE, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_DOUBLE, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_DOUBLE, buf_real8, dimsf, hdferr, mspcid)
 
@@ -216,25 +219,24 @@ Contains
     logical, intent(IN) :: buf_logical(*)
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
-    
-    INTEGER, allocatable :: buf_integer(:)
-    INTEGER :: i, size
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr)
+    integer, allocatable :: buf_integer(:)
+    integer :: i, size
+
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
 
     ! converting logical to integer
     size = 1
-    DO i = 1, ndimsf
+    do i = 1, ndimsf
        size = size * dimsf(i)
-    ENDDO
+    enddo
 
     allocate (buf_integer(size))
     buf_integer = 0
 
-    DO i = 1, size
-       IF(buf_logical(i)) buf_integer(i) = -1
-    ENDDO
+    do i = 1, size
+       if(buf_logical(i)) buf_integer(i) = -1
+    enddo
 
     call h5dwrite_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
 
@@ -253,8 +255,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
 
@@ -271,8 +272,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_REAL, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_REAL, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_REAL, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_REAL, buf_real, dimsf, hdferr, mspcid)
 
@@ -289,8 +289,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_CHARACTER, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_CHARACTER, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_CHARACTER, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_CHARACTER, buf_character, dimsf, hdferr, mspcid)
 
@@ -307,8 +306,7 @@ Contains
     character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_DOUBLE, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_DOUBLE, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_DOUBLE, mspcid, dsetid, hdferr, propid)
 
     call h5dwrite_f(dsetid, H5T_NATIVE_DOUBLE, buf_real8, dimsf, hdferr, mspcid)
 
@@ -327,11 +325,10 @@ Contains
 
     integer :: buf_integer
 
-!!$    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
-    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr)
+    call h5dcreate_f(fileid, dname, H5T_NATIVE_INTEGER, mspcid, dsetid, hdferr, propid)
 
     buf_integer = 0
-    IF(buf_logical) buf_integer = -1
+    if(buf_logical) buf_integer = -1
 
     call h5dwrite_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
 
@@ -346,7 +343,7 @@ Contains
     integer, intent(OUT) :: hdferr
 
     call h5sclose_f(mspcid, hdferr)
-!!$    call h5pclose_f(propid, hdferr)
+    call h5pclose_f(propid, hdferr)
     call h5dclose_f(dsetid, hdferr)
 
     return
@@ -357,7 +354,7 @@ Contains
 
     implicit none
 
-    CHARACTER(len=*), INTENT(IN) :: dname
+    character(len=*), intent(IN) :: dname
     integer, intent(OUT) :: hdferr
 
     call h5dopen_f(fileid, dname, dsetid, hdferr)
@@ -399,9 +396,9 @@ Contains
     integer :: ndims, i
     integer :: hdferr
 
-    CALL h5sget_simple_extent_ndims_f(dspcid, ndims, hdferr)
-    
-    CALL h5sget_simple_extent_dims_f(dspcid, dimsc, maxdimsc, hdferr)
+    call h5sget_simple_extent_ndims_f(dspcid, ndims, hdferr)
+
+    call h5sget_simple_extent_dims_f(dspcid, dimsc, maxdimsc, hdferr)
 
     do i = 1, ndims
        dims(i) = int(dimsc(i))
@@ -432,7 +429,8 @@ Contains
     integer, intent(INOUT) :: buf_integer(*)
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, &
+         hdferr, file_space_id=dspcid, mem_space_id=mspcid)
 
     return
 
@@ -446,7 +444,8 @@ Contains
     real, intent(INOUT) :: buf_real(*)
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_REAL, buf_real, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_REAL, buf_real, dimsf, &
+         hdferr, file_space_id=dspcid, mem_space_id=mspcid)
 
     return
 
@@ -460,7 +459,8 @@ Contains
     character, intent(INOUT) :: buf_character(*)
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_CHARACTER, buf_character, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_CHARACTER, buf_character, dimsf, &
+         hdferr, file_space_id=dspcid, mem_space_id=mspcid)
 
     return
 
@@ -474,7 +474,8 @@ Contains
     real(KIND=8), intent(INOUT) :: buf_real8(*)
     integer, intent(OUT) :: hdferr
 
-    CALL h5dread_f(dsetid, H5T_NATIVE_DOUBLE, buf_real8, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_DOUBLE, buf_real8, dimsf, &
+         hdferr, file_space_id=dspcid, mem_space_id=mspcid)
 
     return
 
@@ -488,27 +489,28 @@ Contains
     logical, intent(INOUT) :: buf_logical(*)
     integer, intent(OUT) :: hdferr
 
-    INTEGER, allocatable :: buf_integer(:)
-    INTEGER :: i, size
+    integer, allocatable :: buf_integer(:)
+    integer :: i, size
 
     hdferr = 1
 
     size = 1
-    DO i = 1, ndimsf
+    do i = 1, ndimsf
        size = size * dimsf(i)
-    ENDDO
+    enddo
     allocate (buf_integer(size))
 
-    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, &
+         hdferr, file_space_id=dspcid, mem_space_id=mspcid)
 
     ! converting integer to logical
-    DO i = 1, size
-       IF(buf_integer(i) == -1) THEN
-          buf_logical(i) = .TRUE.
-       ELSE
-          buf_logical(i) = .FALSE.
-       ENDIF
-    ENDDO
+    do i = 1, size
+       if(buf_integer(i) == -1) then
+          buf_logical(i) = .true.
+       else
+          buf_logical(i) = .false.
+       endif
+    enddo
 
     deallocate(buf_integer)
 
@@ -524,7 +526,7 @@ Contains
     integer, intent(INOUT) :: buf_integer
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr)
 
     return
 
@@ -538,7 +540,7 @@ Contains
     real, intent(INOUT) :: buf_real
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_REAL, buf_real, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_REAL, buf_real, dimsf, hdferr)
 
     return
 
@@ -552,7 +554,7 @@ Contains
     character, intent(INOUT) :: buf_character
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_CHARACTER, buf_character, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_CHARACTER, buf_character, dimsf, hdferr)
 
     return
 
@@ -566,7 +568,7 @@ Contains
     real(KIND=8), intent(INOUT) :: buf_real8
     integer, intent(OUT) :: hdferr
 
-    call h5dread_f(dsetid, H5T_NATIVE_DOUBLE, buf_real8, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_DOUBLE, buf_real8, dimsf, hdferr)
 
     return
 
@@ -584,32 +586,40 @@ Contains
 
     hdferr = 1
 
-    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr, mspcid)
+    call h5dread_f(dsetid, H5T_NATIVE_INTEGER, buf_integer, dimsf, hdferr)
 
-    buf_logical = .FALSE.
-    IF(buf_integer == -1) buf_logical = .TRUE.
+    buf_logical = .false.
+    if(buf_integer == -1) buf_logical = .true.
 
     return
 
   end subroutine fh5d_read_logical_scalar
 
-  subroutine fh5_prepare_read(dname, ndims, dims, hdferr)
+  subroutine fh5_prepare_read(dname, ndims, dims, hdferr, coords)
 
     implicit none
 
     character(len=*), intent(IN) :: dname
-    INTEGER, INTENT(IN) :: ndims
-    INTEGER, DIMENSION(*), INTENT(IN) :: dims
+    integer, intent(IN) :: ndims
+    integer, dimension(*), intent(IN) :: dims
     integer, intent(OUT) :: hdferr
+    integer, intent(IN), optional :: coords(:)
 
-    INTEGER :: i, j
+    integer :: i, j, k, ndims_file
+    integer(HSIZE_T) :: dims_file(7), maxdims_file(7)
 
-    dimsf = 1
+    integer(HSIZE_T) :: offset1d(1), count1d(1)
+    integer(HSIZE_T) :: offset2d(2), count2d(2)
+    integer(HSIZE_T) :: offset3d(3), count3d(3)
+
+    dimsf  = 1
     ndimsf = ndims
 
     do i = 1, ndims
-       dimsf(i) = dims(i)
-    end do
+       dimsf(i) = dims(i)          
+    enddo
+
+    ! opening the dataset from file
 
     call h5dopen_f(fileid, dname, dsetid, hdferr)
     if(dsetid < 0) then
@@ -617,11 +627,112 @@ Contains
        return
     end if
 
+    ! getting the dataspace of the dataset (dimension, size, element type etc)
+
     call h5dget_space_f(dsetid, dspcid, hdferr)
     if(dspcid < 0) then
        hdferr = int(dspcid)
        return
     end if
+
+    ! prepare the memspace to receive the data
+
+    call h5screate_simple_f(ndims, dimsf, mspcid, hdferr)
+
+    ! if coords is present select the points on dataspace and memspace
+
+    if (present(coords)) then
+
+       ! report an error if coords not dimensioned correctly
+
+       if (size(coords) /= dims(ndims)) then
+          write(*,*) "Error in fh5_prepare_read:"
+          stop       "Invalid number of points selected."
+       endif
+
+       ! check the dataspace dimensions in the file
+
+       call h5sget_simple_extent_ndims_f(dspcid, ndims_file, hdferr)
+       call h5sget_simple_extent_dims_f(dspcid, dims_file, maxdims_file, hdferr)
+       
+       ! if the number of points we want is less than that in the file,
+       ! select the points we want (else just read the entire dataspace)
+
+       if (dims(ndims) < dims_file(ndims)) then
+
+          if (ndims == 1) then
+
+             ! the first element points to the right position
+             ! select the first point
+
+             offset1d = 0
+             count1d  = 1
+
+             call h5sselect_hyperslab_f(dspcid, H5S_SELECT_SET_F, offset1d, &
+                  count1d, hdferr)
+
+             ! now add the rest of the points to the dataspace selection
+
+             do j = 2, dims(1)
+
+                offset1d = coords(j) - 1
+
+                call h5sselect_hyperslab_f(dspcid, H5S_SELECT_OR_F, offset1d, &
+                     count1d, hdferr)
+
+             enddo
+
+          else if (ndims == 2) then
+
+             ! the first element points to the right position
+             ! select a 1-d vector of points
+
+             offset2d = (/ 0, 0 /)
+             count2d  = (/ dims(1), 1 /)
+
+             call h5sselect_hyperslab_f(dspcid, H5S_SELECT_SET_F, offset2d, &
+                  count2d, hdferr)
+
+             ! now add the rest of the 1-d vectors to the dataspace selection
+
+             do j = 2, dims(2)
+
+                offset2d(2) = coords(j)-1
+
+                call h5sselect_hyperslab_f(dspcid, H5S_SELECT_OR_F, offset2d, &
+                     count2d, hdferr)
+
+             enddo
+
+          else if (ndims == 3) then
+
+             ! the first element points to the right position
+             ! select a 2-d array of points
+
+             offset3d = (/ 0, 0, 0 /)
+             count3d  = (/ dims(1), dims(2), 1 /)
+
+             call h5sselect_hyperslab_f(dspcid, H5S_SELECT_SET_F, offset3d, &
+                  count3d, hdferr)
+
+             ! now add the rest of the 2-d arrays to the dataspace selection
+
+             do j = 2, dims(3)
+
+                offset3d(3) = coords(j)-1
+
+                call h5sselect_hyperslab_f(dspcid, H5S_SELECT_OR_F, offset3d, &
+                     count3d, hdferr)
+
+             enddo
+
+          else
+
+             stop 'ndims > 3 using partial I/O is not implemented'
+
+          endif
+       endif
+    endif
 
     return
 
@@ -633,6 +744,7 @@ Contains
 
     integer, intent(OUT) :: hdferr
 
+    call h5sclose_f(mspcid, hdferr)
     call h5sclose_f(dspcid, hdferr)
     call h5dclose_f(dsetid, hdferr)
 

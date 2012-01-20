@@ -73,35 +73,33 @@ Module oname_coms
 
       integer :: mdomain  = 0
       integer :: meshtype = 0
-      integer :: ngrids   = 0
       integer :: nzp      = 0
       integer :: nxp      = 0
 
       real :: dtlong = 0.0
       real :: deltax = 0.0
-      real :: deltaz = 0.0
-      real :: dzrat  = 1.0
-      real :: dzmax  = 2000.0
-      real :: zbase  = 0.0
-      real :: dzbase = 0.0
-      real :: ztop   = 0.0
-      real :: dztop  = 0.0
       
-      integer :: nzaux = 0
+      integer :: ndz = 0
       
-      real :: zaux(10) = 0.
-      real :: dzaux(10) = 0.
+      real :: hdz(10) = 0.
+      real :: dz (10) = 0.
 
       real :: zz(maxsndg) = 0.0
 
 !!    NESTED GRID DEFINITION
+
+      integer :: ngrids = 0
 
       integer :: ngrdll(maxgrds) = 0
       real    :: grdrad(maxgrds) = 0.0
 
       real    :: grdlat(maxgrds,maxngrdll) = 0.0
       real    :: grdlon(maxgrds,maxngrdll) = 0.0
-     
+
+      integer :: nconcave(maxgrds) = 1
+      integer :: mrows   (maxgrds) = 3
+      integer :: moveall (maxgrds) = 1
+
 !!    TIMESTEP RATIOS
 
       integer :: ndtrat (maxgrds) = 1
@@ -120,9 +118,11 @@ Module oname_coms
 
 !!    GRID, HISTORY FILES
 
-      integer :: ioutput  = 1
-      integer :: iclobber = 0
-      real    :: frqstate = 3600.0
+      integer :: ioutput   = 1
+      integer :: iclobber  = 0
+      integer :: icompress = 0
+      integer :: iquiet    = 0
+      real    :: frqstate  = 3600.0
 
       character(pathlen) :: gridfile  = 'sfcfile/gridfile_0'
       character(pathlen) :: hfilin    = ''
@@ -291,8 +291,10 @@ Module oname_coms
       real    :: stemlength = 3.0e3
       integer :: plttype    = 0
       integer :: pltorient  = 0
-      character(pathlen) :: pltname = 'gmeta'
       integer :: vec_maxmrl = maxgrds
+
+      character(pathlen) :: pltname     = 'gmeta'
+      character(10)      :: prtval_size = 'medium'
 
 !!    THE LIST OF FILES TO PLOT FROM
 

@@ -161,6 +161,8 @@ end subroutine shdf5_info
 subroutine shdf5_orec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
                                          ,ivars,rvars,cvars,dvars,lvars)
 
+use oname_coms, only: nl
+
 #ifdef OLAM_HDF5_FORTRAN
 use hdf5_f2f
 #endif
@@ -210,7 +212,7 @@ endif
 dimsh(1:ndims) = dims(1:ndims)
      
 ! Prepare memory and options for the write
-call fh5_prepare_write(ndims, dimsh, hdferr)
+call fh5_prepare_write(ndims, dimsh, hdferr, nl%icompress)
 if (hdferr /= 0) then
    print*,'shdf5_orec: can''t prepare requested field:',trim(dsetname)
    return
@@ -259,7 +261,8 @@ end subroutine
 !===============================================================================
 
 subroutine shdf5_irec(ndims,dims,dsetname,ivara,rvara,cvara,dvara,lvara  &
-                                         ,ivars,rvars,cvars,dvars,lvars)
+                                         ,ivars,rvars,cvars,dvars,lvars  &
+                                         ,points)
 
 #ifdef OLAM_HDF5_FORTRAN
 use hdf5_f2f
@@ -267,9 +270,9 @@ use hdf5_f2f
         
 implicit none
 
-character(len=*) :: dsetname ! Dataset name
-integer :: ndims             ! Number of dimensions or rank
-integer, dimension(*) :: dims ! Dataset dimensions.
+character(len=*), intent(IN) :: dsetname  ! Dataset name
+integer, intent(IN) :: ndims              ! Number of dimensions or rank
+integer, dimension(*), intent(IN) :: dims ! Dataset dimensions.
 
 ! Array and scalar arguments for different types. Only specify one in each call.
 integer,          optional :: ivara(*),ivars
@@ -277,6 +280,8 @@ real,             optional :: rvara(*),rvars
 character,        optional :: cvara(*),cvars
 real(kind=8),     optional :: dvara(*),dvars
 logical,          optional :: lvara(*),lvars
+
+integer, intent(IN), optional :: points(:)   !  Array of points to be read
 
 integer:: h5_type   ! Local type designator
 
@@ -311,10 +316,10 @@ if (ndims <=0 .or. minval(dims(1:ndims)) <=0) then
 endif
 
 dimsh(1:ndims) = dims(1:ndims)
-!print*,'-----:',trim(dsetname)
+!print*,'-----:',trim(dsetname),dims(1:ndims)
     
 ! Prepare file and memory space for the read
-call fh5_prepare_read(trim(dsetname)//char(0), ndims, dimsh, hdferr)
+call fh5_prepare_read(trim(dsetname)//char(0), ndims, dimsh, hdferr, coords=points)
 if (hdferr < 0) then
    print*,'shdf5_irec: can''t prepare requested field:',trim(dsetname)
    return
@@ -351,6 +356,9 @@ endif
 
 if (hdferr /= 0) then
    print*,'shdf5_irec: call fh5d_read: hdf5 error =',hdferr
+   print*,'Error reading ', trim(dsetname)
+   print*,'ndims = ', ndims
+   print*,'dims  = ', dims(1:ndims)
    stop
 endif
 
