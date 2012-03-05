@@ -35,6 +35,10 @@ INCLUDES += $(F_DEFINE_FLAG)OLAM_RASTRO
 #INCLUDES = $(INCLUDES) $(F+DEFINE_FLAG)OLAM_RASTRO
 endif
 
+ifdef DAMARIS
+INCLUDES += $(DAMARIS_INC)
+endif
+
 # Define archive and executable names.
 
 BASE=olam
@@ -84,7 +88,11 @@ MPIF_OBJ = $(notdir $(MPIF:.F90=.o))
 $(EXE): $(ARC) $(MPIF) $(MAIN) FORCE
 	@echo ""
 	$(LOADER) -o $(EXE) $(MAIN_OBJ) $(MPIF_OBJ) $(LOADER_OPTS) $(ARC) \
-	    $(LIBNCARG) $(PAR_LIBS) $(LIBS) $(HDF5_LIBS) $(NETCDF_LIBS) $(RASTRO_LIBS) $(OMP)
+	    $(LIBNCARG) $(PAR_LIBS) $(LIBS) \
+	    $(HDF5_LIBS) $(NETCDF_LIBS) \
+	    $(RASTRO_LIBS) \
+	    $(DAMARIS_LIBS) $(DAMARIS_MODE) \
+	    $(OMP)
 	rm -f *.o
 	@echo ""
 	@echo Finished building === $(EXE)

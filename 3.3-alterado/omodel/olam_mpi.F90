@@ -52,12 +52,30 @@ implicit none
 
 include 'mpif.h'
 integer :: ierr
+#ifdef DAMARIS
+  integer :: new_myrank,new_mygroupsize,new_comm
+  integer :: df_start_result, is_client, config_size
+#endif
+
 
 ! Initialize MPI and determine process groupsize and myrank
 
 call MPI_Init(ierr)
 call MPI_Comm_size(MPI_COMM_WORLD,mgroupsize,ierr)
 call MPI_Comm_rank(MPI_COMM_WORLD,myrank,ierr)
+
+#ifdef DAMARIS
+#warning "ENABLE DAMARIS!!!"
+  call df_start_mpi_entity("config.xml",new_comm,new_myrank, new_mygroupsize, df_start_result)
+
+
+  print *, "Damaris Init: result=",df_start_result, "new rank=", new_myrank, "new size=", new_mygroupsize
+
+#else
+#warning "Disabled Damaris!!!"
+#endif
+
+
 
 ! Allocate send and recv tables
 

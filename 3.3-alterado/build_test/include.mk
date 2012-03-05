@@ -37,6 +37,18 @@
 #ARCHIVE=ar rs
 
 
+DAMARIS=yes
+
+ifdef DAMARIS
+
+DAMARIS_DIR=/home/rkassick/Work/damaris-intel
+DAMARIS_LIBS=-Xlinker --start-group $(DAMARIS_DIR)/lib/libdamaris.a $(DAMARIS_DIR)/lib/libdamaris-server.a -Xlinker --end-group -lboost_filesystem -lboost_system -lboost_program_options -lxerces-c -lrt -ldl
+DAMARIS_INC=-I$(DAMARIS_DIR)/include $(F_DEFINE_FLAG)DAMARIS
+DAMARIS_MOD=
+#$(DAMARIS_DIR)/lib/damaris.mod
+
+endif
+
 #-----------------  LINUX Intel Fortran ifort/gcc ---------------
 CMACH=PC_LINUX1
 F_COMP=ifort
