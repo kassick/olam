@@ -202,8 +202,9 @@ subroutine read_offline_met_init()
   integer :: y2
   integer :: year_use_2
 
+#ifdef OLAM_RASTRO
 call rst_event_s_f(OLAM_READ_OFFLINE_MET_INIT_IN," ")
-
+#endif
   ! If we need to recycle over years, find the appropriate year to apply.
   year_use = current_time%year
   ncyc = metcyc2 - metcyc1 + 1
@@ -297,7 +298,9 @@ call rst_event_s_f(OLAM_READ_OFFLINE_MET_INIT_IN," ")
      call shdf5_close()
 
   enddo
+#ifdef OLAM_RASTRO
 call rst_event_s_f(OLAM_READ_OFFLINE_MET_INIT_OUT," ")
+#endif
 
   return
 end subroutine read_offline_met_init

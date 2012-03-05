@@ -23,11 +23,16 @@
 #C_COMP=icc
 #C_OPTS=-O0 -DUNDERSCORE -DLITTLE
 
+#DAMARIS=yes
+ifdef DAMARIS
+
 DAMARIS_DIR=/home/rkassick/Work/damaris-intel
 DAMARIS_LIBS=-Xlinker --start-group $(DAMARIS_DIR)/lib/libdamaris.a $(DAMARIS_DIR)/lib/libdamaris-server.a -Xlinker --end-group -lboost_filesystem -lboost_system -lboost_program_options -lxerces-c -lrt -ldl
-DAMARIS_INC=-I$(DAMARIS_DIR)/include
+DAMARIS_INC=-I$(DAMARIS_DIR)/include $(F_DEFINE_FLAG)DAMARIS
 DAMARIS_MOD=    
 #$(DAMARIS_DIR)/lib/damaris.mod
+
+endif
 
 
 NCARG_DIR=/home/rkassick/Work/ncarg/lib/
@@ -50,8 +55,8 @@ NETCDF_LIBS=-L$(NETCDF_DIR)/lib -lnetcdf
 
 NETCDF_INCS=-I$(NETCDF_DIR)/include
 
-LOADER=$(F_COMP)
-LOADER_OPTS=$(F_OPTS)
+#LOADER=$(F_COMP)
+#LOADER_OPTS=$(F_OPTS)
 LIBS=
 
 
@@ -65,7 +70,8 @@ PAR_LIBS=-L$(MPI_PATH)/lib
 OLAM_MPI=yes
 #
 ## OPTIMIZED:
-F_OPTS=-xHost -O3 -fno-alias -ip -traceback
+F_OPTS=-fpp -xW -O3 -fno-alias -prec-div -free -traceback -debug extended -g
+#F_OPTS=-xHost -O0 -fno-alias -ip -traceback -openmp -debug extended -g
 #F_OPTS=-O3
 #F_OPTS=-g -O3 -xHost -traceback
 #

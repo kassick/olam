@@ -8,6 +8,12 @@ MPIF = $(OMODEL)/olam_mpi.F90 \
        $(OMODEL)/olam_mpi_sea.F90 \
        $(OMODEL)/olam_mpi_land.F90
 
+
+ifdef OLAM_RASTRO
+  RASTRO_SOURCES=$(ARC)($(OUTILS)/rastro.o) \
+		 $(ARC)($(OUTILS)/rastro_f.o)
+endif
+
 # Define objects.
 
 OBJ = $(ARC)($(MODEL_MODS)/max_dims.o) \
@@ -16,8 +22,7 @@ OBJ = $(ARC)($(MODEL_MODS)/max_dims.o) \
       $(ARC)($(MODEL_MODS)/mem_para.o) \
       $(ARC)($(MODEL_MODS)/plotcolors.o) \
       $(ARC)($(OUTILS)/hdf5_utils.o) \
-      $(ARC)($(OUTILS)/rastro.o) \
-      $(ARC)($(OUTILS)/rastro_f.o) \
+      $(RASTRO_SOURCES) \
       $(ARC)($(MODEL_MODS)/micro_coms.o) \
       $(ARC)($(MODEL_MODS)/oplot_coms.o) \
       $(ARC)($(OISAN)/isan_coms.o) \

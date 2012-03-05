@@ -42,6 +42,7 @@ use misc_coms, only: io6, iparallel
 use mem_para,  only: myrank, mgroupsize
 use rastro_evts
 use ifport, only: hostnm,hostnam
+use hdf5_utils, only: shdf5_utils_init, shdf5_force_close
 
 implicit none
 
@@ -68,11 +69,13 @@ integer hn_status
 
 call olam_mpi_init()
 
+#ifdef OLAM_RASTRO
 rastro_id=10
 call rst_init_f(myrank,rastro_id)
 
 hn_status = hostnm(hostname)
 call rst_event_s_f(OLAM_INIT,trim(hostname) // CHAR(0))
+#endif
 
 iparallel = 0
 if (mgroupsize > 1) iparallel = 1
@@ -155,8 +158,10 @@ if (iparallel == 1) then
    close(io6)
 endif
 
+#ifdef OLAM_RASTRO
 call rst_event_s_f(MPI_FINALIZE_OUT,trim(hostname)//CHAR(0))
 
 call rst_finalize_f()
+#endif
 stop 'olam_end'
 end program main

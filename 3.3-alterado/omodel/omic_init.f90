@@ -73,9 +73,9 @@ call rst_event_s_f(OLAM_MICINIT_IN,rst_buf)
 call micinit_gam()
 
 if (level < 3) then
-  #ifdef OLAM_RASTRO
+#ifdef OLAM_RASTRO
   call rst_event_s_f(OLAM_MICINIT_OUT,rst_buf)
-  #endif
+#endif
   return
 endif
 

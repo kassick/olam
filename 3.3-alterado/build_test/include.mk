@@ -46,10 +46,10 @@ F_COMP=ifort
 #PAR_INCS=-I/usr/include/mpich2/
 PAR_INCS=-I/usr/lib/openmpi/include
 #PAR_LIBS=-L/usr/lib/mpich/lib/shared/ -lmpich
-PAR_LIBS=-lmpi_f90
-#PAR_LIBS=-lmpich
+#PAR_LIBS=-lmpi_f90
+PAR_LIBS=-lmpichf90 -lgfortran
 OLAM_MPI=yes
-OLAM_RASTRO=yes
+#OLAM_RASTRO=no
 
 # OPTIMIZED:
 F_OPTS=-fpp -xW -O3 -fno-alias -prec-div -free -traceback
@@ -73,13 +73,19 @@ LIBNCARG=-L$(NCARG_DIR) -lncarg -lncarg_gks -lncarg_c \
 #HDF5_LIBS=-L/usr/local/lib64 -lhdf5 -lz -lm -lgfortran
 #HDF5_INCS=-I/usr/local/include
 
-HDF5_LIBS=-L/usr/lib -lhdf5 -lz -lm #/usr/lib/libgfortran.so.3
-HDF5_INCS=
+HDF5_DIR=/home/rkassick/Work/hdf5-serial-intel/
+#HDF5_LIBS=-L$(HDF5_DIR)/lib -lhdf5 -lz -lm #/usr/lib/libgfortran.so.3 -- this was for hdf5 bundled with debian
+HDF5_LIBS=-L$(HDF5_DIR)/lib 		  \
+      -lhdf5_fortran -lhdf5		  \
+      -lhdf5_hl -lhdf5hl_fortran	  \
+      -lz -lm
+HDF5_INCS=-I$(HDF5_DIR)/include
 
 #NETCDF_LIBS=-L/usr/local/lib64 -lnetcdf
 #NETCDF_INCS=-I/usr/local/include
-NETCDF_LIBS=-lnetcdf
-NETCDF_INCS=
+NETCDF_DIR=/home/rkassick/Work/netcdf-serial-intel
+NETCDF_LIBS=-L$(NETCDF_DIR)/lib -lnetcdf
+NETCDF_INCS=-I$(NETCDF_DIR)/include
 
 OMPI_MPIFC=ifort
 LOADER=mpif90
@@ -91,9 +97,11 @@ ARCHIVE=ar rs
 
 OMP=-openmp
 
-RASTRO_LIBS=-L/home/rkassick/Work/rastro/lib -lRastro
-RASTRO_INCS=-I/home/rkassick/Work/rastro/include
-RASTRO_GEN=/home/rkassick/Work/rastro/bin/rastro_generate
+ifdef OLAM_RASTRO
+  RASTRO_LIBS=-L/home/rkassick/Work/rastro/lib -lRastro
+  RASTRO_INCS=-I/home/rkassick/Work/rastro/include
+  RASTRO_GEN=/home/rkassick/Work/rastro/bin/rastro_generate
+endif
 
 
 #----------------- IBM xlf/xlc ---------------------------------

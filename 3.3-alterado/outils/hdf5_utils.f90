@@ -57,6 +57,52 @@ file_opened = 0
 end subroutine
 
 
+!===================================================
+
+subroutine shdf5_force_close()
+
+use misc_coms, only: io6, iparallel
+use mem_para,  only: myrank, mgroupsize
+use rastro_evts
+use omp_lib
+
+implicit none
+
+integer :: hdferr  ! Error flags
+real, external :: walltime
+integer :: thread_id
+!integer :: OMP_GET_THREAD_NUM
+
+thread_id = 0
+
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
+#endif
+
+! Close RAMS hdf file.
+
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_HDF5_CLOSE_IN,myrank, thread_id)
+#endif
+
+if (file_opened == 0) then
+  stop 'file not opened!'
+endif
+call fh5f_close(hdferr)
+
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_HDF5_CLOSE_OUT,myrank, thread_id)
+#endif
+
+
+#ifdef OLAM_RASTRO
+call rst_event_ii_f(OLAM_SHDF5_CLOSE_OUT,myrank, thread_id)
+#endif
+
+file_opened = 0
+
+return
+end  subroutine
 
 
 
@@ -86,15 +132,14 @@ integer :: thread_id
 thread_id = 0
 
 
-if (file_opened == 1)
+if (file_opened == 1) then
   call shdf5_force_close()
 endif
 
 
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN,
-      myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
 
@@ -117,15 +162,13 @@ if (access(1:1) == 'R') then
     if (caccess == 'R ') iaccess = 1
     if (caccess == 'RW') iaccess = 2
 #ifdef OLAM_RASTRO
-    call rst_event_iiss_f(OLAM_HDF5_OPEN_IN,
-          myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_OPEN_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
     call fh5f_open(trim(locfn)//char(0), iaccess, hdferr)
      
 #ifdef OLAM_RASTRO
-    call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT,
-          myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_OPEN_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
  
     if (hdferr < 0) then
@@ -145,8 +188,7 @@ elseif (access(1:1) == 'W') then
     iaccess=2
     
 #ifdef OLAM_RASTRO
-    call rst_event_iiss_f(OLAM_HDF5_CREATE_IN,
-          myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+    call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
     call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
@@ -172,15 +214,13 @@ elseif (access(1:1) == 'W') then
       iaccess=1
 
 #ifdef OLAM_RASTRO
-      call rst_event_iiss_f(OLAM_HDF5_CREATE_IN,
-            myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+      call rst_event_iiss_f(OLAM_HDF5_CREATE_IN, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
       call fh5f_create(trim(locfn)//char(0), iaccess, hdferr)
 
 #ifdef OLAM_RASTRO
-      call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT,
-            myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+      call rst_event_iiss_f(OLAM_HDF5_CREATE_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
     endif
   endif
@@ -197,8 +237,7 @@ elseif (access(1:1) == 'W') then
 endif
 
 #ifdef OLAM_RASTRO
-call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT,
-  myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
+call rst_event_iiss_f(OLAM_SHDF5_OPEN_OUT, myrank, thread_id, trim(locfn)//CHAR(0),trim(access)//CHAR(0))
 #endif
 
 return
@@ -607,52 +646,6 @@ integer :: thread_id
 return
 end  subroutine
 
-!===================================================
-
-subroutine shdf5_force_close()
-
-use misc_coms, only: io6, iparallel
-use mem_para,  only: myrank, mgroupsize
-use rastro_evts
-use omp_lib
-
-implicit none
-
-integer :: hdferr  ! Error flags
-real, external :: walltime
-integer :: thread_id
-!integer :: OMP_GET_THREAD_NUM
-
-thread_id = 0
-
-#ifdef OLAM_RASTRO
-call rst_event_ii_f(OLAM_SHDF5_CLOSE_IN,myrank, thread_id)
-#endif
-
-! Close RAMS hdf file.
-
-#ifdef OLAM_RASTRO
-call rst_event_ii_f(OLAM_HDF5_CLOSE_IN,myrank, thread_id)
-#endif
-
-if (file_opened == 0)
-  stop 'file not opened!'
-endif
-call fh5f_close(hdferr)
-
-#ifdef OLAM_RASTRO
-call rst_event_ii_f(OLAM_HDF5_CLOSE_OUT,myrank, thread_id)
-#endif
-
-
-#ifdef OLAM_RASTRO
-call rst_event_ii_f(OLAM_SHDF5_CLOSE_OUT,myrank, thread_id)
-#endif
-
-file_opened = 0
-
-return
-end  subroutine
 
 !===============================================================================
 

@@ -23,6 +23,7 @@
 
    NL%TIMEUNIT = 's'      ! Time units of TIMMAX: 's','m','h','d'
    NL%TIMMAX   = 86400.    ! Ending time of this model run
+!   NL%TIMMAX   = 21600.    ! Ending time of this model run
  
 !--------------------------------------------------------------------------
 ! Start of simulation or ISAN processing (when model time counter TIME8 = 0.)

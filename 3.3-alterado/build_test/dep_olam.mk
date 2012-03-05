@@ -1,5 +1,12 @@
 #Makefile include dep_olam.mk
 
+
+ifdef OLAM_RASTRO
+  RASTRO_SOURCES=$(ARC)($(OUTILS)/rastro.o) \
+		 $(ARC)($(OUTILS)/rastro_f.o)
+endif
+
+
 $(ARC)($(MODEL_MODS)/mem_rayf.o): \
 		     $(ARC)($(MODEL_MODS)/rastro_evts.o)
 
@@ -407,8 +414,7 @@ $(ARC)($(OMODEL)/para_init.o): \
 
 $(ARC)($(OUTILS)/hdf5_utils.o): \
 		    $(ARC)($(MODEL_MODS)/rastro_evts.o)\
-		    $(ARC)($(OUTILS)/rastro.o) \
-		    $(ARC)($(OUTILS)/rastro_f.o)
+		    $(RASTRO_SOURCES)
 
 $(ARC)($(OMODEL)/ocio.o): \
                      $(ARC)($(MODEL_MODS)/misc_coms.o)  \
