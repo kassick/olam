@@ -36,6 +36,12 @@
 ! the software authors, Robert L. Walko (robert.walko@duke.edu)
 ! or Roni Avissar (avissar@duke.edu).
 !===============================================================================
+
+#ifndef OLAM_COMM_WORLD
+#define OLAM_COMM_WORLD MPI_COMM_WORLD
+#endif
+
+
 subroutine olam_alloc_mpi_sea(mrls)
 
 use mem_sea,    only: jtab_ws_mpi
@@ -76,8 +82,8 @@ call rst_event_i_f(OLAM_O_ALLOC_MPI_SEA_IN,mrls)
 
 ! allocate send buffers
 
-call MPI_Pack_size(1,MPI_INTEGER,MPI_COMM_WORLD,nbytes_int  ,ierr)
-call MPI_Pack_size(1,MPI_REAL   ,MPI_COMM_WORLD,nbytes_real ,ierr)
+call MPI_Pack_size(1,MPI_INTEGER,OLAM_COMM_WORLD,nbytes_int  ,ierr)
+call MPI_Pack_size(1,MPI_REAL   ,OLAM_COMM_WORLD,nbytes_real ,ierr)
 
 ! Determine number of bytes to send per IWS column
 
@@ -104,7 +110,7 @@ do jsend = 1,nsends_ws(1)
 ! Send buffer sizes to receive ranks
 
    call MPI_Send(send_ws(jsend)%nbytes,1,MPI_INTEGER  &
-                ,send_ws(jsend)%iremote,itag310,MPI_COMM_WORLD,ierr)
+                ,send_ws(jsend)%iremote,itag310,OLAM_COMM_WORLD,ierr)
 
 ! Loop over all mrl values greater than 1
 
@@ -113,7 +119,7 @@ do jsend = 1,nsends_ws(1)
 ! Send jtab_ws_mpi(2+jsend)%jend(mrl) to receive ranks
 
       call MPI_Send(jtab_ws_mpi(2+jsend)%jend(mrl),1,MPI_INTEGER  &
-                   ,send_ws(jsend)%iremote,itag310+mrl,MPI_COMM_WORLD,ierr)
+                   ,send_ws(jsend)%iremote,itag310+mrl,OLAM_COMM_WORLD,ierr)
 
 ! If at least 1 WS point needs to be sent to current remote rank for 
 ! current mrl, increase nsends_ws(mrl) by 1.
@@ -149,7 +155,7 @@ do jsend = 1,nsends_wsf(1)
 ! Send buffer sizes to receive ranks
 
    call MPI_Send(send_wsf(jsend)%nbytes,1,MPI_INTEGER  &
-                ,send_wsf(jsend)%iremote,itag350,MPI_COMM_WORLD,ierr)
+                ,send_wsf(jsend)%iremote,itag350,OLAM_COMM_WORLD,ierr)
 
 ! Loop over all mrl values greater than 1
 
@@ -158,7 +164,7 @@ do jsend = 1,nsends_wsf(1)
 ! Send jseaflux(2+jsend)%jend(mrl) to receive ranks
 
       call MPI_Send(jseaflux(2+jsend)%jend(mrl),1,MPI_INTEGER  &
-                   ,send_wsf(jsend)%iremote,itag350+mrl,MPI_COMM_WORLD,ierr)
+                   ,send_wsf(jsend)%iremote,itag350+mrl,OLAM_COMM_WORLD,ierr)
 
 ! If at least 1 WSF point needs to be sent to current remote rank for 
 ! current mrl, increase nsends_wsf(mrl) by 1.
@@ -176,7 +182,7 @@ do jrecv = 1,nrecvs_ws(1)
 ! Get recv_ws buffer sizes for mrl = 1
 
    call MPI_Recv(recv_ws(jrecv)%nbytes,1,MPI_INTEGER  &
-                ,recv_ws(jrecv)%iremote,itag310,MPI_COMM_WORLD,status,ierr)
+                ,recv_ws(jrecv)%iremote,itag310,OLAM_COMM_WORLD,status,ierr)
 
 ! Allocate recv_ws buffers
 
@@ -193,7 +199,7 @@ do jrecv = 1,nrecvs_ws(1)
 ! Get number of receive points for this mrl and this receive rank
 
       call MPI_Recv(nwspts,1,MPI_INTEGER  &
-                   ,recv_ws(jrecv)%iremote,itag310+mrl,MPI_COMM_WORLD,status,ierr)
+                   ,recv_ws(jrecv)%iremote,itag310+mrl,OLAM_COMM_WORLD,status,ierr)
 
 ! If at least 1 WS point needs to be received from current remote rank for 
 ! current mrl, increase nrecvs_ws(mrl) by 1.
@@ -211,7 +217,7 @@ do jrecv = 1,nrecvs_wsf(1)
 ! Get recv_wsf buffer sizes for mrl = 1
 
    call MPI_Recv(recv_wsf(jrecv)%nbytes,1,MPI_INTEGER  &
-                ,recv_wsf(jrecv)%iremote,itag350,MPI_COMM_WORLD,status,ierr)
+                ,recv_wsf(jrecv)%iremote,itag350,OLAM_COMM_WORLD,status,ierr)
 
 ! Allocate recv_wsf buffers
 
@@ -228,7 +234,7 @@ do jrecv = 1,nrecvs_wsf(1)
 ! Get number of receive points for this mrl and this receive rank
 
       call MPI_Recv(nwsfpts,1,MPI_INTEGER  &
-                   ,recv_wsf(jrecv)%iremote,itag350+mrl,MPI_COMM_WORLD,status,ierr)
+                   ,recv_wsf(jrecv)%iremote,itag350+mrl,OLAM_COMM_WORLD,status,ierr)
 
 ! If at least 1 WSF point needs to be received from current remote rank for 
 ! current mrl, increase nrecvs_wsf(mrl) by 1.
@@ -278,7 +284,7 @@ integer :: iwsglobe
 do jrecv = 1,nrecvs_ws(1)
 
    call MPI_Irecv(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,MPI_PACKED,  &
-                  recv_ws(jrecv)%iremote,itag6,MPI_COMM_WORLD,          &
+                  recv_ws(jrecv)%iremote,itag6,OLAM_COMM_WORLD,          &
                   recv_ws(jrecv)%irequest,ierr                          )
 
 enddo
@@ -290,7 +296,7 @@ do jsend = 1,nsends_ws(1)
    ipos = 0
 
    call MPI_Pack(jtab_ws_mpi(jsend)%jend(1),1,MPI_INTEGER,  &
-      send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+      send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
@@ -301,32 +307,32 @@ do jsend = 1,nsends_ws(1)
       call qsub('WS',iws)
 
       call MPI_Pack(iwsglobe,1,MPI_INTEGER,  &
-         send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       if (sendgroup == 'A' .or. sendgroup == 'T') then
 
          call MPI_Pack(sea%rough(iws),1,MPI_INTEGER,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(sea%can_temp(iws),1,MPI_REAL,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(sea%can_shv(iws),1,MPI_REAL,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'R') then
 
          call MPI_Pack(sea%rlongup(iws),1,MPI_INTEGER,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(sea%rlong_albedo(iws),1,MPI_INTEGER,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(sea%albedo_beam(iws),1,MPI_INTEGER,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(sea%albedo_diffuse(iws),1,MPI_INTEGER,  &
-            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_ws(jsend)%buff,send_ws(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       endif
 
@@ -334,7 +340,7 @@ do jsend = 1,nsends_ws(1)
    call rsub('WSsend',jsend)
 
    call MPI_Isend(send_ws(jsend)%buff,ipos,MPI_PACKED,        &
-                  send_ws(jsend)%iremote,itag6,MPI_COMM_WORLD,  &
+                  send_ws(jsend)%iremote,itag6,OLAM_COMM_WORLD,  &
                   send_ws(jsend)%irequest,ierr                  )
 
 enddo
@@ -379,7 +385,7 @@ if (mrl < 1) return
 do jrecv = 1,nrecvs_wsf(mrl)
 
    call MPI_Irecv(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,MPI_PACKED,  &
-                  recv_wsf(jrecv)%iremote,itag7,MPI_COMM_WORLD,          &
+                  recv_wsf(jrecv)%iremote,itag7,OLAM_COMM_WORLD,          &
                   recv_wsf(jrecv)%irequest,ierr                          )
 
 enddo
@@ -391,7 +397,7 @@ do jsend = 1,nsends_wsf(mrl)
    ipos = 0
 
    call MPI_Pack(jseaflux(2+jsend)%jend(mrl),1,MPI_INTEGER,  &
-      send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+      send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
@@ -402,7 +408,7 @@ do jsend = 1,nsends_wsf(mrl)
       call qsub('WSF',isf)
 
       call MPI_Pack(isfglobe,1,MPI_INTEGER,  &
-         send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       if (sendgroup == 'A') then ! for initialization
 
@@ -411,7 +417,7 @@ do jsend = 1,nsends_wsf(mrl)
          rscr(3) = seaflux(isf)%airshv
 
          call MPI_Pack(rscr,3,MPI_REAL,  &
-         send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'T') then ! for turbulent fluxes
 
@@ -421,7 +427,7 @@ do jsend = 1,nsends_wsf(mrl)
          rscr(4) = seaflux(isf)%ustar
 
          call MPI_Pack(rscr,4,MPI_REAL,  &
-            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'C') then ! for cuparm fluxes
 
@@ -430,7 +436,7 @@ do jsend = 1,nsends_wsf(mrl)
          rscr(3) = seaflux(isf)%dpcpg
 
          call MPI_Pack(rscr,3,MPI_REAL,  &
-            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'M') then ! for microphysics precip fluxes
 
@@ -439,7 +445,7 @@ do jsend = 1,nsends_wsf(mrl)
          rscr(3) = seaflux(isf)%dpcpg
 
          call MPI_Pack(rscr,3,MPI_REAL,  &
-            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'R') then ! for radiative fluxes
 
@@ -448,7 +454,7 @@ do jsend = 1,nsends_wsf(mrl)
          rscr(3) = seaflux(isf)%rshort_diffuse
 
          call MPI_Pack(rscr,3,MPI_REAL,  &
-            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_wsf(jsend)%buff,send_wsf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       endif
 
@@ -456,7 +462,7 @@ do jsend = 1,nsends_wsf(mrl)
    call rsub('WSFsend',jsend)
 
    call MPI_Isend(send_wsf(jsend)%buff,ipos,MPI_PACKED,        &
-                  send_wsf(jsend)%iremote,itag7,MPI_COMM_WORLD,  &
+                  send_wsf(jsend)%iremote,itag7,OLAM_COMM_WORLD,  &
                   send_wsf(jsend)%irequest,ierr                  )
 
 enddo
@@ -505,13 +511,13 @@ do jtmp = 1,nrecvs_ws(1)
    ipos = 0
 
    call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-      nwspts,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+      nwspts,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
    do j = 1,nwspts
       call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-         iwsglobe,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+         iwsglobe,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
       iws = itabg_ws(iwsglobe)%iws_myrank
 !----------------------------------------------------------------
@@ -520,27 +526,27 @@ do jtmp = 1,nrecvs_ws(1)
       if (recvgroup == 'A' .or. recvgroup == 'T') then
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%rough(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%rough(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%can_temp(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%can_temp(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%can_shv(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%can_shv(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       elseif (recvgroup == 'R') then
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%rlongup(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%rlongup(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%rlong_albedo(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%rlong_albedo(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%albedo_beam(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%albedo_beam(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_ws(jrecv)%buff,recv_ws(jrecv)%nbytes,ipos,  &
-            sea%albedo_diffuse(iws),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            sea%albedo_diffuse(iws),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       endif
 
@@ -600,13 +606,13 @@ do jtmp = 1,nrecvs_wsf(mrl)
    ipos = 0
 
    call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-      nwsfpts,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+      nwsfpts,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
    do j = 1,nwsfpts
       call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-         isfglobe,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+         isfglobe,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
       isf = seafluxg(isfglobe)%isf_myrank
 !----------------------------------------------------------------
@@ -615,7 +621,7 @@ do jtmp = 1,nrecvs_wsf(mrl)
       if (recvgroup == 'A') then ! for initialization
 
          call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-            rscr,3,MPI_REAL,MPI_COMM_WORLD,ierr)
+            rscr,3,MPI_REAL,OLAM_COMM_WORLD,ierr)
          
          seaflux(isf)%rhos    = rscr(1)
          seaflux(isf)%airtemp = rscr(2)
@@ -624,7 +630,7 @@ do jtmp = 1,nrecvs_wsf(mrl)
       elseif (recvgroup == 'T') then ! for turbulent fluxes
 
          call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-            rscr,4,MPI_REAL,MPI_COMM_WORLD,ierr)
+            rscr,4,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          seaflux(isf)%rhos    = rscr(1)
          seaflux(isf)%sxfer_t = rscr(2)
@@ -634,7 +640,7 @@ do jtmp = 1,nrecvs_wsf(mrl)
       elseif (recvgroup == 'C') then ! for cuparm fluxes
 
          call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-            rscr,3,MPI_REAL,MPI_COMM_WORLD,ierr)
+            rscr,3,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          seaflux(isf)%pcpg  = rscr(1)
          seaflux(isf)%qpcpg = rscr(2)
@@ -643,7 +649,7 @@ do jtmp = 1,nrecvs_wsf(mrl)
       elseif (recvgroup == 'M') then ! for microphysics precip fluxes
 
          call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-            rscr,3,MPI_REAL,MPI_COMM_WORLD,ierr)
+            rscr,3,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          seaflux(isf)%pcpg  = rscr(1)
          seaflux(isf)%qpcpg = rscr(2)
@@ -652,7 +658,7 @@ do jtmp = 1,nrecvs_wsf(mrl)
       elseif (recvgroup == 'R') then ! for radiative fluxes
 
          call MPI_Unpack(recv_wsf(jrecv)%buff,recv_wsf(jrecv)%nbytes,ipos,  &
-            rscr,3,MPI_REAL,MPI_COMM_WORLD,ierr)
+            rscr,3,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          seaflux(isf)%rlong          = rscr(1)
          seaflux(isf)%rshort         = rscr(2)

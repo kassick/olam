@@ -36,6 +36,12 @@
 ! the software authors, Robert L. Walko (robert.walko@duke.edu)
 ! or Roni Avissar (avissar@duke.edu).
 !===============================================================================
+
+#ifndef OLAM_COMM_WORLD
+#define OLAM_COMM_WORLD MPI_COMM_WORLD
+#endif
+
+
 subroutine olam_mpi_init()
 
 use mem_para,  only: mgroupsize, myrank,                    &
@@ -61,8 +67,8 @@ integer :: ierr
 ! Initialize MPI and determine process groupsize and myrank
 
 call MPI_Init(ierr)
-call MPI_Comm_size(MPI_COMM_WORLD,mgroupsize,ierr)
-call MPI_Comm_rank(MPI_COMM_WORLD,myrank,ierr)
+call MPI_Comm_size(OLAM_COMM_WORLD,mgroupsize,ierr)
+call MPI_Comm_rank(OLAM_COMM_WORLD,myrank,ierr)
 
 #ifdef DAMARIS
 #warning "ENABLE DAMARIS!!!"
@@ -194,9 +200,9 @@ call rst_event_ii_f(OLAM_O_ALLOC_MPI_IN,mza,mrls)
 
 ! allocate send buffers
 
-call MPI_Pack_size(1,MPI_INTEGER,MPI_COMM_WORLD,nbytes_int  ,ierr)
-call MPI_Pack_size(1,MPI_REAL   ,MPI_COMM_WORLD,nbytes_real ,ierr)
-call MPI_Pack_size(1,MPI_REAL8  ,MPI_COMM_WORLD,nbytes_real8,ierr)
+call MPI_Pack_size(1,MPI_INTEGER,OLAM_COMM_WORLD,nbytes_int  ,ierr)
+call MPI_Pack_size(1,MPI_REAL   ,OLAM_COMM_WORLD,nbytes_real ,ierr)
+call MPI_Pack_size(1,MPI_REAL8  ,OLAM_COMM_WORLD,nbytes_real8,ierr)
 
 ! Determine number of bytes to send per IU column
 
@@ -234,7 +240,7 @@ do jsend = 1,nsends_u(1)
    ibuf(2) = send_uf(jsend)%nbytes
 
    call MPI_Send(ibuf,2,MPI_INTEGER  &
-                ,send_u(jsend)%iremote,itag10,MPI_COMM_WORLD,ierr)
+                ,send_u(jsend)%iremote,itag10,OLAM_COMM_WORLD,ierr)
 
 !----------------------------------------------------------
    write(io6,*) myrank, 'sent u/uf ',send_u(jsend)%iremote, itag10
@@ -247,7 +253,7 @@ do jsend = 1,nsends_u(1)
 ! Send jtab_u(25+jsend)%jend(mrl) to receive ranks
 
       call MPI_Send(jtab_u(25+jsend)%jend(mrl),1,MPI_INTEGER  &
-                   ,send_u(jsend)%iremote,itag10+mrl,MPI_COMM_WORLD,ierr)
+                   ,send_u(jsend)%iremote,itag10+mrl,OLAM_COMM_WORLD,ierr)
 
 
 !----------------------------------------------------------
@@ -289,7 +295,7 @@ do jsend = 1,nsends_w(1)
 ! Send buffer sizes to receive ranks
 
    call MPI_Send(send_w(jsend)%nbytes,1,MPI_INTEGER  &
-                ,send_w(jsend)%iremote,itag110,MPI_COMM_WORLD,ierr)
+                ,send_w(jsend)%iremote,itag110,OLAM_COMM_WORLD,ierr)
 
 
 !----------------------------------------------------------
@@ -303,7 +309,7 @@ do jsend = 1,nsends_w(1)
 ! Send jtab_w(35+jsend)%jend(mrl) to receive ranks
 
       call MPI_Send(jtab_w(35+jsend)%jend(mrl),1,MPI_INTEGER  &
-                   ,send_w(jsend)%iremote,itag110+mrl,MPI_COMM_WORLD,ierr)
+                   ,send_w(jsend)%iremote,itag110+mrl,OLAM_COMM_WORLD,ierr)
 
 
 !----------------------------------------------------------
@@ -331,7 +337,7 @@ do jrecv = 1,nrecvs_u(1)
 !----------------------------------------------------------
 
    call MPI_Recv(ibuf,2,MPI_INTEGER  &
-                ,recv_u(jrecv)%iremote,itag10,MPI_COMM_WORLD,status,ierr)
+                ,recv_u(jrecv)%iremote,itag10,OLAM_COMM_WORLD,status,ierr)
 
 
 !----------------------------------------------------------
@@ -363,7 +369,7 @@ do jrecv = 1,nrecvs_u(1)
 !----------------------------------------------------------
 
       call MPI_Recv(nupts,1,MPI_INTEGER  &
-                   ,recv_u(jrecv)%iremote,itag10+mrl,MPI_COMM_WORLD,status,ierr)
+                   ,recv_u(jrecv)%iremote,itag10+mrl,OLAM_COMM_WORLD,status,ierr)
 
 
 !----------------------------------------------------------
@@ -391,7 +397,7 @@ do jrecv = 1,nrecvs_w(1)
 !----------------------------------------------------------
 
    call MPI_Recv(recv_w(jrecv)%nbytes,1,MPI_INTEGER  &
-                ,recv_w(jrecv)%iremote,itag110,MPI_COMM_WORLD,status,ierr)
+                ,recv_w(jrecv)%iremote,itag110,OLAM_COMM_WORLD,status,ierr)
 
 
 !----------------------------------------------------------
@@ -418,7 +424,7 @@ do jrecv = 1,nrecvs_w(1)
 !----------------------------------------------------------
 
       call MPI_Recv(nwpts,1,MPI_INTEGER  &
-                   ,recv_w(jrecv)%iremote,itag110+mrl,MPI_COMM_WORLD,status,ierr)
+                   ,recv_w(jrecv)%iremote,itag110+mrl,OLAM_COMM_WORLD,status,ierr)
 
 
 !----------------------------------------------------------
@@ -486,7 +492,7 @@ if (mrl < 1) return
 do jrecv = 1,nrecvs_u(mrl)
 
    call MPI_Irecv(recv_u(jrecv)%buff,recv_u(jrecv)%nbytes,MPI_PACKED,  &
-                  recv_u(jrecv)%iremote,itag1,MPI_COMM_WORLD,          &
+                  recv_u(jrecv)%iremote,itag1,OLAM_COMM_WORLD,          &
                   recv_u(jrecv)%irequest,ierr                          )
 
 enddo
@@ -498,7 +504,7 @@ do jsend = 1,nsends_u(mrl)
    ipos = 0
 
    call MPI_Pack(jtab_u(25+jsend)%jend(mrl),1,MPI_INTEGER,  &
-      send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+      send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
@@ -509,19 +515,19 @@ do jsend = 1,nsends_u(mrl)
       call qsub('U',iu)
 
       call MPI_Pack(iuglobe,1,MPI_INTEGER,  &
-         send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       call MPI_Pack(umc(1,iu),mza,MPI_REAL,  &
-         send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       call MPI_Pack(uc(1,iu),mza,MPI_REAL,  &
-         send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_u(jsend)%buff,send_u(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    enddo
    call rsub('Usend',25+jsend)
 
    call MPI_Isend(send_u(jsend)%buff,ipos,MPI_PACKED,          &
-                  send_u(jsend)%iremote,itag1,MPI_COMM_WORLD,  &
+                  send_u(jsend)%iremote,itag1,OLAM_COMM_WORLD,  &
                   send_u(jsend)%irequest,ierr                  )
 
 enddo
@@ -571,7 +577,7 @@ if (mrl < 1) return
 do jrecv = 1,nrecvs_u(mrl)
 
    call MPI_Irecv(recv_uf(jrecv)%buff,recv_uf(jrecv)%nbytes,MPI_PACKED,  &
-                  recv_uf(jrecv)%iremote,itag2,MPI_COMM_WORLD,          &
+                  recv_uf(jrecv)%iremote,itag2,OLAM_COMM_WORLD,          &
                   recv_uf(jrecv)%irequest,ierr                          )
 
 enddo
@@ -583,7 +589,7 @@ do jsend = 1,nsends_u(mrl)
    ipos = 0
 
    call MPI_Pack(jtab_u(25+jsend)%jend(mrl),1,MPI_INTEGER,  &
-      send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+      send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
@@ -594,23 +600,23 @@ do jsend = 1,nsends_u(mrl)
       call qsub('U',iu)
 
       call MPI_Pack(iuglobe,1,MPI_INTEGER,  &
-         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       call MPI_Pack(hcnum_u(1,iu),mza,MPI_REAL,  &
-         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       call MPI_Pack(hcnum_w(1,iu),mza,MPI_REAL,  &
-         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       call MPI_Pack(hflux_t(1,iu),mza,MPI_REAL,  &
-         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_uf(jsend)%buff,send_uf(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    enddo
 
    call rsub('Usendf',25+jsend)
 
    call MPI_Isend(send_uf(jsend)%buff,ipos,MPI_PACKED,          &
-                  send_uf(jsend)%iremote,itag2,MPI_COMM_WORLD,  &
+                  send_uf(jsend)%iremote,itag2,OLAM_COMM_WORLD,  &
                   send_uf(jsend)%irequest,ierr                  )
 
 enddo
@@ -670,7 +676,7 @@ if (mrl < 1) return
 do jrecv = 1,nrecvs_w(mrl)
 
    call MPI_Irecv(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,MPI_PACKED,  &
-                  recv_w(jrecv)%iremote,itag3,MPI_COMM_WORLD,          &
+                  recv_w(jrecv)%iremote,itag3,OLAM_COMM_WORLD,          &
                   recv_w(jrecv)%irequest,ierr                          )
 
 enddo
@@ -682,7 +688,7 @@ do jsend = 1,nsends_w(mrl)
    ipos = 0
 
    call MPI_Pack(jtab_w(35+jsend)%jend(mrl),1,MPI_INTEGER,  &
-      send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+      send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
@@ -693,64 +699,64 @@ do jsend = 1,nsends_w(mrl)
       call qsub('W',iw)
 
       call MPI_Pack(iwglobe,1,MPI_INTEGER,  &
-         send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+         send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       if (sendgroup == 'S') then
 
          do ivar = 1,nvar_par
 
             call MPI_Pack(vtab_par(ivar)%rvar2_p(1,iw),mza,MPI_REAL,  &
-               send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+               send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          enddo
 
       elseif (sendgroup == 'I') then
 
          call MPI_Pack(press(1,iw),mza,MPI_REAL8,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(rho(1,iw),mza,MPI_REAL8,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(wc(1,iw),mza,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(thil(1,iw),mza,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'K') then
 
          call MPI_Pack(hkm(1,iw),mza,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(vkm(1,iw),mza,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(vkm_sfc(iw),1,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'P') then
 
          call MPI_Pack(wmarw(1,iw),mza,MPI_REAL8,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(press(1,iw),mza,MPI_REAL8,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(rho(1,iw),mza,MPI_REAL8,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
       elseif (sendgroup == 'T') then
 
          call MPI_Pack(wc(1,iw),mza,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          call MPI_Pack(thil(1,iw),mza,MPI_REAL,  &
-            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+            send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
 
          if (level == 3) then
             call MPI_Pack(rho(1,iw),mza,MPI_REAL8,  &
-               send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,MPI_COMM_WORLD,ierr)
+               send_w(jsend)%buff,send_w(jsend)%nbytes,ipos,OLAM_COMM_WORLD,ierr)
          endif
  
       endif
@@ -759,7 +765,7 @@ do jsend = 1,nsends_w(mrl)
    call rsub('Wsend',35+jsend)
 
    call MPI_Isend(send_w(jsend)%buff,ipos,MPI_PACKED,          &
-                  send_w(jsend)%iremote,itag3,MPI_COMM_WORLD,  &
+                  send_w(jsend)%iremote,itag3,OLAM_COMM_WORLD,  &
                   send_w(jsend)%irequest,ierr                  )
 
 enddo
@@ -821,23 +827,23 @@ do jtmp = 1,nrecvs_u(mrl)
    ipos = 0
 
    call MPI_Unpack(recv_u(jrecv)%buff,recv_u(jrecv)%nbytes,ipos,  &
-      nupts,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+      nupts,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
    do j = 1,nupts
       call MPI_Unpack(recv_u(jrecv)%buff,recv_u(jrecv)%nbytes,ipos,  &
-         iuglobe,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+         iuglobe,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
       iu = itabg_u(iuglobe)%iu_myrank
 !----------------------------------------------------------------
       call qsub('U',iu)
 
       call MPI_Unpack(recv_u(jrecv)%buff,recv_u(jrecv)%nbytes,ipos,  &
-         umc(1,iu),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+         umc(1,iu),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       call MPI_Unpack(recv_u(jrecv)%buff,recv_u(jrecv)%nbytes,ipos,  &
-         uc(1,iu),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+         uc(1,iu),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
    enddo
    call rsub('Urecv',25+jrecv)
@@ -900,26 +906,26 @@ do jtmp = 1,nrecvs_u(mrl)
    ipos = 0
 
    call MPI_Unpack(recv_uf(jrecv)%buff,recv_uf(jrecv)%nbytes,ipos,  &
-      nupts,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+      nupts,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
    do j = 1,nupts
       call MPI_Unpack(recv_uf(jrecv)%buff,recv_uf(jrecv)%nbytes,ipos,  &
-         iuglobe,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+         iuglobe,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
       iu = itabg_u(iuglobe)%iu_myrank
 !----------------------------------------------------------------
       call qsub('U',iu)
 
       call MPI_Unpack(recv_uf(jrecv)%buff,recv_uf(jrecv)%nbytes,ipos,  &
-         hcnum_u(1,iu),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+         hcnum_u(1,iu),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       call MPI_Unpack(recv_uf(jrecv)%buff,recv_uf(jrecv)%nbytes,ipos,  &
-         hcnum_w(1,iu),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+         hcnum_w(1,iu),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       call MPI_Unpack(recv_uf(jrecv)%buff,recv_uf(jrecv)%nbytes,ipos,  &
-         hflux_t(1,iu),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+         hflux_t(1,iu),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
    enddo
    call rsub('Urecv',25+jrecv)
@@ -992,13 +998,13 @@ do jtmp = 1,nrecvs_w(mrl)
    ipos = 0
 
    call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-      nwpts,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+      nwpts,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
    call psub()
 !----------------------------------------------------------------
    do j = 1,nwpts
       call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-         iwglobe,1,MPI_INTEGER,MPI_COMM_WORLD,ierr)
+         iwglobe,1,MPI_INTEGER,OLAM_COMM_WORLD,ierr)
 
       iw = itabg_w(iwglobe)%iw_myrank
 !----------------------------------------------------------------
@@ -1009,57 +1015,57 @@ do jtmp = 1,nrecvs_w(mrl)
          do ivar = 1,nvar_par
 
             call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-               vtab_par(ivar)%rvar2_p(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+               vtab_par(ivar)%rvar2_p(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          enddo
 
       elseif (recvgroup == 'I') then
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            press(1,iw),mza,MPI_REAL8,MPI_COMM_WORLD,ierr)
+            press(1,iw),mza,MPI_REAL8,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            rho(1,iw),mza,MPI_REAL8,MPI_COMM_WORLD,ierr)
+            rho(1,iw),mza,MPI_REAL8,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            wc(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+            wc(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            thil(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+            thil(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       elseif (recvgroup == 'K') then
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            hkm(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+            hkm(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            vkm(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+            vkm(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            vkm_sfc(iw),1,MPI_REAL,MPI_COMM_WORLD,ierr)
+            vkm_sfc(iw),1,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
       elseif (recvgroup == 'P') then
             
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            wmarw(1,iw),mza,MPI_REAL8,MPI_COMM_WORLD,ierr)
+            wmarw(1,iw),mza,MPI_REAL8,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            press(1,iw),mza,MPI_REAL8,MPI_COMM_WORLD,ierr)
+            press(1,iw),mza,MPI_REAL8,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            rho(1,iw),mza,MPI_REAL8,MPI_COMM_WORLD,ierr)
+            rho(1,iw),mza,MPI_REAL8,OLAM_COMM_WORLD,ierr)
 
       elseif (recvgroup == 'T') then
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            wc(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+            wc(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-            thil(1,iw),mza,MPI_REAL,MPI_COMM_WORLD,ierr)
+            thil(1,iw),mza,MPI_REAL,OLAM_COMM_WORLD,ierr)
 
          if (level == 3) then
             call MPI_Unpack(recv_w(jrecv)%buff,recv_w(jrecv)%nbytes,ipos,  &
-               rho(1,iw),mza,MPI_REAL8,MPI_COMM_WORLD,ierr)
+               rho(1,iw),mza,MPI_REAL8,OLAM_COMM_WORLD,ierr)
          endif
 
       endif
@@ -1093,7 +1099,7 @@ character(*), intent(in) :: message
 #ifdef MPI  
   write(*,'(A,I0,A)') "Node ", myrank, ":"
   write(*,'(A)') "STOP "//message
-  call mpi_abort(MPI_COMM_WORLD,1,ier)
+  call mpi_abort(OLAM_COMM_WORLD,1,ier)
   stop
 #else
   write(*,*) "STOPPING: "//message
