@@ -100,7 +100,9 @@ OBJ = $(ARC)($(MODEL_MODS)/max_dims.o) \
       $(ARC)($(OMODEL)/othrm.o) \
       $(ARC)($(OMODEL)/timestep.o) \
       $(ARC)($(OMODEL)/ocio.o) \
+      $(ARC)($(OMODEL)/ocio_damaris.o) \
       $(ARC)($(OMODEL)/history_write.o) \
+      $(ARC)($(OMODEL)/history_write_damaris.o) \
       $(ARC)($(OMODEL)/history_start.o) \
       $(ARC)($(OMODEL)/scalar_transport.o) \
       $(ARC)($(OMODEL)/surface_fluxes.o) \

@@ -422,6 +422,11 @@ $(ARC)($(OMODEL)/ocio.o): \
                      $(ARC)($(LEAF)/leaf_coms.o)  \
                      $(ARC)($(OUTILS)/hdf5_utils.o)
 
+$(ARC)($(OMODEL)/ocio_damaris.o): \
+                     $(ARC)($(MODEL_MODS)/misc_coms.o)  \
+                     $(ARC)($(MODEL_MODS)/mem_grid.o)  \
+                     $(ARC)($(LEAF)/leaf_coms.o)
+
 $(ARC)($(OMODEL)/analysis_write.o): \
                      $(ARC)($(MODEL_MODS)/var_tables.o)  \
                      $(ARC)($(MODEL_MODS)/misc_coms.o)  \
@@ -429,6 +434,9 @@ $(ARC)($(OMODEL)/analysis_write.o): \
                      $(ARC)($(OUTILS)/hdf5_utils.o)
 
 $(ARC)($(OMODEL)/history_write.o): \
+		     $(ARC)($(MODEL_MODS)/rastro_evts.o)
+
+$(ARC)($(OMODEL)/history_write_damaris.o): \
 		     $(ARC)($(MODEL_MODS)/rastro_evts.o)
 
 $(ARC)($(OMODEL)/history_start.o): \

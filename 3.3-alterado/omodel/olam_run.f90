@@ -402,7 +402,7 @@ if (trim(runtype) /= 'HISTORY') then
   write(io6,'(/,a)') 'CKPT 3'
    write(io6,'(/,a)') 'olam_run calling history_write'
 
-   call history_write('STATE')
+   call history_write('STATE',0)
   write(io6,'(/,a)') 'CKPT 4'
 endif
 
@@ -519,7 +519,7 @@ do while (time8 < timmax8)
       trim(stepc1)//trim(stepc2)//trim(stepc3)//trim(stepc4)//trim(stepc5)
 
 
-   call olam_output
+   call olam_output(mstp)
    
 enddo
 
@@ -639,7 +639,7 @@ end subroutine ed_offline_model
 
 !===========================================================================
 
-subroutine olam_output()
+subroutine olam_output(iteration)
 
 use misc_coms,   only: io6, time8, dtlm, iflag, frqstate, timmax8, initial, &
                        s1900_sim
@@ -653,6 +653,7 @@ use consts_coms, only: r8
 use rastro_evts
 implicit none
 
+integer, intent(in) :: iteration
 integer :: ierr,ifm,ifileok
 real(kind=r8) :: frqplt8
 real, external :: walltime
@@ -676,8 +677,12 @@ endif
 
 if (mod(time8,real(frqstate,r8)) < dtlm(1)  .or.  &
    time8  >=  timmax8 - .01*dtlm(1) .or. iflag == 1) then
-    
+   
+#ifdef DAMARIS_SUPPORT
+    call history_write_damaris('INST', iteration)
+#else
     call history_write('INST')
+#endif
 endif
 
 if (isfcl == 1 .and. iupdsst == 1) then
