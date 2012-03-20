@@ -37,15 +37,13 @@
 ! or Roni Avissar (avissar@duke.edu).
 !===============================================================================
 
-#ifndef OLAM_COMM_WORLD
-#define OLAM_COMM_WORLD MPI_COMM_WORLD
-#endif
 
 subroutine olam_alloc_mpi_land(nzg,nzs,mrls)
 
 use mem_leaf,  only: jtab_wl_mpi
 use mem_para,  only: nsends_wl, nsends_wlf, nrecvs_wl, nrecvs_wlf,  &
-                     send_wl, send_wlf, recv_wl, recv_wlf
+                     send_wl, send_wlf, recv_wl, recv_wlf, &
+		     OLAM_COMM_WORLD
 use mem_sflux, only: landflux, jlandflux
 use misc_coms, only: io6
 use rastro_evts
@@ -264,7 +262,7 @@ subroutine mpi_send_wl(sendgroup)
 
 use leaf_coms,  only: nzg, nzs
 use mem_leaf,   only: land, itab_wl, jtab_wl_mpi
-use mem_para,   only: nrecvs_wl, nsends_wl, send_wl, recv_wl
+use mem_para,   only: nrecvs_wl, nsends_wl, send_wl, recv_wl, OLAM_COMM_WORLD
 use misc_coms,  only: io6
 
 implicit none
@@ -360,7 +358,7 @@ subroutine mpi_send_wlf(sendgroup,mrl)
 ! of field variables
 
 use leaf_coms,  only: nzg, nzs
-use mem_para,   only: nrecvs_wlf, nsends_wlf, send_wlf, recv_wlf
+use mem_para,   only: nrecvs_wlf, nsends_wlf, send_wlf, recv_wlf, OLAM_COMM_WORLD
 use mem_sflux,  only: landflux, jlandflux
 use misc_coms,  only: io6
 
@@ -486,7 +484,7 @@ subroutine mpi_recv_wl(recvgroup)
 
 use leaf_coms, only: nzg, nzs
 use mem_leaf,  only: land, itabg_wl
-use mem_para,  only: nsends_wl, nrecvs_wl, send_wl, recv_wl
+use mem_para,  only: nsends_wl, nrecvs_wl, send_wl, recv_wl, OLAM_COMM_WORLD
 use misc_coms, only: io6
 
 implicit none
@@ -577,7 +575,7 @@ subroutine mpi_recv_wlf(recvgroup,mrl)
 ! of field variables
 
 use leaf_coms, only: nzg, nzs
-use mem_para,  only: nsends_wlf, nrecvs_wlf, send_wlf, recv_wlf
+use mem_para,  only: nsends_wlf, nrecvs_wlf, send_wlf, recv_wlf, OLAM_COMM_WORLD
 use mem_sflux, only: landflux, landfluxg
 use misc_coms, only: io6
 

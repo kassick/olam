@@ -40,6 +40,7 @@ Module mem_para
 
 integer :: mgroupsize
 integer :: myrank
+integer :: OLAM_COMM_WORLD
 
 integer, allocatable :: nsends_u(:)  ! dimensioned to mrls
 integer, allocatable :: nsends_w(:)  ! dimensioned to mrls

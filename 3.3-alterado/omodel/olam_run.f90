@@ -402,7 +402,11 @@ if (trim(runtype) /= 'HISTORY') then
   write(io6,'(/,a)') 'CKPT 3'
    write(io6,'(/,a)') 'olam_run calling history_write'
 
-   call history_write('STATE',0)
+#ifdef DAMARIS_SUPPORT
+   call history_write_damaris('STATE',0)
+#else
+   call history_write('STATE')
+#endif
   write(io6,'(/,a)') 'CKPT 4'
 endif
 

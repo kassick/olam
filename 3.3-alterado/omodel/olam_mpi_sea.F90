@@ -37,16 +37,14 @@
 ! or Roni Avissar (avissar@duke.edu).
 !===============================================================================
 
-#ifndef OLAM_COMM_WORLD
-#define OLAM_COMM_WORLD MPI_COMM_WORLD
-#endif
 
 
 subroutine olam_alloc_mpi_sea(mrls)
 
 use mem_sea,    only: jtab_ws_mpi
 use mem_para,   only: nsends_ws, nsends_wsf, nrecvs_ws, nrecvs_wsf,  &
-                      send_ws, send_wsf, recv_ws, recv_wsf
+                      send_ws, send_wsf, recv_ws, recv_wsf, &
+		       OLAM_COMM_WORLD
 use mem_sflux,  only: seaflux, jseaflux
 use misc_coms,  only: io6
 use rastro_evts
@@ -261,7 +259,7 @@ subroutine mpi_send_ws(sendgroup)
 ! of field variables
 
 use mem_sea,    only: sea, itab_ws, jtab_ws_mpi
-use mem_para,   only: nrecvs_ws, nsends_ws, send_ws, recv_ws
+use mem_para,   only: nrecvs_ws, nsends_ws, send_ws, recv_ws, OLAM_COMM_WORLD
 use misc_coms,  only: io6
 
 implicit none
@@ -357,7 +355,7 @@ subroutine mpi_send_wsf(sendgroup,mrl)
 ! Subroutine to perform a parallel MPI send of a "WSF group"
 ! of field variables
 
-use mem_para,   only: nrecvs_wsf, nsends_wsf, send_wsf, recv_wsf
+use mem_para,   only: nrecvs_wsf, nsends_wsf, send_wsf, recv_wsf, OLAM_COMM_WORLD
 use mem_sflux,  only: seaflux, jseaflux
 use misc_coms,  only: io6
 
@@ -480,7 +478,7 @@ subroutine mpi_recv_ws(recvgroup)
 ! of field variables
 
 use mem_sea,    only: sea, itabg_ws
-use mem_para,   only: nsends_ws, nrecvs_ws, send_ws, recv_ws, myrank
+use mem_para,   only: nsends_ws, nrecvs_ws, send_ws, recv_ws, myrank, OLAM_COMM_WORLD
 use misc_coms,  only: io6
 
 implicit none
@@ -570,7 +568,7 @@ subroutine mpi_recv_wsf(recvgroup,mrl)
 ! Subroutine to perform a parallel MPI receive of a "WSF group"
 ! of field variables
 
-use mem_para,   only: nsends_wsf, nrecvs_wsf, send_wsf, recv_wsf
+use mem_para,   only: nsends_wsf, nrecvs_wsf, send_wsf, recv_wsf, OLAM_COMM_WORLD
 use mem_sflux,  only: seaflux, seafluxg
 use misc_coms,  only: io6
 

@@ -425,6 +425,7 @@ $(ARC)($(OMODEL)/ocio.o): \
 $(ARC)($(OMODEL)/ocio_damaris.o): \
                      $(ARC)($(MODEL_MODS)/misc_coms.o)  \
                      $(ARC)($(MODEL_MODS)/mem_grid.o)  \
+		     $(ARC)($(OMODEL)/damaris_helper.o) \
                      $(ARC)($(LEAF)/leaf_coms.o)
 
 $(ARC)($(OMODEL)/analysis_write.o): \
@@ -437,6 +438,7 @@ $(ARC)($(OMODEL)/history_write.o): \
 		     $(ARC)($(MODEL_MODS)/rastro_evts.o)
 
 $(ARC)($(OMODEL)/history_write_damaris.o): \
+		     $(ARC)($(OMODEL)/damaris_helper.o) \
 		     $(ARC)($(MODEL_MODS)/rastro_evts.o)
 
 $(ARC)($(OMODEL)/history_start.o): \

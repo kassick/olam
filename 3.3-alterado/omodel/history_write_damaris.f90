@@ -1,51 +1,54 @@
-!===============================================================================
-! OLAM version 3.3
+  !===============================================================================
+  ! OLAM version 3.3
 
-! Copyright (C) 2002-2008; All Rights Reserved; 
-! Duke University, Durham, North Carolina, USA 
+  ! Copyright (C) 2002-2008; All Rights Reserved; 
+  ! Duke University, Durham, North Carolina, USA 
 
-! Portions of this software are copied or derived from the RAMS software
-! package.  The following copyright notice pertains to RAMS and its derivatives,
-! including OLAM:  
+  ! Portions of this software are copied or derived from the RAMS software
+  ! package.  The following copyright notice pertains to RAMS and its derivatives,
+  ! including OLAM:  
 
-   !----------------------------------------------------------------------------
-   ! Copyright (C) 1991-2006  ; All Rights Reserved ; Colorado State University; 
-   ! Colorado State University Research Foundation ; ATMET, LLC 
+     !----------------------------------------------------------------------------
+     ! Copyright (C) 1991-2006  ; All Rights Reserved ; Colorado State University; 
+     ! Colorado State University Research Foundation ; ATMET, LLC 
 
-   ! This software is free software; you can redistribute it and/or modify it 
-   ! under the terms of the GNU General Public License as published by the Free
-   ! Software Foundation; either version 2 of the License, or (at your option)
-   ! any later version. 
+     ! This software is free software; you can redistribute it and/or modify it 
+     ! under the terms of the GNU General Public License as published by the Free
+     ! Software Foundation; either version 2 of the License, or (at your option)
+     ! any later version. 
 
-   ! This software is distributed in the hope that it will be useful, but
-   ! WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   ! or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   ! for more details.
- 
-   ! You should have received a copy of the GNU General Public License along
-   ! with this program; if not, write to the Free Software Foundation, Inc.,
-   ! 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA 
-   ! (http://www.gnu.org/licenses/gpl.html) 
-   !----------------------------------------------------------------------------
+     ! This software is distributed in the hope that it will be useful, but
+     ! WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+     ! or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+     ! for more details.
+   
+     ! You should have received a copy of the GNU General Public License along
+     ! with this program; if not, write to the Free Software Foundation, Inc.,
+     ! 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA 
+     ! (http://www.gnu.org/licenses/gpl.html) 
+     !----------------------------------------------------------------------------
 
-! It is requested that any scientific publications based on application of OLAM
-! include the following acknowledgment:  "OLAM was developed at the 
-! Edmund T. Pratt Jr. School of Engineering, Duke University."
+  ! It is requested that any scientific publications based on application of OLAM
+  ! include the following acknowledgment:  "OLAM was developed at the 
+  ! Edmund T. Pratt Jr. School of Engineering, Duke University."
 
-! For additional information, including published references, please contact
-! the software authors, Robert L. Walko (robert.walko@duke.edu)
-! or Roni Avissar (avissar@duke.edu).
-!===============================================================================
+  ! For additional information, including published references, please contact
+  ! the software authors, Robert L. Walko (robert.walko@duke.edu)
+  ! or Roni Avissar (avissar@duke.edu).
+  !===============================================================================
 
 #ifdef DAMARIS_SUPPORT
-subroutine history_write_damaris(vtype,iteration)
 
-use var_tables, only: num_var, vtab_r
-use misc_coms,  only: io6, ioutput, hfilepref, time8, iyear1, imonth1, idate1, &
-                      itime1, iclobber, iparallel
+#warning 'USING HISTORY-WRITE with DAMARIS'
+  subroutine history_write_damaris(vtype,iteration)
+
+  use var_tables, only: num_var, vtab_r
+  use misc_coms,  only: io6, ioutput, hfilepref, time8, iyear1, imonth1, idate1, &
+			itime1, iclobber, iparallel
 use hdf5_utils, only: shdf5_orec, shdf5_open, shdf5_close
 use mem_para,   only: myrank
 use rastro_evts
+use damaris_helper
 
 implicit none
 
@@ -58,7 +61,7 @@ character(len=128) :: hnamel
 character(len=32)  :: varn
 character(len=10)  :: post
 logical            :: exans
-integer            :: nv, nvcnt, ndims, idims(3), sdims(3)
+integer            :: nv, nvcnt, ndims, idims(3), sdims(3), ierr
 real, external :: walltime
 character(len=10)  :: action
 
@@ -161,7 +164,9 @@ enddo
 
 !       call shdf5_close()
 
-call df_signal("history_write")
+write (io6,*) "calling history_write in damaris, iteration=",iteration
+call df_signal("history_write", iteration, ierr)
+write (io6,*) "called history_write in damaris, err=", ierr
 
 ! Comment out following call (Martin includes grid info in history file)
 

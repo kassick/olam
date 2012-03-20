@@ -40,8 +40,11 @@
 
 #ifdef DAMARIS_SUPPORT
 
+#warning 'COMMIO -- using damaris version'
 
-subroutine commio_dammaris(action,iteration)
+
+subroutine commio_damaris(action,iteration)
+use damaris_helper
 
 ! THIS ROUTINE READS OR WRITES NON-HORIZONTALLY VARYING FIELDS
 ! THAT ARE COMMON TO ALL PROCESSES. CALL THIS ROUTINE WITH
@@ -59,8 +62,7 @@ use leaf_coms,  only: nzg, nzs, slz, ivegflg, isfcl
 implicit none
 integer          :: ndims, idims(2), sdims(2), k
 character(len=*) :: action
-integer, intent=(in) :: iteration
-integer,allocatable        :: sdims(:)
+integer :: iteration
 
   if (trim(action) == 'READ') then
     stop 'BAD IMPLEMENTATION -- Damaris still does not support read primitives'
@@ -124,72 +126,9 @@ idims(1) = 1
 call damaris_io(action,iteration, ndims, sdims, idims, 'time8', dvars=time8)
 
 return
-end subroutine commio_dammaris
+end subroutine commio_damaris
 
 
-subroutine damaris_io(action, iteration, ndims, sdims, dims, dsetname &
-                                              ,ivara,rvara,cvara,dvara,lvara  &
-                                              ,ivars,rvars,cvars,dvars,lvars)
-  implicit none
-
-
-  character(len=*)           :: dsetname, action
-  integer                    :: ndims, dims(*), sdims(*)
-  integer,          optional :: ivara(*), ivars
-  real,             optional :: rvara(*), rvars
-  character(len=*), optional :: cvara(*), cvars
-  real(kind=8),     optional :: dvara(*), dvars
-  logical,          optional :: lvara(*), lvars
-
-  integer*2                  :: chunk_handle
-  integer                    :: err
-
-
-  ! damaris requires a start and end dimensions; we only need to say it begins
-  ! in 0 and ends in the values of dims vector
-
-
-  call df_chunk_set(ndims,sdims,dims, chunk_handle)
-
-  if chunck_handle = 0 then
-    stop 'ERROR: Damaris Chunk Handle is 0'
-  endif
-
-
-  ! now write it out
-  if(present(ivars)) then 
-      df_chunk_write(chunk_handle, dsetname, iteration, ivars, err)
-  elseif(present(rvars)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, rvars, err)
-  elseif(present(cvars)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, cvars, err)
-  elseif(present(dvars)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, dvars, err)
-  elseif(present(lvars)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, lvars, err)
-  elseif(present(ivara)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, ivara, err)
-  elseif(present(rvara)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, rvara, err)
-  elseif(present(cvara)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, cvara, err)
-  elseif(present(dvara)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, dvara, err)
-  elseif(present(lvara)) then
-      df_chunk_write(chunk_handle, dsetname, iteration, lvara, err)
-  else
-     print*,'Incorrect or missing data field argument in damaris_io'
-     stop 'damaris_io: bad data field'
-  endif
-
-
-  if err < 0 then
-    print (io6,*) 'error writing damaris variable ', dsetname
-    stop 'error writing variable'
-  endif
-
-
-end subroutine damaris_io
 
 #endif
 

@@ -101,6 +101,7 @@ OBJ = $(ARC)($(MODEL_MODS)/max_dims.o) \
       $(ARC)($(OMODEL)/timestep.o) \
       $(ARC)($(OMODEL)/ocio.o) \
       $(ARC)($(OMODEL)/ocio_damaris.o) \
+      $(ARC)($(OMODEL)/damaris_helper.o) \
       $(ARC)($(OMODEL)/history_write.o) \
       $(ARC)($(OMODEL)/history_write_damaris.o) \
       $(ARC)($(OMODEL)/history_start.o) \

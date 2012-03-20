@@ -37,9 +37,6 @@
 ! or Roni Avissar (avissar@duke.edu).
 !===============================================================================
 
-#ifndef OLAM_COMM_WORLD
-#define OLAM_COMM_WORLD MPI_COMM_WORLD
-#endif
 
 
 subroutine olam_mpi_init()
@@ -48,7 +45,8 @@ use mem_para,  only: mgroupsize, myrank,                    &
                      send_u, send_w, send_uf,               &
                      recv_u, recv_w, recv_uf,               &
                      send_wl, send_wlf, send_ws, send_wsf,  &
-                     recv_wl, recv_wlf, recv_ws, recv_wsf
+                     recv_wl, recv_wlf, recv_ws, recv_wsf,   &
+		     OLAM_COMM_WORLD
 
 use misc_coms, only: io6, iparallel
 
@@ -59,23 +57,37 @@ implicit none
 include 'mpif.h'
 integer :: ierr
 #ifdef DAMARIS
-  integer :: new_myrank,new_mygroupsize,new_comm
-  integer :: df_start_result, is_client, config_size
+  integer :: new_comm
+  integer :: is_client
 #endif
 
 
 ! Initialize MPI and determine process groupsize and myrank
 
 call MPI_Init(ierr)
-call MPI_Comm_size(OLAM_COMM_WORLD,mgroupsize,ierr)
-call MPI_Comm_rank(OLAM_COMM_WORLD,myrank,ierr)
+!call MPI_Comm_size(OLAM_COMM_WORLD,mgroupsize,ierr)
+!call MPI_Comm_rank(OLAM_COMM_WORLD,myrank,ierr)
 
 #ifdef DAMARIS
 #warning "ENABLE DAMARIS!!!"
-  call df_start_mpi_entity("config.xml",new_comm,new_myrank, new_mygroupsize, df_start_result)
+
+  print *, "starting damaris"
+  new_comm = MPI_COMM_WORLD
+  call df_start_mpi_entity('olam.xml',MPI_COMM_WORLD,is_client)
+
+  if (is_client.LE.0) then
+    ! i'm server
+    print *,"I was a server!"
+    call MPI_Finalize(ierr)
+    stop 'I was server, quitting and cleaning'
+  endif
 
 
-  print *, "Damaris Init: result=",df_start_result, "new rank=", new_myrank, "new size=", new_mygroupsize
+  call df_get_entity_comm(OLAM_COMM_WORLD)
+  call MPI_Comm_size(OLAM_COMM_WORLD,mgroupsize,ierr)
+  call MPI_Comm_rank(OLAM_COMM_WORLD,myrank,ierr)
+  
+  print *, "Damaris Init: result=",is_client, "new rank=", myrank, "new size=", mgroupsize
 
 #else
 #warning "Disabled Damaris!!!"
@@ -120,7 +132,8 @@ subroutine olam_mpi_finalize()
 use mem_para, only: send_u, send_w, recv_u,                &
                     recv_w, send_uf, recv_uf,              &
                     send_wl, send_wlf, send_ws, send_wsf,  &
-                    recv_wl, recv_wlf, recv_ws, recv_wsf
+                    recv_wl, recv_wlf, recv_ws, recv_wsf, &
+		    OLAM_COMM_WORLD
 
 implicit none
 
@@ -129,6 +142,8 @@ implicit none
 include 'mpif.h'
 integer :: ierr
 
+call df_kill_server(ierr)
+call df_finalize(ierr)
 call MPI_Finalize(ierr)
 
 if (allocated(send_u))  deallocate(send_u)
@@ -160,7 +175,8 @@ subroutine olam_alloc_mpi(mza,mrls)
 
 use mem_ijtabs, only: jtab_u, jtab_w
 use mem_para,   only: myrank, nrecvs_u, nrecvs_w, nsends_u, nsends_w,  &
-                      recv_u, recv_w, recv_uf, send_u, send_w, send_uf
+                      recv_u, recv_w, recv_uf, send_u, send_w, send_uf, &
+		      OLAM_COMM_WORLD
 use misc_coms,  only: io6
 use var_tables, only: nvar_par
 use rastro_evts
@@ -456,7 +472,8 @@ subroutine mpi_send_u(sendgroup)
 ! of field variables
 
 use mem_basic,  only: umc,uc
-use mem_para,   only: send_u, recv_u, nsends_u, nrecvs_u
+use mem_para,   only: send_u, recv_u, nsends_u, nrecvs_u, &
+		      OLAM_COMM_WORLD
 use mem_ijtabs, only: itab_u, jtab_u, mrl_begs, istp
 use mem_grid,   only: mza
 use misc_coms,  only: io6
@@ -544,7 +561,8 @@ subroutine mpi_send_uf(hcnum_u,hcnum_w,hflux_t)
 ! Subroutine to perform a parallel MPI send of a "U group"
 ! of field variables
 
-use mem_para,   only: send_uf, recv_uf, nsends_u, nrecvs_u
+use mem_para,   only: send_uf, recv_uf, nsends_u, nrecvs_u, &
+			OLAM_COMM_WORLD
 use mem_ijtabs, only: jtab_u, itab_u, mrl_begs, istp
 use mem_grid,   only: mza, mua
 use misc_coms,  only: io6
@@ -640,7 +658,7 @@ use mem_ijtabs, only: jtab_w, itab_w, mrl_begs, mrl_begl, istp
 use mem_grid,   only: mza, mwa
 use misc_coms,  only: io6
 use micro_coms, only: level
-use mem_para,   only: nrecvs_w, nsends_w, recv_w, send_w
+use mem_para,   only: nrecvs_w, nsends_w, recv_w, send_w, OLAM_COMM_WORLD
 
 implicit none
 
@@ -783,7 +801,7 @@ subroutine mpi_recv_u(recvgroup)
 ! of field variables
 
 use mem_basic,  only: umc,uc
-use mem_para,   only: send_u, recv_u, nsends_u, nrecvs_u, mgroupsize
+use mem_para,   only: send_u, recv_u, nsends_u, nrecvs_u, mgroupsize, OLAM_COMM_WORLD
 use mem_ijtabs, only: itabg_u, mrl_begs, istp
 use mem_grid,   only: mza
 use misc_coms,  only: io6
@@ -865,7 +883,7 @@ subroutine mpi_recv_uf(hcnum_u,hcnum_w,hflux_t)
 ! Subroutine to perform a parallel MPI receive of a "U group"
 ! of field variables
 
-use mem_para,   only: send_uf, recv_uf, nsends_u, nrecvs_u, mgroupsize
+use mem_para,   only: send_uf, recv_uf, nsends_u, nrecvs_u, mgroupsize, OLAM_COMM_WORLD
 use mem_ijtabs, only: mrl_begs, itabg_u, istp
 use mem_grid,   only: mza, mua
 use misc_coms,  only: io6
@@ -950,7 +968,7 @@ subroutine mpi_recv_w(recvgroup,wmarw)
 use mem_basic,  only: wmc,wc,thil,rho,press
 use mem_turb,   only: hkm,vkm,vkm_sfc
 use var_tables, only: vtab_par, nvar_par
-use mem_para,   only: nrecvs_w, nsends_w, recv_w, send_w, mgroupsize
+use mem_para,   only: nrecvs_w, nsends_w, recv_w, send_w, mgroupsize, OLAM_COMM_WORLD
 use mem_ijtabs, only: itabg_w, mrl_begs, mrl_begl, istp
 use mem_grid,   only: mza, mwa
 use misc_coms,  only: io6
@@ -1086,7 +1104,7 @@ end subroutine mpi_recv_w
 !=============================================================================
 
 subroutine olam_stop(message)
-use mem_para,  only: myrank
+use mem_para,  only: myrank, OLAM_COMM_WORLD
 implicit none
 
 #ifdef OLAM_MPI
