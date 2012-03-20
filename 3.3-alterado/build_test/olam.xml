@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulation xmlns="http://damaris.gforge.inria.fr/Damaris/Model" language="fortran" name="dummy">
+  <architecture>
+    <cores count="8">
+      <clients count="7"/>
+    </cores>
+    <buffer name="b1 " size="134217728"/>
+    <queue name="q1 " size="134217728"/>
+  </architecture>
+  <data>
+    <!--Define parameters and dimensions here if necessary-->
+    <layout dimensions="?" name="float_nodims" type="float"/>
+    <layout dimensions="?" name="int_nodims" type="int"/>
+    <layout dimensions="?" name="double_nodims" type="double"/>
+    <variable layout="int_nodims" name="nl%itime1">no description available</variable>
+    <variable layout="int_nodims" name="nl%idate1">no description available</variable>
+    <variable layout="int_nodims" name="nl%imonth1">no description available</variable>
+    <variable layout="int_nodims" name="nl%iyear1">no description available</variable>
+    <variable layout="int_nodims" name="nl%ngrids">no description available</variable>
+    <variable layout="int_nodims" name="nl%nzp">no description available</variable>
+    <variable layout="int_nodims" name="nl%nzg">no description available</variable>
+    <variable layout="int_nodims" name="nl%nzs">no description available</variable>
+    <variable layout="int_nodims" name="nl%nxp">no description available</variable>
+    <variable layout="int_nodims" name="nl%mdomain">no description available</variable>
+    <variable layout="int_nodims" name="nl%isfcl">no description available</variable>
+    <variable layout="int_nodims" name="nl%itopoflg">no description available</variable>
+    <variable layout="int_nodims" name="nl%ivegflg">no description available</variable>
+    <variable layout="float_nodims" name="nl%deltax">no description available</variable>
+    <variable layout="float_nodims" name="nl%deltaz">no description available</variable>
+    <variable layout="float_nodims" name="nl%dzrat">no description available</variable>
+    <variable layout="float_nodims" name="nl%dzmax">no description available</variable>
+    <variable layout="float_nodims" name="nl%zbase">no description available</variable>
+    <variable layout="float_nodims" name="nl%centlat">no description available</variable>
+    <variable layout="float_nodims" name="nl%centlon">no description available</variable>
+    <variable layout="float_nodims" name="nl%grdlen">no description available</variable>
+    <variable layout="float_nodims" name="nl%grdwid">no description available</variable>
+    <variable layout="float_nodims" name="nl%grdaxis">no description available</variable>
+    <variable layout="float_nodims" name="nl%slz">no description available</variable>
+    <variable layout="double_nodims" name="time8">no description available</variable>
+
+
+
+
+    <variable layout="float_nodims" name="THSRCSH">no description available</variable>
+    <variable layout="float_nodims" name="ACONPR">no description available</variable>
+    <variable layout="float_nodims" name="THIL">no description available</variable>
+    <variable layout="int_nodims" name="IWGLOBE_L">no description available</variable>
+    <variable layout="int_nodims" name="IWGLOBE_S">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SFCWATER_ENERGY">no description available</variable>
+    <variable layout="float_nodims" name="FTHRD_LW">no description available</variable>
+    <variable layout="float_nodims" name="ALBEDT">no description available</variable>
+    <variable layout="float_nodims" name="SEA%RLONG_ALBEDO">no description available</variable>
+    <variable layout="int_nodims" name="IUGLOBE_S">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SURFACE_SSH">no description available</variable>
+    <variable layout="double_nodims" name="PRESS">no description available</variable>
+    <variable layout="float_nodims" name="LAND%QPCPG">no description available</variable>
+    <variable layout="float_nodims" name="LANDFLUX%SFLUXT">no description available</variable>
+    <variable layout="float_nodims" name="LANDFLUX%SFLUXR">no description available</variable>
+    <variable layout="float_nodims" name="LAND%CAN_SHV">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RSHORT_DIFFUSE">no description available</variable>
+    <variable layout="float_nodims" name="VKM">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SOIL_WATER">no description available</variable>
+    <variable layout="float_nodims" name="LAND%CAN_TEMP">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SXFER_R">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SXFER_T">no description available</variable>
+    <variable layout="float_nodims" name="LAND%DPCPG">no description available</variable>
+    <variable layout="float_nodims" name="SEAFLUX%SFLUXR">no description available</variable>
+    <variable layout="int_nodims" name="LANDFLUX%IWRANK">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RLONGUP">no description available</variable>
+    <variable layout="float_nodims" name="SEAFLUX%SFLUXT">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RSHORT_S">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RSHORT_V">no description available</variable>
+    <variable layout="int_nodims" name="IRANKW_L">no description available</variable>
+    <variable layout="float_nodims" name="SEA%SURFACE_SSH">no description available</variable>
+    <variable layout="float_nodims" name="CONPRR">no description available</variable>
+    <variable layout="int_nodims" name="IRANKW_S">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RSHORT_G">no description available</variable>
+    <variable layout="float_nodims" name="SEA%SEAICEC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%ROUGH">no description available</variable>
+    <variable layout="float_nodims" name="SEA%RSHORT_DIFFUSE">no description available</variable>
+    <variable layout="float_nodims" name="UC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%ALBEDO_DIFFUSE">no description available</variable>
+    <variable layout="float_nodims" name="SEA%SXFER_R">no description available</variable>
+    <variable layout="int_nodims" name="LAND%LSL">no description available</variable>
+    <variable layout="float_nodims" name="SEA%SXFER_T">no description available</variable>
+    <variable layout="float_nodims" name="HKM">no description available</variable>
+    <variable layout="float_nodims" name="SH_V">no description available</variable>
+    <variable layout="float_nodims" name="SH_W">no description available</variable>
+    <variable layout="float_nodims" name="UMC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SNOWFAC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%STOM_RESIST">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RLONG">no description available</variable>
+    <variable layout="int_nodims" name="SEAFLUX%IWRANK">no description available</variable>
+    <variable layout="float_nodims" name="SH_C">no description available</variable>
+    <variable layout="float_nodims" name="USTAR">no description available</variable>
+    <variable layout="int_nodims" name="IMGLOBE">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SFCWATER_DEPTH">no description available</variable>
+    <variable layout="float_nodims" name="LAND%CAN_DEPTH">no description available</variable>
+    <variable layout="float_nodims" name="RLONGUP">no description available</variable>
+    <variable layout="float_nodims" name="VKM_SFC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_FRACAREA">no description available</variable>
+    <variable layout="float_nodims" name="RTSRC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_ROUGH">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_HEIGHT">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RLONG_G">no description available</variable>
+    <variable layout="float_nodims" name="SEA%ALBEDO_DIFFUSE">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SOIL_ENERGY">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_TEMP">no description available</variable>
+    <variable layout="float_nodims" name="SEA%SEATC">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RLONG_S">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RLONG_V">no description available</variable>
+    <variable layout="float_nodims" name="FTHRD">no description available</variable>
+    <variable layout="int_nodims" name="IRANKU_L">no description available</variable>
+    <variable layout="float_nodims" name="WC">no description available</variable>
+    <variable layout="int_nodims" name="IRANKU_S">no description available</variable>
+    <variable layout="float_nodims" name="LAND%GROUND_SHV">no description available</variable>
+    <variable layout="float_nodims" name="SXFER_RK">no description available</variable>
+    <variable layout="float_nodims" name="SEA%RSHORT">no description available</variable>
+    <variable layout="float_nodims" name="SEA%CAN_DEPTH">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_WATER">no description available</variable>
+    <variable layout="int_nodims" name="IUGLOBE">no description available</variable>
+    <variable layout="float_nodims" name="SFLUX_T">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VF">no description available</variable>
+    <variable layout="float_nodims" name="SFLUX_R">no description available</variable>
+    <variable layout="int_nodims" name="IRANKU">no description available</variable>
+    <variable layout="float_nodims" name="THSRC">no description available</variable>
+    <variable layout="int_nodims" name="IRANKW">no description available</variable>
+    <variable layout="float_nodims" name="WMC">no description available</variable>
+    <variable layout="int_nodims" name="SEAFLUX%ISFGLOBE">no description available</variable>
+    <variable layout="float_nodims" name="LAND%PCPG">no description available</variable>
+    <variable layout="int_nodims" name="IUGLOBE_L">no description available</variable>
+    <variable layout="float_nodims" name="SEA%QPCPG">no description available</variable>
+    <variable layout="int_nodims" name="IWGLOBE">no description available</variable>
+    <variable layout="int_nodims" name="IMGLOBE_S">no description available</variable>
+    <variable layout="float_nodims" name="VKH">no description available</variable>
+    <variable layout="int_nodims" name="LAND%NTEXT_SOIL">no description available</variable>
+    <variable layout="int_nodims" name="IMGLOBE_L">no description available</variable>
+    <variable layout="float_nodims" name="LAND%ALBEDO_BEAM">no description available</variable>
+    <variable layout="float_nodims" name="SEA%CAN_TEMP">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_ALBEDO">no description available</variable>
+    <variable layout="float_nodims" name="SEA%DPCPG">no description available</variable>
+    <variable layout="float_nodims" name="UMP">no description available</variable>
+    <variable layout="float_nodims" name="SEA%PCPG">no description available</variable>
+    <variable layout="float_nodims" name="RSHORT">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_TAI">no description available</variable>
+    <variable layout="float_nodims" name="SEA%RLONG">no description available</variable>
+    <variable layout="float_nodims" name="SEA%ROUGH">no description available</variable>
+    <variable layout="int_nodims" name="LAND%NLEV_SFCWATER">no description available</variable>
+    <variable layout="float_nodims" name="SEA%CAN_SHV">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_LAI">no description available</variable>
+    <variable layout="float_nodims" name="RTSRCSH">no description available</variable>
+    <variable layout="float_nodims" name="SEA%ALBEDO_BEAM">no description available</variable>
+    <variable layout="float_nodims" name="SXFER_TK">no description available</variable>
+    <variable layout="float_nodims" name="THETA">no description available</variable>
+    <variable layout="float_nodims" name="SEA%RLONGUP">no description available</variable>
+    <variable layout="float_nodims" name="LAND%HCAPVEG">no description available</variable>
+    <variable layout="int_nodims" name="LANDFLUX%ILFGLOBE">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RLONG_ALBEDO">no description available</variable>
+    <variable layout="float_nodims" name="LAND%SFCWATER_MASS">no description available</variable>
+    <variable layout="float_nodims" name="COSZ">no description available</variable>
+    <variable layout="float_nodims" name="LAND%RSHORT">no description available</variable>
+    <variable layout="float_nodims" name="RLONG">no description available</variable>
+    <variable layout="double_nodims" name="RHO">no description available</variable>
+    <variable layout="float_nodims" name="LAND%VEG_NDVIC">no description available</variable>
+  </data>
+  <actions>
+    <script name="history_write" file="script.py" language="python" />
+  </actions>
+</simulation>
